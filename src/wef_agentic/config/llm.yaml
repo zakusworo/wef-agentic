@@ -1,0 +1,68 @@
+# LLM provider configuration per agent
+# Provider opsi: "ollama-local" | "ollama-cloud" | "claude-agent-sdk"
+#
+# Setiap agent boleh punya 3 field model:
+#   - model_local      : dipakai jika provider=ollama-local
+#   - model            : dipakai jika provider=ollama-cloud (default/legacy)
+#   - model_claude     : dipakai jika provider=claude-agent-sdk
+#
+# Runtime override (priority tertinggi):
+#   WEF_AGENTIC_PROVIDER_OVERRIDE — force semua agen pakai provider tertentu
+#   WEF_AGENTIC_MODEL_OVERRIDE    — force semua agen pakai model tertentu
+
+defaults:
+  provider: ollama-cloud
+  model: deepseek-v4-pro:cloud
+  model_local: gemma4:e4b
+  model_claude: claude-sonnet-4-6
+  max_tokens: 2048
+  temperature: 0.2
+
+agents:
+  coordinator:
+    provider: ollama-cloud
+    model: deepseek-v4-pro:cloud
+    model_local: gemma4:e4b
+    model_claude: claude-opus-4-7
+    max_tokens: 3000
+    temperature: 0.3
+
+  water:
+    provider: ollama-cloud
+    model: deepseek-v4-pro:cloud
+    model_local: gemma4:e4b
+    model_claude: claude-sonnet-4-6
+    max_tokens: 2048
+    temperature: 0.2
+
+  energy:
+    provider: ollama-cloud
+    model: deepseek-v4-pro:cloud
+    model_local: gemma4:e4b
+    model_claude: claude-sonnet-4-6
+    max_tokens: 2048
+    temperature: 0.2
+
+  food:
+    provider: ollama-cloud
+    model: deepseek-v4-pro:cloud
+    model_local: gemma4:e4b
+    model_claude: claude-sonnet-4-6
+    max_tokens: 2048
+    temperature: 0.2
+
+  critic:
+    provider: ollama-cloud
+    model: kimi-k2.6:cloud
+    model_local: gemma4:e4b
+    model_claude: claude-opus-4-7
+    max_tokens: 3000
+    temperature: 0.1
+
+# Nexus footprint estimation constants (WEF 2026b proxies)
+footprint:
+  kwh_per_1k_tokens: 0.0003
+  water_l_per_1k_tokens: 0.005
+  co2_kg_per_kwh: 0.4
+  ollama_cloud_flat_monthly_usd: 20
+  amortization_runs_per_month: 1000
