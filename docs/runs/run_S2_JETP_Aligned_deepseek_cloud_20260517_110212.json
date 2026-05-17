@@ -1,0 +1,65 @@
+{
+  "timestamp_utc": "2026-05-17T11:02:12.413607+00:00",
+  "scenario": {
+    "id": "S2_JETP_Aligned",
+    "name": "S2 — JETP-Aligned 2030",
+    "location": "sleman"
+  },
+  "provider_override": "ollama-cloud",
+  "agents": [
+    {
+      "name": "water",
+      "provider": "ollama-cloud",
+      "model": "deepseek-v4-pro:cloud",
+      "tokens_in": 2025,
+      "tokens_out": 1469,
+      "tool_calls": 3
+    },
+    {
+      "name": "energy",
+      "provider": "ollama-cloud",
+      "model": "deepseek-v4-pro:cloud",
+      "tokens_in": 1224,
+      "tokens_out": 1249,
+      "tool_calls": 3
+    },
+    {
+      "name": "food",
+      "provider": "ollama-cloud",
+      "model": "deepseek-v4-pro:cloud",
+      "tokens_in": 1536,
+      "tokens_out": 1591,
+      "tool_calls": 3
+    },
+    {
+      "name": "critic",
+      "provider": "ollama-cloud",
+      "model": "kimi-k2.6:cloud",
+      "tokens_in": 2697,
+      "tokens_out": 3000,
+      "tool_calls": 0
+    },
+    {
+      "name": "coordinator",
+      "provider": "ollama-cloud",
+      "model": "deepseek-v4-pro:cloud",
+      "tokens_in": 2443,
+      "tokens_out": 2579,
+      "tool_calls": 0
+    }
+  ],
+  "timings_sec": {
+    "phase1_parallel_domain": 31.11,
+    "phase2_critic": 130.28,
+    "phase3_coordinator": 47.87,
+    "total": 209.26
+  },
+  "footprint": {
+    "total_tokens": 19813,
+    "energy_kwh": 0.005943899999999999,
+    "water_l": 0.099065,
+    "co2_kg": 0.00237756
+  },
+  "coordinator_preview": "**Ringkasan Eksekutif**\n\nSkenario JETP-Aligned 2030 di Kabupaten Sleman menunjukkan adanya tekanan silang (trade-off) yang signifikan antara ketahanan air, energi, dan pangan. Meskipun secara tahunan neraca air masih surplus, defisit musim kemarau yang melebar akibat penurunan presipitasi dan kenaikan suhu akan meningkatkan kebutuhan irigasi suplementer hingga 209 mm. Pada saat yang sama, produksi padi diproyeksikan turun 5% akibat penyusutan lahan dan cekaman air (water stress 7%), meskipun swasembada pangan lokal masih terjaga. Di sisi energi, permintaan listrik tumbuh 26% dan target bauran energi terbarukan 34% berpotensi meningkatkan ketergantungan pada pembangkit listrik tenaga air yang debitnya justru terancam oleh defisit musiman. Ketiga sektor bertemu pada titik kritis: peningkatan pemompaan air tanah untuk irigasi dan pasokan listrik berbasis hidro akan memperdalam krisis air tanah di Sleman Tengah-Selatan, sementara alih fungsi lahan yang terus berlangsung menggerus basis produksi pangan. Temuan ini bersifat indikatif karena model yang digunakan masih sederhana dan belum menangkap variabilitas spasial, dinamika air tanah, serta intervensi adaptif.\n\n**Temuan Utama (Bullet-Point Findings)**\n\n- **Trade-off Air–Pangan:** Defisit air musim kemarau 135,9 mm memicu kebutuhan irigasi 209,1 mm. Jika dipenuhi dengan pemompaan air tanah, krisis air tanah di Sleman Tengah-Selatan akan memburuk. Produksi padi turun 5% (239.315 ton) akibat water stress dan penyusutan lahan, namun",
+  "critic_preview": ""
+}

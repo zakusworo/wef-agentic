@@ -281,8 +281,13 @@ python tests/smoke_no_llm.py
 # Single agent via Ollama local
 python tests/smoke_llm.py
 
-# Full 5-agen pipeline Sleman fixture
+# Full 5-agen pipeline Sleman fixture (llama3.2:1b lokal, ~10 menit)
 python tests/smoke_e2e_sleman.py
+
+# Production-grade run via Ollama Cloud (deepseek-v4-pro + kimi-k2.6)
+# Butuh OLLAMA_API_KEY di .env + WEF_AGENTIC_PROVIDER_OVERRIDE=ollama-cloud
+python tests/run_cloud_deepseek.py S2_JETP_Aligned
+# Output: docs/runs/run_<scenario>_deepseek_cloud_<timestamp>.{json,log}
 
 # Lint (RUF001/002 ignored untuk emoji/Indonesia)
 ruff check src/wef_agentic
@@ -299,7 +304,34 @@ Pipeline penuh 5 agen pakai cached fixture Sleman, tergantung model backend:
 |---|---:|---:|---:|---:|---:|
 | `llama3.2:1b` (local, smoke-only) | 18.9s | 414.9s | 145.5s | **579.3s** (~10 min) | 11,662 |
 | `gemma4:e4b` (local, production-grade) | *TBD* | *TBD* | *TBD* | *est. 60–120s* | — |
-| `deepseek-v4-pro:cloud` / `kimi-k2.6:cloud` (Ollama Cloud, 3-concurrent) | *TBD* | *TBD* | *TBD* | *est. 30–60s* | — |
+| `deepseek-v4-pro:cloud` (domain+coord) / `kimi-k2.6:cloud` (critic), Ollama Cloud 3-concurrent | **31.1s** | **130.3s** | **47.9s** | **209.3s** (~3.5 min) | **19,813** |
+
+#### Run Ollama Cloud — Deepseek v4 Pro + Kimi K2.6 (2026-05-17 10:58 UTC)
+
+Verifikasi pertama production run via Ollama Cloud (`tests/run_cloud_deepseek.py`).
+Raw output tersimpan di [`docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json`](docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json) + `.log`.
+
+| Agent | Model | Tokens (in / out) | Tool calls |
+|---|---|---:|---:|
+| water | `deepseek-v4-pro:cloud` | 2,025 / 1,469 | (parallel) |
+| energy | `deepseek-v4-pro:cloud` | 1,224 / 1,249 | (parallel) |
+| food | `deepseek-v4-pro:cloud` | 1,536 / 1,591 | (parallel) |
+| critic | `kimi-k2.6:cloud` | 2,697 / **3,000 (cap)** | 0 |
+| coordinator | `deepseek-v4-pro:cloud` | 2,443 / 2,579 | 0 |
+
+**Nexus footprint untuk run ini:** Total 19,813 tokens · 0.00594 kWh · 0.099 L air · 2.4 g CO₂eq.
+
+**Coordinator synthesis (preview):**
+
+> Skenario JETP-Aligned 2030 di Kabupaten Sleman menunjukkan adanya tekanan silang (trade-off) yang signifikan antara ketahanan air, energi, dan pangan. Meskipun secara tahunan neraca air masih surplus, defisit musim kemarau yang melebar akibat penurunan presipitasi dan kenaikan suhu akan meningkatkan kebutuhan irigasi suplementer hingga 209 mm. Pada saat yang sama, produksi padi diproyeksikan turun 5% akibat penyusutan lahan dan cekaman air (water stress 7%), meskipun swasembada pangan lokal masih terjaga. Di sisi energi, permintaan listrik tumbuh 26% dan target bauran energi terbarukan 34% berpotensi meningkatkan ketergantungan pada pembangkit listrik tenaga air yang debitnya justru terancam oleh defisit musiman.
+
+**Trade-off temuan (dari coordinator):** Defisit air kemarau 135,9 mm → kebutuhan irigasi 209,1 mm. Produksi padi turun 5% (239,315 ton) akibat water stress + penyusutan lahan; SSL pangan lokal masih terjaga. Demand listrik tumbuh 26%, target EBT 34% bergantung PLTA yang debit-nya terancam defisit musiman.
+
+**Catatan teknis (penting untuk runs berikutnya):**
+
+- **Critic (`kimi-k2.6:cloud`) menghabiskan seluruh 3,000 token output pada reasoning trace (`thinking` field) sehingga `content` kosong.** Untuk reasoning models, `max_tokens` di `config/llm.yaml` perlu dinaikkan (rekomendasi: 6,000–8,000 untuk critic) atau provider perlu di-update agar concatenate `thinking + content`. Coordinator (juga deepseek-v4-pro) tidak terkena karena prompt sintesisnya lebih spesifik dan output-nya lebih ringkas.
+- Phase 1 paralel benar-benar concurrent (3 agen Ollama Cloud 3-slot), bottleneck di Phase 2 (critic) — di iteration berikutnya bisa dipercepat dengan reasoning budget yang lebih besar atau model non-reasoning untuk critic.
+- Footprint kWh/L/CO₂eq tetap *order-of-magnitude proxy* (lihat caveat di section Nexus Footprint).
 
 > **Catatan:** `llama3.2:1b` adalah model smoke-only (verify pipeline jalan), bukan untuk output produksi. Untuk run produktif gunakan `gemma4:e4b` local atau Ollama Cloud (3 concurrent paralelisasi domain agents). Critic + Coordinator dominan saat token output panjang — bottleneck di model kecil.
 
