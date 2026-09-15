@@ -1,4 +1,13 @@
-"""Thornthwaite-Mather monthly water balance — simplified.
+"""Thornthwaite-Mather (1957) monthly water balance.
+
+Soil-moisture depletion follows the original exponential retention relation
+
+    S = C · exp(-APWL / C)
+
+where C is the soil water capacity and APWL the accumulated potential water loss
+(sum of negative P - PET since the soil was last at capacity). When no initial
+storage is given, the annual cycle is repeated until end-of-year storage
+converges ("spin-up"), so results do not depend on an arbitrary January state.
 
 Reference:
 - Thornthwaite, C.W. & Mather, J.R. (1957). Instructions and tables for computing
@@ -7,15 +16,63 @@ Reference:
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 
 import pandas as pd
+
+_MIN_STORAGE_MM = 1e-9
 
 
 @dataclass
 class WaterBalanceResult:
     monthly: pd.DataFrame      # P, ET0, ETa, surplus, deficit, soil_moisture per bulan
     annual_summary: dict       # totals + indices (surplus, deficit, P/ET ratio)
+
+
+def _apwl_from_storage(storage: float, cap: float) -> float:
+    """Invert S = C·exp(-APWL/C)."""
+    if storage >= cap:
+        return 0.0
+    return -cap * math.log(max(storage, _MIN_STORAGE_MM) / cap)
+
+
+def _step(p: float, pet: float, storage: float, apwl: float, cap: float):
+    """One monthly step. Returns (eta, surplus, deficit, new_storage, new_apwl)."""
+    p_minus_pet = p - pet
+    if p_minus_pet < 0:
+        # Dry month: storage decays exponentially with accumulated potential loss
+        apwl += -p_minus_pet
+        target = cap * math.exp(-apwl / cap)
+        withdrawal = min(max(storage - target, 0.0), -p_minus_pet)
+        new_storage = storage - withdrawal
+        eta = p + withdrawal
+        surplus = 0.0
+    else:
+        # Wet month: recharge storage, excess above capacity = surplus
+        new_storage = storage + p_minus_pet
+        surplus = max(0.0, new_storage - cap)
+        new_storage = min(new_storage, cap)
+        apwl = _apwl_from_storage(new_storage, cap)
+        eta = pet
+    deficit = pet - eta
+    return eta, surplus, deficit, new_storage, apwl
+
+
+def _spin_up_storage(
+    precip: list[float], pet: list[float], cap: float,
+    max_cycles: int = 50, tol_mm: float = 0.01,
+) -> float:
+    """Repeat the annual cycle from full capacity until end-of-cycle storage converges."""
+    storage = cap
+    for _ in range(max_cycles):
+        start = storage
+        apwl = _apwl_from_storage(storage, cap)
+        for p, e in zip(precip, pet, strict=True):
+            _, _, _, storage, apwl = _step(p, e, storage, apwl, cap)
+        if abs(storage - start) < tol_mm:
+            break
+    return storage
 
 
 def thornthwaite_mather(
@@ -28,7 +85,7 @@ def thornthwaite_mather(
     Args:
         monthly_df: DataFrame dengan kolom 'precip_mm', 'et0_mm', sorted chronologically
         soil_water_capacity_mm: kapasitas air tanah maksimum (default 150 mm untuk tanah loam)
-        initial_soil_water_mm: kondisi awal (default = full capacity)
+        initial_soil_water_mm: kondisi awal; None = spun-up steady state of the given cycle
 
     Returns:
         WaterBalanceResult dengan monthly trace + summary annual
@@ -37,44 +94,24 @@ def thornthwaite_mather(
     missing = required_cols - set(monthly_df.columns)
     if missing:
         raise ValueError(f"monthly_df missing columns: {missing}")
+    if soil_water_capacity_mm <= 0:
+        raise ValueError("soil_water_capacity_mm must be > 0")
 
     df = monthly_df.copy().reset_index(drop=True)
-    n = len(df)
-
-    storage = soil_water_capacity_mm if initial_soil_water_mm is None else initial_soil_water_mm
     cap = soil_water_capacity_mm
+    precip = [float(v) for v in df["precip_mm"]]
+    pet = [float(v) for v in df["et0_mm"]]
+
+    if initial_soil_water_mm is None:
+        storage = _spin_up_storage(precip, pet, cap)
+    else:
+        storage = min(max(float(initial_soil_water_mm), 0.0), cap)
+    initial_storage = storage
+    apwl = _apwl_from_storage(storage, cap)
 
     eta_list, surplus_list, deficit_list, sm_list = [], [], [], []
-
-    for i in range(n):
-        p = float(df.loc[i, "precip_mm"])
-        pet = float(df.loc[i, "et0_mm"])
-
-        # Step 1: net P - PET
-        p_minus_pet = p - pet
-
-        if p_minus_pet >= 0:
-            # Wet month: storage naik, kelebihan = surplus
-            new_storage = storage + p_minus_pet
-            if new_storage > cap:
-                surplus = new_storage - cap
-                new_storage = cap
-            else:
-                surplus = 0.0
-            eta = pet  # ET actual = ET potential di bulan basah
-            deficit = 0.0
-        else:
-            # Dry month: tarik dari storage
-            # Thornthwaite-Mather menggunakan eksponensial decay
-            # APWL (Accumulated Potential Water Loss) = sum negative P-PET sejak storage penuh
-            # Simplification: linear depletion
-            withdrawal = min(storage, abs(p_minus_pet))
-            new_storage = storage - withdrawal
-            eta = p + withdrawal  # ET actual = P + air dari storage
-            deficit = max(0.0, pet - eta)
-            surplus = 0.0
-
-        storage = new_storage
+    for p, e in zip(precip, pet, strict=True):
+        eta, surplus, deficit, storage, apwl = _step(p, e, storage, apwl, cap)
         eta_list.append(eta)
         surplus_list.append(surplus)
         deficit_list.append(deficit)
@@ -90,6 +127,7 @@ def thornthwaite_mather(
     total_eta = float(df["eta_mm"].sum())
     total_surplus = float(df["surplus_mm"].sum())
     total_deficit = float(df["deficit_mm"].sum())
+    storage_change = storage - initial_storage
 
     summary = {
         "total_precip_mm": total_p,
@@ -97,6 +135,10 @@ def thornthwaite_mather(
         "total_eta_mm": total_eta,
         "total_surplus_mm": total_surplus,
         "total_deficit_mm": total_deficit,
+        "initial_soil_water_mm": initial_storage,
+        "storage_change_mm": storage_change,
+        # P = ETa + surplus + ΔS must close; non-zero residual means a model bug
+        "mass_balance_residual_mm": total_p - total_eta - total_surplus - storage_change,
         "p_pet_ratio": (total_p / total_pet) if total_pet > 0 else float("nan"),
         "aridity_index": (total_pet / total_p) if total_p > 0 else float("inf"),
     }
@@ -126,7 +168,7 @@ def scenario_apply_climate_change(
         monthly_df: baseline dengan precip_mm, et0_mm
         delta_precip_pct: persen perubahan hujan (e.g. -10.0 = turun 10%)
         delta_temp_c: kenaikan suhu (°C). Translate ke ET0 via sensitivity factor.
-        et0_temp_sensitivity: %/°C — default 4%/°C (Allen 1998 approximate)
+        et0_temp_sensitivity: fraksi per °C — default 0.04 (≈4%/°C, Allen 1998 approximate)
 
     Returns:
         DataFrame baru dengan kolom precip & et0 di-adjust

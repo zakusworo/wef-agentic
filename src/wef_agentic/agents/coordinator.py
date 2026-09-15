@@ -1,25 +1,28 @@
-"""Coordinator Agent — orchestrator utama."""
+"""Coordinator Agent — synthesis across sectors."""
 from __future__ import annotations
 
-from typing import Any
+import json
+from typing import TYPE_CHECKING, Any
 
 from wef_agentic.agents.base import Agent, AgentOutput
+from wef_agentic.agents.critic import format_checks
+
+if TYPE_CHECKING:
+    from wef_agentic.orchestration.nexus import NexusState
 
 
 class CoordinatorAgent(Agent):
     name = "coordinator"
     system_prompt = (
         "Anda adalah Coordinator dalam sistem multi-agent untuk WEF Nexus governance "
-        "Kabupaten Sleman, D.I. Yogyakarta. Tugas Anda:\n\n"
-        "1. Menerima query/skenario dari user/analis Bappeda.\n"
-        "2. Menyintesis hasil analisis dari Water Agent, Energy Agent, Food Agent, "
+        "tingkat sub-nasional. Tugas Anda:\n\n"
+        "1. Menyintesis hasil analisis dari Water Agent, Energy Agent, Food Agent, "
         "dan Critic Agent menjadi narasi koheren dalam Bahasa Indonesia formal.\n"
-        "3. Eksplisit menonjolkan TRADE-OFF antar sektor (water vs energy vs food).\n"
-        "4. Eksplisit menyebutkan ketidakpastian dan limitasi data.\n\n"
-        "Konteks: Sleman adalah lumbung padi DIY dengan 5 'reality fires':\n"
-        "(1) krisis air tanah Sleman Tengah-Selatan; (2) alih fungsi LP2B; "
-        "(3) beban grid pasca-subsidi; (4) ancaman Merapi VEI 3+ recurrent; "
-        "(5) tekanan hidrolik pariwisata Borobudur-Prambanan-Merapi.\n\n"
+        "2. Eksplisit menonjolkan TRADE-OFF antar sektor (water vs energy vs food), "
+        "berdasarkan coupling yang dihitung framework.\n"
+        "3. Eksplisit menyebutkan ketidakpastian, limitasi data, dan temuan Critic.\n"
+        "4. Hanya mengutip angka dari angka kunci; jangan mengarang angka.\n\n"
+        "Gunakan isu kunci lokasi jika diberikan; jangan membawa konteks wilayah lain.\n\n"
         "Format output: ringkasan eksekutif (2-3 paragraf) + bullet-point findings "
         "+ rekomendasi prioritas + caveat."
     )
@@ -31,14 +34,18 @@ class CoordinatorAgent(Agent):
         energy_output: AgentOutput,
         food_output: AgentOutput,
         critic_output: AgentOutput,
+        nexus: NexusState,
     ) -> AgentOutput:
         prompt = (
-            f"## Skenario Dianalisis\n\n"
-            f"- Nama: **{scenario.get('name', 'UNNAMED')}**\n"
-            f"- Iklim: {scenario.get('climate', 'baseline')}\n"
-            f"- Policy: {scenario.get('policy', 'BAU')}\n"
-            f"- LP2B protection: {scenario.get('lp2b_protection', 'moderate')}\n"
-            f"- Horizon: {scenario.get('horizon', 2050)}\n\n"
+            "## Skenario Dianalisis\n\n"
+            + self._scenario_header(scenario, nexus)
+            + f"\nIklim: {scenario.get('climate', 'baseline')}\n"
+            f"Policy: {scenario.get('policy', 'BAU')}\n"
+            f"LP2B protection: {scenario.get('lp2b_protection', 'moderate')}\n\n"
+            "## Angka Kunci (deterministik)\n\n"
+            f"```json\n{json.dumps(nexus.key_figures(), indent=2, ensure_ascii=False)}\n```\n\n"
+            "## Pemeriksaan Deterministik\n\n"
+            f"{format_checks(nexus.checks)}\n\n"
             "## Hasil per Sektor\n\n"
             f"### Water Agent\n{water_output.content}\n\n"
             f"### Energy Agent\n{energy_output.content}\n\n"
@@ -47,14 +54,8 @@ class CoordinatorAgent(Agent):
             f"{critic_output.content}\n\n"
             "---\n\n"
             "Sintesis hasil di atas menjadi analisis koheren. Soroti trade-off, "
-            "uncertainty, dan rekomendasi prioritas untuk Bappeda Sleman."
+            f"uncertainty, dan rekomendasi prioritas untuk pemerintah daerah "
+            f"{nexus.location_context['display']}."
         )
         response = await self._call_llm(prompt)
-        return AgentOutput(
-            agent=self.name,
-            content=response.content,
-            usage_input_tokens=response.usage.input_tokens,
-            usage_output_tokens=response.usage.output_tokens,
-            provider=response.provider,
-            model=response.model,
-        )
+        return self._output(response)

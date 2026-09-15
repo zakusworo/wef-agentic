@@ -1,0 +1,29 @@
+# Cross-sector coupling parameters — used by orchestration/nexus.py + physics/coupling.py
+#
+# Values marked ASSUMPTION are screening defaults chosen for order-of-magnitude
+# plausibility in Java lowland irrigation. Replace them with calibrated local data
+# (Distan, BBWS Serayu-Opak, PLN) before using results for anything but screening.
+
+irrigation:
+  application_efficiency: 0.65   # gravity irrigation, Indonesia (existing framework default)
+  supply_fraction: 0.6           # ASSUMPTION: share of gross irrigation requirement actually delivered
+  groundwater_share: 0.3         # ASSUMPTION: share of delivered water pumped from groundwater
+  pump_head_m: 30.0              # ASSUMPTION: total dynamic head, shallow-to-medium wells
+  pump_efficiency: 0.45          # ASSUMPTION: wire-to-water efficiency of small electric pumps
+                                 #   (diesel pumps are common; their energy is NOT grid demand)
+  cropping_intensity: 2.0        # ASSUMPTION: harvests/year on irrigated land (harvest area ÷ physical area)
+
+power_sector_water:
+  # Freshwater consumption per MWh generated. Off-site: reported, not deducted from
+  # the local water balance.
+  fossil_m3_per_mwh: 2.6         # Macknick et al. (2012) median, coal with cooling tower —
+                                 #   upper bound for once-through seawater-cooled coastal plants
+  renewable_m3_per_mwh: 0.1      # ASSUMPTION: PV/wind order of magnitude; excludes reservoir evaporation
+
+checks:
+  groundwater_warn_fraction_of_surplus: 0.25   # warn when pumped volume > 25% of annual surplus
+  yield_plausibility_tolerance: 0.25           # warn when modelled yield deviates >25% from observed
+  low_confidence_threshold: 0.6                # flag inputs whose provenance confidence is below this
+
+fallbacks:
+  population_when_unknown: 100000              # used only with an explicit low-confidence warning

@@ -18,13 +18,18 @@ defaults:
   max_tokens: 2048
   temperature: 0.2
 
+# Empty completion (e.g. all tokens spent on reasoning) → one retry with a doubled
+# budget up to this cap; still empty → EmptyCompletionError (never passed on silently).
+retry:
+  max_tokens_cap: 16000
+
 agents:
   coordinator:
     provider: ollama-cloud
     model: deepseek-v4-pro:cloud
     model_local: gemma4:e4b
     model_claude: claude-opus-4-7
-    max_tokens: 3000
+    max_tokens: 6000
     temperature: 0.3
 
   water:
@@ -56,13 +61,36 @@ agents:
     model: kimi-k2.6:cloud
     model_local: gemma4:e4b
     model_claude: claude-opus-4-7
-    max_tokens: 3000
+    max_tokens: 8000        # kimi-k2.6 is a reasoning model: 3000 was fully spent on thinking
     temperature: 0.1
 
-# Nexus footprint estimation constants (WEF 2026b proxies)
+# Nexus footprint estimation constants (WEF 2026b proxies) — see llm/footprint.py
+# ASSUMPTION marks values that are order-of-magnitude choices, not sourced measurements.
 footprint:
-  kwh_per_1k_tokens: 0.0003
-  water_l_per_1k_tokens: 0.005
-  co2_kg_per_kwh: 0.4
+  kwh_per_1k_output_tokens: 0.0003   # IT energy, medium model, decode (public per-query estimates)
+  input_token_weight: 0.1            # ASSUMPTION: prefill token ≈ 10% of a decode token's energy
+  size_multiplier:                   # ASSUMPTION: energy scales roughly with active parameters
+    small: 0.1
+    medium: 1.0
+    large: 3.0
+  size_patterns:                     # first regex match wins; default = medium
+    - {pattern: ":e?[1-9](\\.\\d+)?b\\b|haiku", size: small}   # ≤ 9B tags: 1b, e4b, 3.8b
+    - {pattern: "opus|deepseek-v4-pro|kimi-k2", size: large}
+  providers:
+    ollama-local:                    # consumer hardware in Indonesia, no evaporative cooling
+      pue: 1.0
+      wue_onsite_l_per_kwh: 0.0
+      ewif_l_per_kwh: null           # Indonesian grid water intensity: not sourced → reported missing
+      co2_kg_per_kwh: 0.85           # Jawa-Bali grid (Kemen ESDM 2022), same as physics/energy_demand
+    ollama-cloud:                    # datacenter location undisclosed → US averages
+      pue: 1.2                       # ASSUMPTION: typical hyperscale-ish facility
+      wue_onsite_l_per_kwh: 0.55     # Li et al. (2023), US on-site WUE used in the paper
+      ewif_l_per_kwh: 3.14           # Li et al. (2023), US average electricity water intensity
+      co2_kg_per_kwh: 0.4            # US grid mix average
+    claude-agent-sdk:
+      pue: 1.2
+      wue_onsite_l_per_kwh: 0.55
+      ewif_l_per_kwh: 3.14
+      co2_kg_per_kwh: 0.4
   ollama_cloud_flat_monthly_usd: 20
   amortization_runs_per_month: 1000

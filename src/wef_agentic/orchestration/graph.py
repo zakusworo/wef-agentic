@@ -1,16 +1,17 @@
 """Orchestration graph — Pattern A: scenario sweep.
 
-Coordinator → (Water || Energy || Food) → Critic → Coordinator synthesis
-
-Mendukung 2 mode:
-- run_scenario() — full pipeline, parallel domain agents (fastest)
-- run_scenario_staged() — split per-phase untuk live progress UI
+    compute_nexus (deterministic, off the event loop)
+      → Water || Energy || Food  (parallel LLM interpretation)
+      → Critic (audits narratives against key figures + checks)
+      → Coordinator synthesis
 """
 from __future__ import annotations
 
 import asyncio
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import Any
 
 from wef_agentic.agents import (
     AgentOutput,
@@ -20,12 +21,17 @@ from wef_agentic.agents import (
     FoodAgent,
     WaterAgent,
 )
+from wef_agentic.geo import Location
 from wef_agentic.llm.footprint import NexusFootprint
+from wef_agentic.orchestration.nexus import NexusState, compute_nexus
+
+EventCallback = Callable[[str, dict[str, Any]], None]
 
 
 @dataclass
 class ScenarioRunResult:
     scenario: dict
+    nexus: NexusState
     water: AgentOutput
     energy: AgentOutput
     food: AgentOutput
@@ -35,124 +41,87 @@ class ScenarioRunResult:
     timings: dict = field(default_factory=dict)
 
 
-async def run_scenario(scenario: dict) -> ScenarioRunResult:
-    """Execute full pipeline (parallel domain agents). Fastest mode."""
-    water = WaterAgent()
-    energy = EnergyAgent()
-    food = FoodAgent()
-    critic = CriticAgent()
-    coordinator = CoordinatorAgent()
-
-    t0 = time.time()
-    water_out, energy_out, food_out = await asyncio.gather(
-        water.run(scenario), energy.run(scenario), food.run(scenario),
-    )
-    t_domain = time.time() - t0
-
-    t1 = time.time()
-    critic_out = await critic.audit(scenario, water_out, energy_out, food_out)
-    t_critic = time.time() - t1
-
-    t2 = time.time()
-    coord_out = await coordinator.synthesize(
-        scenario, water_out, energy_out, food_out, critic_out
-    )
-    t_coord = time.time() - t2
-
-    fp = NexusFootprint()
-    for ai, ao in [
-        (water, water_out), (energy, energy_out), (food, food_out),
-        (critic, critic_out), (coordinator, coord_out),
-    ]:
-        fp.add(ai.to_footprint(ao))
-
-    return ScenarioRunResult(
-        scenario=scenario,
-        water=water_out, energy=energy_out, food=food_out,
-        critic=critic_out, coordinator=coord_out,
-        footprint=fp,
-        timings={"domain": t_domain, "critic": t_critic, "coordinator": t_coord,
-                 "total": t_domain + t_critic + t_coord},
-    )
+def _agent_event(output: AgentOutput, elapsed: float) -> dict[str, Any]:
+    return {
+        "agent": output.agent,
+        "elapsed": elapsed,
+        "input_tokens": output.usage_input_tokens,
+        "output_tokens": output.usage_output_tokens,
+        "model": output.model,
+        "attempts": output.meta.get("attempts", 1),
+    }
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Staged API — sub-phases callable terpisah untuk live logging di UI
-# ─────────────────────────────────────────────────────────────────────────────
+async def _timed(coro):
+    t0 = time.perf_counter()
+    out = await coro
+    return out, time.perf_counter() - t0
 
 
-async def run_one_agent(agent_class, scenario: dict, **kwargs):
-    """Generic single-agent runner. Returns (agent_instance, output, elapsed_s)."""
-    instance = agent_class()
-    t0 = time.time()
-    output = await instance.run(scenario, **kwargs) if hasattr(instance, "run") else None
-    elapsed = time.time() - t0
-    return instance, output, elapsed
-
-
-async def run_water(scenario: dict):
-    """Phase: water agent only."""
-    instance = WaterAgent()
-    t0 = time.time()
-    out = await instance.run(scenario)
-    return instance, out, time.time() - t0
-
-
-async def run_energy(scenario: dict):
-    instance = EnergyAgent()
-    t0 = time.time()
-    out = await instance.run(scenario)
-    return instance, out, time.time() - t0
-
-
-async def run_food(scenario: dict):
-    instance = FoodAgent()
-    t0 = time.time()
-    out = await instance.run(scenario)
-    return instance, out, time.time() - t0
-
-
-async def run_critic(scenario: dict, water_out, energy_out, food_out):
-    instance = CriticAgent()
-    t0 = time.time()
-    out = await instance.audit(scenario, water_out, energy_out, food_out)
-    return instance, out, time.time() - t0
-
-
-async def run_coordinator(scenario: dict, water_out, energy_out, food_out, critic_out):
-    instance = CoordinatorAgent()
-    t0 = time.time()
-    out = await instance.synthesize(scenario, water_out, energy_out, food_out, critic_out)
-    return instance, out, time.time() - t0
-
-
-def build_result(
+async def run_scenario(
     scenario: dict,
-    water, water_out, energy, energy_out, food, food_out,
-    critic, critic_out, coordinator, coord_out,
-    timings: dict | None = None,
+    *,
+    location: Location | None = None,
+    on_event: EventCallback | None = None,
 ) -> ScenarioRunResult:
-    """Helper untuk merakit ScenarioRunResult dari per-agent outputs."""
+    """Execute the full pipeline. `on_event(phase, payload)` receives progress updates."""
+    emit = on_event or (lambda _phase, _payload: None)
+
+    # Instantiate first so provider misconfiguration fails before slow data fetches
+    water, energy, food = WaterAgent(), EnergyAgent(), FoodAgent()
+    critic, coordinator = CriticAgent(), CoordinatorAgent()
+
+    t_start = time.perf_counter()
+    emit("nexus_start", {"location_query": scenario.get("location_query")})
+    nexus = await asyncio.to_thread(compute_nexus, scenario, location)
+    t_nexus = time.perf_counter() - t_start
+    emit("nexus_done", {"elapsed": t_nexus, "checks": nexus.checks, "warnings": nexus.warnings})
+
+    emit("domain_start", {})
+    t0 = time.perf_counter()
+    (water_out, dt_w), (energy_out, dt_e), (food_out, dt_f) = await asyncio.gather(
+        _timed(water.run(scenario, nexus)),
+        _timed(energy.run(scenario, nexus)),
+        _timed(food.run(scenario, nexus)),
+    )
+    t_domain = time.perf_counter() - t0
+    for out, dt in ((water_out, dt_w), (energy_out, dt_e), (food_out, dt_f)):
+        emit("agent_done", _agent_event(out, dt))
+
+    emit("critic_start", {})
+    critic_out, t_critic = await _timed(
+        critic.audit(scenario, water_out, energy_out, food_out, nexus)
+    )
+    emit("agent_done", _agent_event(critic_out, t_critic))
+
+    emit("coordinator_start", {})
+    coord_out, t_coord = await _timed(
+        coordinator.synthesize(scenario, water_out, energy_out, food_out, critic_out, nexus)
+    )
+    emit("agent_done", _agent_event(coord_out, t_coord))
+
     fp = NexusFootprint()
-    for ai, ao in [
+    for agent, output in [
         (water, water_out), (energy, energy_out), (food, food_out),
         (critic, critic_out), (coordinator, coord_out),
     ]:
-        fp.add(ai.to_footprint(ao))
+        fp.add(agent.to_footprint(output))
+
+    timings = {
+        "nexus": t_nexus, "domain": t_domain, "critic": t_critic, "coordinator": t_coord,
+        "water": dt_w, "energy": dt_e, "food": dt_f,
+        "total": time.perf_counter() - t_start,
+    }
+    emit("done", {"timings": timings, "total_tokens": fp.total_tokens})
 
     return ScenarioRunResult(
-        scenario=scenario,
+        scenario=scenario, nexus=nexus,
         water=water_out, energy=energy_out, food=food_out,
         critic=critic_out, coordinator=coord_out,
-        footprint=fp,
-        timings=timings or {},
+        footprint=fp, timings=timings,
     )
 
 
 async def run_scenario_sweep(scenarios: list[dict]) -> list[ScenarioRunResult]:
     """Run multiple scenarios sequentially."""
-    results = []
-    for sc in scenarios:
-        result = await run_scenario(sc)
-        results.append(result)
-    return results
+    return [await run_scenario(sc) for sc in scenarios]

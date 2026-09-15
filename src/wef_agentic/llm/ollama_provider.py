@@ -67,21 +67,21 @@ class OllamaProvider(LLMProvider):
         except httpx.HTTPError as e:
             raise RuntimeError(f"Ollama call failed ({self.name}, {self.model}): {e}") from e
 
-        content = response.get("message", {}).get("content", "")
+        message = response.get("message") or {}
+        # eval_count includes reasoning tokens, so usage stays correct for footprint
         usage = Usage(
-            input_tokens=response.get("prompt_eval_count", 0),
-            output_tokens=response.get("eval_count", 0),
+            input_tokens=response.get("prompt_eval_count") or 0,
+            output_tokens=response.get("eval_count") or 0,
         )
 
         return LLMResponse(
-            content=content,
+            content=message.get("content") or "",
             usage=usage,
             provider=self.name,
-            model=self.model,
-            meta={
-                "total_duration_ns": response.get("total_duration", 0),
-                "done_reason": response.get("done_reason"),
-            },
+            model=response.get("model") or self.model,
+            done_reason=response.get("done_reason"),
+            thinking=message.get("thinking") or "",
+            meta={"total_duration_ns": response.get("total_duration") or 0},
         )
 
     @staticmethod

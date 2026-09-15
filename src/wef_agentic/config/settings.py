@@ -1,4 +1,4 @@
-"""Central settings loaded from .env + llm.yaml."""
+"""Central settings loaded from .env + llm.yaml + nexus.yaml."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -32,13 +32,22 @@ class Settings(BaseSettings):
     ollama_api_key: str = Field(default="", alias="OLLAMA_API_KEY")
 
 
-def load_llm_config() -> dict:
-    """Load per-agent LLM config from llm.yaml."""
-    path = CONFIG_DIR / "llm.yaml"
+def _load_yaml(name: str) -> dict:
+    path = CONFIG_DIR / name
     if not path.exists():
         return {}
     with open(path) as f:
         return yaml.safe_load(f) or {}
+
+
+def load_llm_config() -> dict:
+    """Load per-agent LLM config from llm.yaml."""
+    return _load_yaml("llm.yaml")
+
+
+def load_nexus_config() -> dict:
+    """Load cross-sector coupling parameters from nexus.yaml."""
+    return _load_yaml("nexus.yaml")
 
 
 settings = Settings()

@@ -1,76 +1,59 @@
 """Water Agent — location-agnostic."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from wef_agentic.agents.base import Agent, AgentOutput
-from wef_agentic.tools import call_tool
+from wef_agentic.agents.base import NUMBERS_ARE_GIVEN_NOTE, Agent, AgentOutput
+
+if TYPE_CHECKING:
+    from wef_agentic.orchestration.nexus import NexusState
 
 
 class WaterAgent(Agent):
     name = "water"
     system_prompt = (
         "Anda adalah Water Agent dalam sistem WEF-Agentic untuk multi-city WEF Nexus governance. "
-        "Anda menganalisis ketersediaan air dan kebutuhan irigasi berdasarkan "
-        "Thornthwaite-Mather monthly water balance dengan data Open-Meteo realtime.\n\n"
-        "Tugas: interpretasi hasil tool dalam Bahasa Indonesia formal. Fokus pada:\n"
-        "- Surplus vs deficit annual\n"
-        "- Implikasi terhadap irigasi pertanian\n"
+        "Anda menginterpretasi hasil Thornthwaite-Mather monthly water balance (depletion "
+        "eksponensial) dan coupling irigasi yang sudah dihitung framework.\n\n"
+        "Tugas: interpretasi dalam Bahasa Indonesia formal. Fokus pada:\n"
+        "- Surplus vs defisit tahunan DAN musiman (surplus musim hujan tidak otomatis menutup "
+        "defisit musim kemarau)\n"
+        "- Water stress sebelum vs sesudah irigasi, dan kebutuhan irigasi\n"
+        "- Volume air tanah yang dipompa untuk irigasi\n"
         "- Risiko fisik dari skenario (climate delta)\n"
-        "- Konteks spesifik lokasi (jika Sleman: sub-DAS Code/Opak/Kuning/Boyong + krisis air tanah; "
-        "lainnya: konteks geografis sesuai negara/wilayah)\n"
+        "- Konteks spesifik lokasi (gunakan isu kunci & sub-DAS jika diberikan)\n"
         "- Apa yang BELUM bisa dianalisis dengan model simplified (caveat)\n\n"
         "Output: 1-2 paragraf naratif + bullet findings."
     )
 
-    async def run(self, scenario: dict[str, Any]) -> AgentOutput:
-        location_query = scenario.get("location_query", "sleman")
-        station = scenario.get("water_station")  # None = auto pilih sesuai location
-        year = scenario.get("water_baseline_year", 2023)
-        delta_p = scenario.get("delta_precip_pct", 0.0)
-        delta_t = scenario.get("delta_temp_c", 0.0)
-
-        climate_summary = call_tool("get_climate_summary", location_query=location_query)
-        wb_kwargs = {
-            "location_query": location_query,
-            "year": year,
-            "delta_precip_pct": delta_p,
-            "delta_temp_c": delta_t,
-        }
-        if station:
-            wb_kwargs["station"] = station
-        wb = call_tool("run_water_balance", **wb_kwargs)
-        irr_demand = call_tool(
-            "compute_irrigation_demand",
-            deficit_mm=wb["summary"]["total_deficit_mm"],
-        )
-
+    async def run(self, scenario: dict[str, Any], nexus: NexusState) -> AgentOutput:
+        c = nexus.coupling
         tool_outputs = [
-            {"tool": "get_climate_summary", "data": climate_summary},
-            {"tool": "run_water_balance", "data": wb},
-            {"tool": "compute_irrigation_demand", "data": irr_demand},
+            {"tool": "get_climate_summary", "data": nexus.climate_summary},
+            {"tool": "run_water_balance", "data": nexus.water_balance},
+            {"tool": "compute_irrigation_demand", "data": nexus.irrigation},
+            {"tool": "nexus_coupling_water", "data": {
+                "water_stress_raw": c["water_stress_raw"],
+                "irrigation_supply_fraction": c["irrigation_supply_fraction"],
+                "water_stress_effective": c["water_stress_effective"],
+                "irrigated_physical_area_ha": c["irrigated_physical_area_ha"],
+                "pumping_scenario": c["pumping_scenario"],
+                "baseline_climate_deficit_mm":
+                    nexus.water_balance_baseline["summary"]["total_deficit_mm"],
+            }},
         ]
 
-        loc_display = wb["location"]["name"]
-        country = wb["location"].get("country", "")
         prompt = (
-            f"Skenario: {scenario.get('name', 'UNNAMED')}\n"
-            f"Lokasi: {loc_display}{' (' + country + ')' if country else ''}\n"
-            f"Climate delta: precip {delta_p:+.1f}%, temp {delta_t:+.1f}°C\n"
-            f"Year analyzed: {year}\n\n"
+            self._scenario_header(scenario, nexus) + "\n"
+            f"Climate delta: precip {scenario.get('delta_precip_pct', 0.0):+.1f}%, "
+            f"temp {scenario.get('delta_temp_c', 0.0):+.1f}°C terhadap tahun "
+            f"{nexus.water_balance['year']}\n\n"
+            f"{NUMBERS_ARE_GIVEN_NOTE}\n\n"
             "Tool outputs:\n"
             + self._format_tool_outputs(tool_outputs)
-            + "\n\nInterpretasikan dalam Bahasa Indonesia formal. Soroti water stress + "
-            "irrigation demand untuk lokasi spesifik."
+            + "\n\nInterpretasikan dalam Bahasa Indonesia formal. Soroti water stress, "
+            "ketidaksesuaian musiman, dan kebutuhan irigasi untuk lokasi spesifik."
         )
 
         response = await self._call_llm(prompt)
-        return AgentOutput(
-            agent=self.name,
-            content=response.content,
-            tool_outputs=tool_outputs,
-            usage_input_tokens=response.usage.input_tokens,
-            usage_output_tokens=response.usage.output_tokens,
-            provider=response.provider,
-            model=response.model,
-        )
+        return self._output(response, tool_outputs)

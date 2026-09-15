@@ -157,6 +157,13 @@ def energy_chart(agent_output) -> go.Figure | None:
                            showarrow=True, arrowhead=2, arrowcolor=PALETTE["primary"],
                            bgcolor="white", bordercolor=PALETTE["primary"], borderwidth=1,
                            ax=0, ay=-40)
+    horizon, d_horizon = data.get("horizon"), ep.get("demand_horizon_gwh")
+    if horizon not in (2030, 2050) and d_horizon is not None:
+        fig.add_annotation(x=horizon, y=d_horizon,
+                           text=f"<b>{horizon}: {d_horizon:.0f} GWh</b>",
+                           showarrow=True, arrowhead=2, arrowcolor=PALETTE["primary"],
+                           bgcolor="white", bordercolor=PALETTE["primary"], borderwidth=1,
+                           ax=0, ay=-40)
 
     loc_name = data.get("location", {}).get("name", "")
     quality = data.get("data_quality", "")

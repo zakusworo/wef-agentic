@@ -1,6 +1,7 @@
 """Energy demand projection — log-linear elasticity model.
 
-D(t) = D(t0) × (POP(t)/POP(t0))^α × (GDPpc(t)/GDPpc(t0))^β × efficiency_factor
+D(t) = D(t0) × (POP(t)/POP(t0))^β × (GDPpc(t)/GDPpc(t0))^α × efficiency_factor
+       + electrification (EV, induction) + climate-driven irrigation pumping delta
 
 Estimasi α & β:
 - α (income elasticity) ~ 0.6–0.9 untuk Indonesia (PLN/ESDM studies)
@@ -41,6 +42,8 @@ def fit_elasticity_baseline(
     }
 
 
+# Socio-economic & electrification pathways. Renewable share is a property of the
+# policy scenario (orchestration/scenarios.py), not of the demand pathway.
 SCENARIOS = {
     "BAU": {
         "pop_growth_pct": 0.6,        # %/tahun
@@ -48,7 +51,6 @@ SCENARIOS = {
         "efficiency_gain_pct": 0.5,    # %/tahun perbaikan efisiensi
         "ev_share_target_2050": 0.10,
         "induction_share_target_2050": 0.20,
-        "renewable_share_2030": 0.23,  # mengikuti RUPTL existing
     },
     "JETP_Aligned": {
         "pop_growth_pct": 0.6,
@@ -56,7 +58,6 @@ SCENARIOS = {
         "efficiency_gain_pct": 1.0,
         "ev_share_target_2050": 0.40,
         "induction_share_target_2050": 0.50,
-        "renewable_share_2030": 0.34,  # JETP CIPP target
     },
     "NetZero_Sleman_2045": {
         "pop_growth_pct": 0.5,
@@ -64,7 +65,6 @@ SCENARIOS = {
         "efficiency_gain_pct": 1.5,
         "ev_share_target_2050": 0.80,
         "induction_share_target_2050": 0.95,
-        "renewable_share_2030": 0.45,
     },
 }
 
@@ -73,8 +73,14 @@ def project_demand(
     scenario: str = "BAU",
     horizon: int = 2050,
     baseline: dict | None = None,
+    extra_demand_at_horizon_gwh: float = 0.0,
 ) -> EnergyProjection:
-    """Project demand tahunan dari base year ke horizon."""
+    """Project demand tahunan dari base year ke horizon.
+
+    `extra_demand_at_horizon_gwh` (e.g. climate-driven irrigation pumping from the
+    nexus coupling) ramps linearly from 0 at the base year to its full value at
+    the horizon — the base-year amount is already inside historical consumption.
+    """
     if scenario not in SCENARIOS:
         raise ValueError(f"Unknown scenario: {scenario}. Available: {list(SCENARIOS)}")
 
@@ -104,14 +110,14 @@ def project_demand(
         )
 
         # Tambahan demand dari elektrifikasi (EV, induction) — linear toward target 2050
-        progress = (yr - base_year) / (2050 - base_year)
-        progress = min(max(progress, 0), 1)
-        ev_demand_gwh = base["base_demand_gwh"] * 0.05 * s["ev_share_target_2050"] * progress
+        progress_2050 = min(max((yr - base_year) / (2050 - base_year), 0), 1)
+        ev_demand_gwh = base["base_demand_gwh"] * 0.05 * s["ev_share_target_2050"] * progress_2050
         induction_demand_gwh = (
-            base["base_demand_gwh"] * 0.03 * s["induction_share_target_2050"] * progress
+            base["base_demand_gwh"] * 0.03 * s["induction_share_target_2050"] * progress_2050
         )
 
-        total_demand = demand + ev_demand_gwh + induction_demand_gwh
+        progress_horizon = 1.0 if horizon <= base_year else (yr - base_year) / (horizon - base_year)
+        pumping_gwh = extra_demand_at_horizon_gwh * progress_horizon
 
         rows.append(
             {
@@ -119,12 +125,17 @@ def project_demand(
                 "demand_baseline_gwh": demand,
                 "demand_ev_gwh": ev_demand_gwh,
                 "demand_induction_gwh": induction_demand_gwh,
-                "demand_total_gwh": total_demand,
+                "demand_irrigation_pumping_gwh": pumping_gwh,
+                "demand_total_gwh": demand + ev_demand_gwh + induction_demand_gwh + pumping_gwh,
             }
         )
 
     df = pd.DataFrame(rows)
-    return EnergyProjection(yearly=df, scenario=scenario, assumptions={**base, **s})
+    return EnergyProjection(
+        yearly=df,
+        scenario=scenario,
+        assumptions={**base, **s, "extra_demand_at_horizon_gwh": extra_demand_at_horizon_gwh},
+    )
 
 
 def compute_emissions(

@@ -4,20 +4,14 @@ from __future__ import annotations
 from typing import Any
 
 from wef_agentic.data.openmeteo import aggregate_monthly, fetch_climate_for_location
-from wef_agentic.geo import resolve_location
+from wef_agentic.physics.coupling import water_stress_fraction
 from wef_agentic.physics.water_balance import (
     irrigation_demand_mm,
     scenario_apply_climate_change,
     thornthwaite_mather,
 )
+from wef_agentic.tools._common import resolve_or_raise
 from wef_agentic.tools.registry import register
-
-
-def _resolve_or_raise(location_query: str):
-    loc = resolve_location(location_query)
-    if loc is None:
-        raise ValueError(f"Tidak dapat resolve location: '{location_query}'")
-    return loc
 
 
 @register(
@@ -41,7 +35,7 @@ def get_climate_summary(
     year_start: int = 1991,
     year_end: int = 2024,
 ) -> dict[str, Any]:
-    location = _resolve_or_raise(location_query)
+    location = resolve_or_raise(location_query)
     df = fetch_climate_for_location(location)
     monthly = aggregate_monthly(df)
     monthly = monthly[(monthly["year"] >= year_start) & (monthly["year"] <= year_end)]
@@ -73,7 +67,7 @@ def get_climate_summary(
     name="run_water_balance",
     description=(
         "Jalankan Thornthwaite-Mather monthly water balance untuk lokasi. "
-        "Returns surplus, deficit, irrigation demand."
+        "Returns surplus, deficit, water stress (1 - ETa/PET)."
     ),
     parameters={
         "type": "object",
@@ -96,13 +90,11 @@ def run_water_balance(
     delta_temp_c: float = 0.0,
     soil_water_capacity_mm: float = 150.0,
 ) -> dict[str, Any]:
-    location = _resolve_or_raise(location_query)
+    location = resolve_or_raise(location_query)
     df = fetch_climate_for_location(location)
     monthly = aggregate_monthly(df)
 
-    effective_station = station
-    if effective_station is None:
-        effective_station = "Mlati" if location.name == "Sleman" else location.name
+    effective_station = station or location.metadata.get("default_station", location.name)
 
     sub = monthly[(monthly["station"] == effective_station) & (monthly["year"] == year)].copy()
     if sub.empty:
@@ -116,6 +108,7 @@ def run_water_balance(
         sub, delta_precip_pct=delta_precip_pct, delta_temp_c=delta_temp_c
     )
     result = thornthwaite_mather(sub, soil_water_capacity_mm=soil_water_capacity_mm)
+    summary = result.annual_summary
 
     return {
         "location": location.to_dict(),
@@ -123,7 +116,11 @@ def run_water_balance(
         "year": year,
         "delta_precip_pct": delta_precip_pct,
         "delta_temp_c": delta_temp_c,
-        "summary": {k: round(v, 1) for k, v in result.annual_summary.items()},
+        "soil_water_capacity_mm": soil_water_capacity_mm,
+        "summary": {k: round(v, 3) for k, v in summary.items()},
+        "water_stress_raw": round(
+            water_stress_fraction(summary["total_eta_mm"], summary["total_pet_mm"]), 4
+        ),
         "monthly": result.monthly[
             ["month", "precip_mm", "et0_mm", "eta_mm", "surplus_mm", "deficit_mm", "soil_moisture_mm"]
         ].round(1).to_dict(orient="records"),

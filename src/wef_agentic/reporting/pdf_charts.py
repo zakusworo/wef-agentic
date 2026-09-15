@@ -87,11 +87,13 @@ def energy_png(agent_output) -> bytes | None:
     ax.plot(years, demand, "o-", color=PALETTE["energy"], linewidth=2.5, markersize=8)
     ax.fill_between(years, demand, alpha=0.15, color=PALETTE["energy"])
 
-    for yr_target in (2030, 2050):
-        key = f"demand_{yr_target}_gwh"
-        if ep.get(key) is not None:
-            ax.annotate(f"{yr_target}: {ep[key]:.0f} GWh",
-                        xy=(yr_target, ep[key]),
+    targets = {2030: ep.get("demand_2030_gwh"), 2050: ep.get("demand_2050_gwh")}
+    if data.get("horizon"):
+        targets.setdefault(data["horizon"], ep.get("demand_horizon_gwh"))
+    for yr_target, value in targets.items():
+        if value is not None:
+            ax.annotate(f"{yr_target}: {value:.0f} GWh",
+                        xy=(yr_target, value),
                         xytext=(10, 20), textcoords="offset points",
                         bbox=dict(boxstyle="round,pad=0.3", fc="white", ec=PALETTE["primary"]),
                         fontsize=9, color=PALETTE["primary"], fontweight="bold",

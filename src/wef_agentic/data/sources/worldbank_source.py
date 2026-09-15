@@ -12,8 +12,9 @@ from wef_agentic.geo.location import Location
 WB_URL = "https://api.worldbank.org/v2/country/{country}/indicator/{indicator}"
 
 # Variable → World Bank indicator code
+# socio.population (SP.POP.TOTL) deliberately omitted: it is a country total and
+# would silently replace a city/regency population.
 INDICATOR_MAP = {
-    "socio.population": "SP.POP.TOTL",
     "socio.gdp_per_capita_usd": "NY.GDP.PCAP.CD",
     "energy.consumption_kwh_per_capita": "EG.USE.ELEC.KH.PC",
 }
@@ -56,7 +57,6 @@ class WorldBankSource(DataSource):
             raise DataSourceUnavailable(f"World Bank fetch failed: {e}") from e
 
         unit = {
-            "socio.population": "jiwa",
             "socio.gdp_per_capita_usd": "USD",
             "energy.consumption_kwh_per_capita": "kWh/year",
         }[variable]

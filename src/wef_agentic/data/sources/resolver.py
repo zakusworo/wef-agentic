@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from wef_agentic.data.sources.base import DataPacket, DataSource, DataSourceUnavailable
 from wef_agentic.data.sources.bps_static_source import BPSStaticSource
+from wef_agentic.data.sources.geocoded_source import GeocodedPopulationSource
 from wef_agentic.data.sources.manual_source import ManualOverrideSource
 from wef_agentic.data.sources.openmeteo_source import OpenMeteoSource
 from wef_agentic.data.sources.proxy_source import CountryProxySource
@@ -28,8 +29,9 @@ class DataResolver:
     1. ManualOverrideSource (tier 1, user-curated) — paling authoritative
     2. BPSStaticSource (tier 1, Sleman) — hardcoded BPS
     3. OpenMeteoSource (tier 1, global climate)
-    4. WorldBankSource (tier 2, country)
-    5. CountryProxySource (tier 3, last resort)
+    4. GeocodedPopulationSource (tier 2, gazetteer population)
+    5. WorldBankSource (tier 2, country)
+    6. CountryProxySource (tier 3, last resort)
     """
 
     def __init__(self, sources: list[DataSource] | None = None):
@@ -38,6 +40,7 @@ class DataResolver:
                 ManualOverrideSource(),
                 BPSStaticSource(),
                 OpenMeteoSource(),
+                GeocodedPopulationSource(),
                 WorldBankSource(),
                 CountryProxySource(),
             ]

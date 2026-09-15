@@ -94,6 +94,13 @@ VARIABLES: dict[str, VariableSpec] = {
         domain="food",
         schema={"type": "number", "minimum": 0},
     ),
+    "food.rice_land_loss_ha_per_year": VariableSpec(
+        name="food.rice_land_loss_ha_per_year",
+        description="Laju historis alih fungsi lahan sawah (ha/tahun)",
+        unit="ha/year",
+        domain="food",
+        schema={"type": "number", "minimum": 0},
+    ),
     "food.rice_yield_t_per_ha": VariableSpec(
         name="food.rice_yield_t_per_ha",
         description="Produktivitas padi (ton/ha)",

@@ -68,10 +68,10 @@ def fetch_climate_for_location(
 ) -> pd.DataFrame:
     """Universal climate fetcher untuk Location apapun.
 
-    - Sleman preset: pakai 3 stasiun + fixture cache jika tersedia
+    - Preset dengan data lokal (Sleman): pakai 3 stasiun + fixture cache jika tersedia
     - Other location: single point fetch live
     """
-    if location.name == "Sleman" and location.source == "preset":
+    if location.has_local_data:
         return _fetch_sleman_stations(start, end, cache)
 
     cache_path = PROCESSED_DIR / f"openmeteo_{location.slug}_{start}_{end}.parquet"

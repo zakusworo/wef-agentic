@@ -5,6 +5,7 @@ from wef_agentic.data.sources.base import (
     DataSourceUnavailable,
 )
 from wef_agentic.data.sources.bps_static_source import BPSStaticSource
+from wef_agentic.data.sources.geocoded_source import GeocodedPopulationSource
 from wef_agentic.data.sources.manual_source import ManualOverrideSource
 from wef_agentic.data.sources.openmeteo_source import OpenMeteoSource
 from wef_agentic.data.sources.proxy_source import CountryProxySource
@@ -26,6 +27,7 @@ __all__ = [
     "DataResolver",
     "DataSource",
     "DataSourceUnavailable",
+    "GeocodedPopulationSource",
     "ManualOverrideSource",
     "OpenMeteoSource",
     "ResolutionTrace",

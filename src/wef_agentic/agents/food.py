@@ -1,77 +1,56 @@
 """Food Agent — location-agnostic."""
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from wef_agentic.agents.base import Agent, AgentOutput
-from wef_agentic.tools import call_tool
+from wef_agentic.agents.base import NUMBERS_ARE_GIVEN_NOTE, Agent, AgentOutput
+
+if TYPE_CHECKING:
+    from wef_agentic.orchestration.nexus import NexusState
 
 
 class FoodAgent(Agent):
     name = "food"
     system_prompt = (
         "Anda adalah Food Agent dalam sistem WEF-Agentic untuk multi-city WEF Nexus. "
-        "Anda menganalisis produksi pangan + ketahanan pangan (SSL).\n\n"
-        "Tugas: interpretasi hasil tool dalam Bahasa Indonesia formal. Fokus pada:\n"
-        "- Produksi 2030 & 2050 dengan asumsi water stress + LP2B protection\n"
+        "Anda menginterpretasi proyeksi produksi pangan + ketahanan pangan (SSL) yang sudah "
+        "dihitung framework.\n\n"
+        "Tugas: interpretasi dalam Bahasa Indonesia formal. Fokus pada:\n"
+        "- Produksi 2030 & tahun horizon dengan asumsi LP2B protection\n"
+        "- Water stress berasal dari water balance setelah irigasi (coupling air→pangan), "
+        "bukan asumsi skenario\n"
         "- SSL: surplus atau defisit?\n"
-        "- Trade-off dengan sektor air (rice = water-intensive)\n"
-        "- Jika data_quality = 'illustrative': sebutkan bahwa parameter Sleman di-proxy ke "
-        "lokasi lain, butuh FAOSTAT/national survey untuk presisi\n"
-        "- Caveat: Doorenbos-Kassam empirical, bukan DSSAT terkalibrasi\n\n"
+        "- Trade-off dengan sektor air (padi = water-intensive, pompa air tanah)\n"
+        "- Jika project_crop_yield.available = false: jelaskan kesenjangan data dan data apa "
+        "yang dibutuhkan; JANGAN mengarang angka produksi atau SSL\n"
+        "- Caveat: Doorenbos-Kassam empirical, bukan DSSAT/AquaCrop terkalibrasi\n\n"
         "Output: 1-2 paragraf naratif + bullet findings."
     )
 
-    async def run(self, scenario: dict[str, Any]) -> AgentOutput:
-        location_query = scenario.get("location_query", "sleman")
-        crop = scenario.get("food_crop", "padi")
-        food_scenario = scenario.get("energy_scenario", "BAU")
-        water_stress = scenario.get("water_stress_fraction", 0.05)
-        lp2b = scenario.get("lp2b_protection", "moderate")
-        horizon = scenario.get("horizon", 2050)
-
-        history = call_tool("get_food_history", location_query=location_query)
-        proj = call_tool(
-            "project_crop_yield",
-            location_query=location_query,
-            crop=crop,
-            scenario=food_scenario,
-            water_stress_fraction=water_stress,
-            lp2b_protection=lp2b,
-            horizon=horizon,
-        )
-        production_2030 = proj["endpoints"].get("production_2030_t") or 0.0
-        ssl = call_tool(
-            "compute_food_ssl",
-            production_t=production_2030,
-            location_query=location_query,
-            year=2030,
-        )
-
+    async def run(self, scenario: dict[str, Any], nexus: NexusState) -> AgentOutput:
+        c = nexus.coupling
         tool_outputs = [
-            {"tool": "get_food_history", "data": history},
-            {"tool": "project_crop_yield", "data": proj},
-            {"tool": "compute_food_ssl", "data": ssl},
+            {"tool": "get_food_history", "data": nexus.food_history},
+            {"tool": "project_crop_yield", "data": nexus.crop_projection},
         ]
+        if nexus.food_ssl is not None:
+            tool_outputs.append({"tool": "compute_food_ssl", "data": nexus.food_ssl})
+        tool_outputs.append({"tool": "nexus_coupling_food", "data": {
+            "water_stress_raw": c["water_stress_raw"],
+            "irrigation_supply_fraction": c["irrigation_supply_fraction"],
+            "water_stress_effective": c["water_stress_effective"],
+        }})
 
         prompt = (
-            f"Skenario: {scenario.get('name', 'UNNAMED')}\n"
-            f"Lokasi: {proj['location']['name']} ({proj['location'].get('country', '')})\n"
-            f"Crop: {crop}, scenario: {food_scenario}, water stress: {water_stress}, "
-            f"LP2B: {lp2b}\n\n"
+            self._scenario_header(scenario, nexus) + "\n"
+            f"Crop: {scenario.get('food_crop', 'padi')}, "
+            f"LP2B: {scenario.get('lp2b_protection', 'moderate')}\n\n"
+            f"{NUMBERS_ARE_GIVEN_NOTE}\n\n"
             "Tool outputs:\n"
             + self._format_tool_outputs(tool_outputs)
-            + "\n\nInterpretasikan dalam Bahasa Indonesia formal. Jika data illustrative, "
-            "sebutkan eksplisit."
+            + "\n\nInterpretasikan dalam Bahasa Indonesia formal. Jika data illustrative "
+            "atau tidak tersedia, sebutkan eksplisit."
         )
 
         response = await self._call_llm(prompt)
-        return AgentOutput(
-            agent=self.name,
-            content=response.content,
-            tool_outputs=tool_outputs,
-            usage_input_tokens=response.usage.input_tokens,
-            usage_output_tokens=response.usage.output_tokens,
-            provider=response.provider,
-            model=response.model,
-        )
+        return self._output(response, tool_outputs)

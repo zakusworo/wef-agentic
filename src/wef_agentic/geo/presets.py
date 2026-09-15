@@ -18,6 +18,7 @@ SLEMAN = Location(
     source="preset",
     metadata={
         "has_static_socioeconomic_data": True,  # BPS data tersedia
+        "default_station": "Mlati",              # tengah, urban-irrigation zone
         "stations": [
             {"name": "Pakem", "lat": -7.66, "lon": 110.42, "zone": "Utara (Merapi slope)"},
             {"name": "Mlati", "lat": -7.74, "lon": 110.34, "zone": "Tengah (urban-irrigation)"},

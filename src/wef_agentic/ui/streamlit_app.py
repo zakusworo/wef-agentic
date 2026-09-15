@@ -27,13 +27,8 @@ from wef_agentic.geo import (  # noqa: E402
 )
 from wef_agentic.orchestration import (  # noqa: E402
     SCENARIOS,
-    build_result,
     get_scenario,
-    run_coordinator,
-    run_critic,
-    run_energy,
-    run_food,
-    run_water,
+    run_scenario,
 )
 from wef_agentic.reporting import (  # noqa: E402
     coordinator_chart,
@@ -195,10 +190,7 @@ st.title("WEF-Agentic: Multi-City WEF Nexus Framework")
 scenario_data = get_scenario(scenario_id)
 if st.session_state.resolved_location is not None:
     loc = st.session_state.resolved_location
-    if loc.source == "preset" and loc.name == "Sleman":
-        scenario_data["location_query"] = "sleman"
-    else:
-        scenario_data["location_query"] = loc.name
+    scenario_data["location_query"] = "sleman" if loc.has_local_data else loc.name
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -207,49 +199,58 @@ if st.session_state.resolved_location is not None:
 
 
 def _dashboard_cards(result):
-    """Top-of-page summary cards: SSL, demand 2030, water deficit, emisi, tokens."""
-    # Extract key metrics dari tool outputs
-    water_data = next((t["data"] for t in result.water.tool_outputs
-                       if t["tool"] == "run_water_balance"), {})
-    energy_data = next((t["data"] for t in result.energy.tool_outputs
-                        if t["tool"] == "project_energy_demand"), {})
-    food_ssl_data = next((t["data"] for t in result.food.tool_outputs
-                          if t["tool"] == "compute_food_ssl"), {})
-    emissions_data = next((t["data"] for t in result.energy.tool_outputs
-                           if t["tool"] == "estimate_emissions"), {})
-
-    deficit_mm = water_data.get("summary", {}).get("total_deficit_mm", 0)
-    surplus_mm = water_data.get("summary", {}).get("total_surplus_mm", 0)
-    demand_2030 = (energy_data.get("endpoints", {}) or {}).get("demand_2030_gwh", 0) or 0
-    ssl = food_ssl_data.get("ssl", 0)
-    co2 = emissions_data.get("co2_emissions_mt", 0)
-    total_tokens = result.footprint.total_tokens
+    """Top-of-page summary cards from the deterministic nexus key figures."""
+    k = result.nexus.key_figures()
+    air, energi, pangan = k["air"], k["energi"], k["pangan"]
 
     cols = st.columns(5)
     cols[0].metric(
         "💧 Water deficit",
-        f"{deficit_mm:.0f} mm/yr",
-        delta=f"surplus {surplus_mm:.0f} mm" if surplus_mm > 0 else None,
-        delta_color="normal",
+        f"{air['defisit_mm']:.0f} mm/yr",
+        delta=f"stress {air['water_stress_setelah_irigasi']:.3f} (irigasi)",
+        delta_color="off",
     )
-    cols[1].metric("⚡ Demand 2030", f"{demand_2030:.0f} GWh")
-    cols[2].metric(
-        "🌾 SSL padi",
-        f"{ssl:.2f}",
-        delta="surplus" if ssl >= 1 else f"defisit {(1-ssl)*100:.0f}%",
-        delta_color="normal" if ssl >= 1 else "inverse",
+    cols[1].metric(
+        "⚡ Demand 2030", f"{energi['demand_2030_gwh'] or 0:.0f} GWh",
+        delta=f"+{energi['tambahan_pompa_irigasi_akibat_iklim_gwh']:.2f} GWh pompa (iklim)",
+        delta_color="off",
     )
-    cols[3].metric("🌍 CO₂eq 2030", f"{co2:.2f} Mt")
-    cols[4].metric("🤖 LLM tokens", f"{total_tokens:,}")
+    ssl = pangan.get("ssl_2030")
+    if ssl is None:
+        cols[2].metric("🌾 SSL padi", "n/a", help=pangan.get("alasan"))
+    else:
+        cols[2].metric(
+            "🌾 SSL padi",
+            f"{ssl:.2f}",
+            delta="surplus" if ssl >= 1 else f"defisit {(1-ssl)*100:.0f}%",
+            delta_color="normal" if ssl >= 1 else "inverse",
+        )
+    cols[3].metric("🌍 CO₂eq 2030", f"{energi['emisi_2030_mt_co2']:.2f} Mt")
+    cols[4].metric("🤖 LLM tokens", f"{result.footprint.total_tokens:,}")
+
+
+def _checks_panel(nexus):
+    icon = {"ok": "🟢", "warn": "🟡", "fail": "🔴"}
+    for w in nexus.warnings:
+        st.warning(w)
+    df = pd.DataFrame([
+        {"": icon.get(c["status"], "⚪"), "Check": c["name"], "Detail": c["detail"]}
+        for c in nexus.checks
+    ])
+    st.dataframe(df, use_container_width=True, hide_index=True)
 
 
 def _footprint_panel(footprint):
     est = footprint.estimate()
-    cols = st.columns(4)
+    cols = st.columns(5)
     cols[0].metric("Total tokens", f"{est['total_tokens']:,}")
     cols[1].metric("⚡ Energy (kWh)", f"{est['energy_kwh']:.4f}")
-    cols[2].metric("💧 Water (L)", f"{est['water_l']:.3f}")
-    cols[3].metric("🌍 CO₂eq (kg)", f"{est['co2_kg']:.4f}")
+    cols[2].metric("💧 Water on-site (L)", f"{est['water_onsite_l']:.4f}")
+    cols[3].metric("💧 Water off-site (L)", f"{est['water_offsite_l']:.4f}")
+    cols[4].metric("🌍 CO₂eq (kg)", f"{est['co2_kg']:.4f}")
+    for note in est["notes"]:
+        st.caption(f"⚠ {note}")
+    st.dataframe(pd.DataFrame(est["per_entry"]), use_container_width=True, hide_index=True)
 
     by_agent = footprint.by_agent()
     if by_agent:
@@ -301,7 +302,7 @@ def _provenance_panel(location):
                 "Source": packet.source,
                 "Tier": f"{tier_emoji} T{packet.tier}",
                 "Conf": f"{packet.confidence:.2f}",
-                "Year": packet.year or "—",
+                "Year": str(packet.year) if packet.year else "—",
                 "Note": packet.note[:80] + ("..." if len(packet.note) > 80 else ""),
             })
         else:
@@ -339,22 +340,16 @@ def _comparison_panel():
     # ─── Metrics comparison ───
     metrics_data = []
     for name, r in zip(names, results, strict=True):
-        water_d = next((t["data"] for t in r.water.tool_outputs
-                        if t["tool"] == "run_water_balance"), {})
-        energy_d = next((t["data"] for t in r.energy.tool_outputs
-                         if t["tool"] == "project_energy_demand"), {})
-        food_ssl = next((t["data"] for t in r.food.tool_outputs
-                         if t["tool"] == "compute_food_ssl"), {})
-        emis = next((t["data"] for t in r.energy.tool_outputs
-                     if t["tool"] == "estimate_emissions"), {})
+        k = r.nexus.key_figures()
         metrics_data.append({
             "Scenario": name,
-            "Water deficit (mm)": water_d.get("summary", {}).get("total_deficit_mm", 0),
-            "Water surplus (mm)": water_d.get("summary", {}).get("total_surplus_mm", 0),
-            "Demand 2030 (GWh)": (energy_d.get("endpoints", {}) or {}).get("demand_2030_gwh", 0) or 0,
-            "Demand 2050 (GWh)": (energy_d.get("endpoints", {}) or {}).get("demand_2050_gwh", 0) or 0,
-            "SSL padi": food_ssl.get("ssl", 0),
-            "CO₂eq Mt": emis.get("co2_emissions_mt", 0),
+            "Water deficit (mm)": k["air"]["defisit_mm"],
+            "Water surplus (mm)": k["air"]["surplus_mm"],
+            "Water stress": k["air"]["water_stress_setelah_irigasi"],
+            "Demand 2030 (GWh)": k["energi"]["demand_2030_gwh"] or 0,
+            "Demand horizon (GWh)": k["energi"]["demand_horizon_gwh"] or 0,
+            "SSL padi": k["pangan"].get("ssl_2030") or 0,
+            "CO₂eq Mt": k["energi"]["emisi_2030_mt_co2"],
             "Total tokens": r.footprint.total_tokens,
         })
 
@@ -442,55 +437,33 @@ with tab_run:
             try:
                 st.write(f"⚙ Provider: `{provider_choice}` | Mode: "
                          + ("realtime fetch" if is_realtime else "cached"))
+                phase_labels = {
+                    "nexus_start": "Phase 1/4 — 🔗 Nexus deterministik (data + model fisik)...",
+                    "domain_start": "Phase 2/4 — 💧⚡🌾 Agen domain (paralel)...",
+                    "critic_start": "Phase 3/4 — 🔍 Critic Agent...",
+                    "coordinator_start": "Phase 4/4 — 🧭 Coordinator Agent...",
+                }
 
-                status.update(label="Phase 1/5 — 💧 Water Agent...")
-                st.write("💧 **Water Agent** starting...")
-                if is_realtime:
-                    st.write("   ⏱ Fetching Open-Meteo (~30-60s untuk lokasi baru)...")
-                water, water_out, dt_w = asyncio.run(run_water(scenario_data))
-                st.write(f"   ✓ done in {dt_w:.1f}s | tokens: "
-                         f"in={water_out.usage_input_tokens}, out={water_out.usage_output_tokens}")
-                st.write("   ↳ tools: "
-                         + ", ".join(t["tool"] for t in water_out.tool_outputs))
+                def on_event(phase, payload):
+                    if phase in phase_labels:
+                        status.update(label=phase_labels[phase])
+                        st.write(f"**{phase_labels[phase]}**")
+                        if phase == "nexus_start" and is_realtime:
+                            st.write("   ⏱ Fetching Open-Meteo (~30-60s untuk lokasi baru)...")
+                    elif phase == "nexus_done":
+                        flagged = sum(c["status"] != "ok" for c in payload["checks"])
+                        st.write(f"   ✓ done in {payload['elapsed']:.1f}s | "
+                                 f"{len(payload['checks'])} checks, {flagged} warn/fail")
+                    elif phase == "agent_done":
+                        retry = (f" | ⟳ {payload['attempts']} attempts"
+                                 if payload["attempts"] > 1 else "")
+                        st.write(f"   ✓ {payload['agent']} {payload['elapsed']:.1f}s | tokens: "
+                                 f"in={payload['input_tokens']}, out={payload['output_tokens']} | "
+                                 f"`{payload['model']}`{retry}")
 
-                status.update(label="Phase 2/5 — ⚡ Energy Agent...")
-                st.write("⚡ **Energy Agent** starting...")
-                energy, energy_out, dt_e = asyncio.run(run_energy(scenario_data))
-                st.write(f"   ✓ done in {dt_e:.1f}s | tokens: "
-                         f"in={energy_out.usage_input_tokens}, out={energy_out.usage_output_tokens}")
-
-                status.update(label="Phase 3/5 — 🌾 Food Agent...")
-                st.write("🌾 **Food Agent** starting...")
-                food, food_out, dt_f = asyncio.run(run_food(scenario_data))
-                st.write(f"   ✓ done in {dt_f:.1f}s | tokens: "
-                         f"in={food_out.usage_input_tokens}, out={food_out.usage_output_tokens}")
-
-                status.update(label="Phase 4/5 — 🔍 Critic Agent...")
-                st.write("🔍 **Critic Agent** auditing...")
-                critic, critic_out, dt_c = asyncio.run(
-                    run_critic(scenario_data, water_out, energy_out, food_out)
-                )
-                st.write(f"   ✓ done in {dt_c:.1f}s | tokens: "
-                         f"in={critic_out.usage_input_tokens}, out={critic_out.usage_output_tokens}")
-
-                status.update(label="Phase 5/5 — 🧭 Coordinator Agent...")
-                st.write("🧭 **Coordinator Agent** synthesizing...")
-                coordinator, coord_out, dt_co = asyncio.run(
-                    run_coordinator(scenario_data, water_out, energy_out, food_out, critic_out)
-                )
-                st.write(f"   ✓ done in {dt_co:.1f}s | tokens: "
-                         f"in={coord_out.usage_input_tokens}, out={coord_out.usage_output_tokens}")
-
-                total_t = dt_w + dt_e + dt_f + dt_c + dt_co
+                result = asyncio.run(run_scenario(scenario_data, location=loc, on_event=on_event))
+                total_t = result.timings["total"]
                 st.write(f"\n🎉 **Total elapsed: {total_t:.1f}s**")
-
-                result = build_result(
-                    scenario_data,
-                    water, water_out, energy, energy_out, food, food_out,
-                    critic, critic_out, coordinator, coord_out,
-                    timings={"water": dt_w, "energy": dt_e, "food": dt_f,
-                             "critic": dt_c, "coordinator": dt_co, "total": total_t},
-                )
                 st.session_state.last_result = result
 
                 # Save to history
@@ -514,6 +487,8 @@ with tab_run:
         # ─── Dashboard cards at top ───
         st.subheader("📊 Dashboard Quick Glance")
         _dashboard_cards(result)
+        with st.expander("🔗 Nexus coupling — pemeriksaan deterministik", expanded=True):
+            _checks_panel(result.nexus)
         st.divider()
 
         # Location banner
@@ -573,7 +548,8 @@ with tab_run:
 
         st.divider()
         st.subheader("🌐 Nexus Footprint (WEF 2026b)")
-        st.caption("Estimasi proxy. Sumber: Zhang et al. (2025), WEF (2026b).")
+        st.caption("Estimasi proxy (bukan measurement). Metode air: Li et al. (2023); "
+                   "semua faktor di config/llm.yaml → footprint.")
         _footprint_panel(result.footprint)
 
     else:

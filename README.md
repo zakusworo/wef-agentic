@@ -7,9 +7,9 @@ Operasionalisasi dua framework WEF 2026:
 - **WEF (2026a)** *Making Agentic AI Work for Government: A Readiness Framework* (April 2026)
 - **WEF (2026b)** *Building Resilient and Scalable AI Value Chains: A Nexus Strategy* (May 2026)
 
-Spec lengkap: [`../WEF-Agentic.md`](../WEF-Agentic.md)
+Spec lengkap: `WEF-Agentic.md` (dokumen desain internal, tidak termasuk di repo ini).
 
-> **Status:** Phase 1 complete — 5 agen × 5 skenario × multi-city × data sources framework × comparison mode × PDF export.
+> **Status:** Phase 1 complete — deterministic nexus coupling × 5 agen × 5 skenario × multi-city × data sources framework × comparison mode × PDF export × offline test suite + CI.
 
 ---
 
@@ -17,14 +17,17 @@ Spec lengkap: [`../WEF-Agentic.md`](../WEF-Agentic.md)
 
 | Domain | Capability |
 |---|---|
-| **Agents** | 5 LLM-backed agen (Coordinator, Water, Energy, Food, Critic) dengan tool-use loop |
+| **Nexus coupling** | Deterministik, sebelum LLM: water balance → water stress → yield; pompa irigasi → demand listrik; demand listrik → konsumsi air pembangkit. Plus pemeriksaan konsistensi otomatis |
+| **Agents** | 5 LLM agen (Water, Energy, Food, Critic, Coordinator) yang *menginterpretasi* hasil model — scripted tool pipeline, bukan LLM tool-calling |
 | **Scenarios** | 5 skenario pre-defined (BAU, JETP-Aligned, Net-Zero 2045, Climate Stress SSP5-8.5, Tourism Boom) |
 | **Multi-city** | Preset Sleman (BPS lengkap) + custom city via Open-Meteo geocoding (Bandung, Marrakesh, dll.) |
-| **Data sources** | 5 providers ber-tier (Manual / BPS / Open-Meteo / World Bank / Country-proxy) dengan DataResolver fallback |
-| **Provenance** | Setiap variable membawa source, year, unit, confidence (0-1), tier, note |
+| **Data sources** | 6 providers ber-tier (Manual / BPS / Open-Meteo / Gazetteer / World Bank / Country-proxy) via DataResolver — dipakai langsung oleh tools |
+| **Provenance** | Setiap input membawa source, year, unit, confidence (0-1), tier, note; input low-confidence di-flag |
 | **LLM providers** | 3 backend swap-able (Ollama Local / Ollama Cloud / Claude Agent SDK) — runtime override via env |
-| **Nexus footprint** | Tokens → kWh → liter air → CO₂eq tracked per run |
-| **Reporting** | PDF report dengan 5 matplotlib charts embedded + provenance + bounded-autonomy notice |
+| **Robustness** | Jawaban kosong (reasoning model kehabisan token) → retry dengan budget 2× → gagal eksplisit, tidak diteruskan diam-diam |
+| **Nexus footprint** | Tokens → kWh (per ukuran model, PUE) → air on-site + off-site → CO₂eq (grid per provider) |
+| **Reproducibility** | Run record JSON: git SHA, config, prompt hash, model yang dilaporkan backend, done_reason, output lengkap |
+| **Reporting** | PDF report: charts, tabel pemeriksaan deterministik, provenance, bounded-autonomy notice |
 | **UI** | Streamlit 3-tab (Run / Compare / Data Sources) dengan live progress, dashboard cards, radar trade-off chart |
 
 ---
@@ -32,32 +35,35 @@ Spec lengkap: [`../WEF-Agentic.md`](../WEF-Agentic.md)
 ## 🏗 Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                   geo/ (Location, Open-Meteo geocoding)         │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────────┐
-│  data/sources/ (5 providers, tier 1-3)                          │
-│    Manual → BPS → Open-Meteo → World Bank → Country-Proxy       │
-│              ↓ DataResolver (priority cascade)                  │
-│              DataPacket(value, source, year, confidence, tier)  │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────────┐
-│  physics/ (water_balance · energy_demand · crop_yield)          │
-│  tools/   (10 registered, JSON-callable)                        │
-└──────────────────────┬──────────────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────────────┐
-│  agents/  (5 agen + base)        ─┐                             │
-│  llm/     (Ollama L/C, Claude)    ├─▶  orchestration/  (graph)  │
-│  llm/footprint.py                 │                             │
-└────────────────────────────────────┴──────────────────────────┐ │
-                                                                ▼ ▼
-┌─────────────────────────────────────────────────────────────────┐
-│  reporting/ (matplotlib + reportlab PDF)                        │
-│  ui/streamlit_app.py (Run · Compare · Data Sources tabs)        │
-└─────────────────────────────────────────────────────────────────┘
+ scenario + Location
+        │
+        ▼
+┌──────────────────────────────────────────────────────────────────┐
+│ orchestration/nexus.py — compute_nexus()  (deterministik, no LLM) │
+│                                                                  │
+│  data/sources DataResolver ──► tools/ (water · energy · food)    │
+│                                  │                               │
+│  climate Δ ─► Thornthwaite-Mather (skenario & baseline iklim)    │
+│                 ├─► water stress setelah irigasi ─► Doorenbos-    │
+│                 │     Kassam yield ─► produksi ─► SSL             │
+│                 └─► pompa air tanah (Δ iklim) ─► +GWh demand      │
+│  demand × porsi EBT ─► emisi CO₂ + konsumsi air pembangkit       │
+│                                                                  │
+│  run_checks(): mass balance · seasonal mismatch · groundwater vs │
+│  recharge proxy · populasi konsisten · yield plausibility ·      │
+│  low-confidence inputs                                           │
+└───────────────────────────────┬──────────────────────────────────┘
+                                │ NexusState (angka kunci + checks)
+            ┌───────────────────┼───────────────────┐
+            ▼                   ▼                   ▼
+       Water Agent        Energy Agent         Food Agent      (paralel)
+            └───────────────────┼───────────────────┘
+                                ▼
+            Critic Agent — audit narasi vs angka kunci + checks
+                                ▼
+            Coordinator — sintesis trade-off + rekomendasi
+                                ▼
+       footprint · run record · PDF (reporting/) · Streamlit (ui/)
 ```
 
 ---
@@ -67,11 +73,11 @@ Spec lengkap: [`../WEF-Agentic.md`](../WEF-Agentic.md)
 ### 1. Install
 
 ```bash
-cd "/mnt/e/WEF Project/wef-agentic"
-python3 -m venv .venv
-source .venv/bin/activate           # WSL / Linux / macOS
+cd wef-agentic
+python3.11 -m venv .venv
+source .venv/bin/activate           # Linux / macOS / WSL
 # .venv\Scripts\activate            # Windows
-pip install -e ".[dev]"
+pip install -e ".[dev]"             # + ".[dev,claude]" untuk Claude Agent SDK
 ```
 
 ### 2. Pilih LLM Provider
@@ -100,31 +106,41 @@ Per-agent default ada di `src/wef_agentic/config/llm.yaml`. Env var override dip
 python -m wef_agentic.data.bootstrap
 
 # Atau pakai fixture synthetic kalibrasi BPS-BMKG (offline, instant)
-python tests/generate_fixture.py
+python scripts/generate_fixture.py
 ```
 
-### 4. Run UI
+### 4. Run
 
 ```bash
-streamlit run src/wef_agentic/ui/streamlit_app.py
-# → http://localhost:8501
+streamlit run src/wef_agentic/ui/streamlit_app.py      # UI → http://localhost:8501
+
+python scripts/run_scenario.py S2_JETP_Aligned          # CLI, simpan run record ke docs/runs/
+python scripts/run_scenario.py S1_BAU_2030 --location Bandung --provider ollama-local --model gemma4:e4b
 ```
 
 ---
 
 ## 🧠 Core Concepts
 
+### Siapa menghitung apa
+
+Semua angka dihitung **deterministik** oleh `compute_nexus()` sebelum LLM dipanggil. Agen menerima angka tersebut dan diinstruksikan untuk mengutip, bukan menghitung ulang. Critic mengaudit narasi agen terhadap *angka kunci* dan hasil *pemeriksaan deterministik*. Dengan begitu kesalahan numerik LLM bisa dideteksi, dan hasil model fisik tidak bergantung pada model bahasa yang dipakai.
+
+Tool registry (`tools/`) tetap menyediakan JSON schema per tool; saat ini tools dipanggil oleh pipeline, bukan dipilih oleh LLM.
+
 ### 5 Agen
 
 | Agent | Role | Default model (yaml) |
 |---|---|---|
-| **Coordinator** | Decompose query, sintesis hasil, sorot trade-off WEF | `deepseek-v4-pro:cloud` (max_tokens 3000) |
-| **Water** | Thornthwaite-Mather water balance, irrigation demand | `deepseek-v4-pro:cloud` |
-| **Energy** | Elasticity-based demand projection, grid emissions | `deepseek-v4-pro:cloud` |
-| **Food** | Doorenbos-Kassam yield, SSL (Self-Sufficiency Level) | `deepseek-v4-pro:cloud` |
-| **Critic** | Audit konsistensi, mass-balance, bias, error consequence (WEF 2026a) | `kimi-k2.6:cloud` |
+| **Water** | Interpretasi water balance (surplus/defisit tahunan & musiman), stress, irigasi, air tanah | `deepseek-v4-pro:cloud` |
+| **Energy** | Interpretasi proyeksi demand, tambahan pompa irigasi, emisi, air pembangkit | `deepseek-v4-pro:cloud` |
+| **Food** | Interpretasi yield, produksi, SSL — atau kesenjangan data jika luas panen lokal tidak ada | `deepseek-v4-pro:cloud` |
+| **Critic** | Fidelity angka, konsistensi antar-sektor, tanggapan atas WARN/FAIL, bias, error consequence (WEF 2026a) | `kimi-k2.6:cloud` (max_tokens 8000) |
+| **Coordinator** | Sintesis trade-off, uncertainty, rekomendasi untuk pemerintah daerah lokasi | `deepseek-v4-pro:cloud` (max_tokens 6000) |
 
 Setiap agen punya 3 field model di yaml (`model_local` / `model` / `model_claude`) — provider swap tidak mengubah agen, hanya backend.
+
+**Jawaban kosong tidak pernah diteruskan.** Reasoning model (mis. Kimi K2.6) bisa menghabiskan seluruh budget untuk `thinking`. Base agent me-retry sekali dengan budget 2× (cap `retry.max_tokens_cap` di `llm.yaml`); jika tetap kosong, run gagal dengan `EmptyCompletionError`. Token dari semua attempt dihitung di footprint.
 
 ### 5 Skenario
 
@@ -136,59 +152,66 @@ Setiap agen punya 3 field model di yaml (`model_local` / `model` / `model_claude
 | `S4_Climate_Stress` | Climate Stress 2030 | P −15%, T +1.8°C | SSP5-8.5 + drought + Merapi VEI 3 di T+3 |
 | `S5_Tourism_Boom` | KSPN Borobudur Boom 2030 | P −3%, T +1.0°C | 2 juta+ wisatawan, LP2B lax, hospitality conversion |
 
-Skenario location-agnostic — `get_scenario("S2_JETP_Aligned", location_query="Bandung")` override target city.
+Skenario location-agnostic — `get_scenario("S2_JETP_Aligned", location_query="Bandung")` override target city. Water stress **bukan** input skenario: diturunkan dari climate Δ. Untuk sensitivity run, set `water_stress_override` (run akan membawa peringatan).
+
+### Nexus Coupling
+
+Parameter di `src/wef_agentic/config/nexus.yaml`; nilai bertanda `ASSUMPTION` adalah default screening yang harus dikalibrasi dengan data lokal.
+
+| Link | Perhitungan |
+|---|---|
+| Iklim → air | Thornthwaite-Mather bulanan dengan retensi eksponensial `S = C·exp(−APWL/C)`, storage awal = steady state (spin-up) |
+| Air → pangan | `stress = (1 − ETa/PET) × (1 − supply_fraction)` → Doorenbos-Kassam `Ya/Ymax = 1 − Ky·stress` |
+| Air → energi | air tanah = defisit / efisiensi × supply × porsi air tanah × luas fisik; `E = ρgH/η`; yang ditambahkan ke demand adalah selisih skenario − iklim baseline, di-ramp ke tahun horizon |
+| Energi → air | konsumsi air pembangkit = demand × (porsi fosil × 2.6 + porsi EBT × 0.1) m³/MWh — off-site, dilaporkan, tidak dikurangkan dari neraca lokal |
+| Populasi | sektor energi & pangan memakai populasi dasar dan laju pertumbuhan yang sama (dicek) |
+
+Pemeriksaan deterministik (`ok` / `warn` / `fail`) masuk ke prompt Critic & Coordinator, UI, PDF, dan run record.
 
 ### Data Sources Framework
 
-5 providers terdaftar di `data/sources/`, dipilih DataResolver berdasarkan **tier priority**:
+6 providers terdaftar di `data/sources/`, dipilih DataResolver berdasarkan **tier priority**:
 
 | Tier | Provider | Cakupan | Confidence |
 |---|---|---|---|
 | 🟢 1 | `ManualOverrideSource` | Upload JSON user via UI | 0.99 |
-| 🟢 1 | `BPSStaticSource` | Sleman only (4 variable, BPS Statistik 2023) | 0.95 |
+| 🟢 1 | `BPSStaticSource` | Sleman only (populasi, listrik, luas panen, alih fungsi lahan, yield) | 0.95 |
 | 🟢 1 | `OpenMeteoSource` | Global, 3 climate variable, ERA5 reanalysis (10-yr mean) | 0.92 |
-| 🟡 2 | `WorldBankSource` | Country-level, 3 indicator via REST API | 0.75 |
+| 🟡 2 | `GeocodedPopulationSource` | Populasi GeoNames dari hasil geocoding (kota, bukan negara) | 0.70 |
+| 🟡 2 | `WorldBankSource` | Country-level per-kapita indicators (GDP, listrik) via REST API | 0.75 |
 | 🔴 3 | `CountryProxySource` | Last-resort static defaults per ISO code | 0.55 |
 
-**11 standardized variables** di domain `climate.*`, `socio.*`, `energy.*`, `food.*`, `grid.*`. Setiap fetch menghasilkan `DataPacket` dengan provenance lengkap (source, year, unit, confidence, tier, note).
+World Bank tidak lagi melayani `socio.population` (itu total negara, bukan kota). Jika populasi tidak diketahui sama sekali, fallback 100k dipakai **dengan** provenance confidence 0.1 dan peringatan.
 
-Manual override format ada di `data/external/override_<slug>.json`, schema dari `registry.manual_override_schema()`.
+**12 standardized variables** di domain `climate.*`, `socio.*`, `energy.*`, `food.*`, `grid.*`. Manual override format ada di `data/external/override_<slug>.json`, schema dari `registry.manual_override_schema()`.
 
 ### Multi-City
 
-- **Preset**: hardcoded `Location` dengan country/region/coords lengkap (saat ini hanya Sleman, BPS data tier 1).
-- **Custom**: nama kota apa saja → Open-Meteo geocoding (gratis, no key) → resolve country code → fetch climate realtime → fallback country-proxy untuk variable yang tidak tersedia.
-
-Verified: Sleman cached fixture water balance 0.33s · Bandung fresh fetch 1.95s · Marrakesh full chain 11.3s (Morocco, deficit 1481mm, semi-arid).
+- **Preset**: hardcoded `Location` dengan data lokal (saat ini hanya Sleman, BPS tier 1).
+- **Custom**: nama kota apa saja → Open-Meteo geocoding (gratis, no key) → fetch climate realtime → per-kapita country proxy. Match yang dipilih user di UI dipin, jadi geocoding ulang tidak bisa memilih kota lain dengan nama sama.
+- **Proyeksi pangan butuh luas panen lokal.** Tanpa BPS/manual override, proyeksi pangan dan coupling pompa irigasi dilaporkan *unavailable* — tidak meminjam lahan Sleman.
 
 ### Nexus Footprint
 
-Setiap run melacak LLM footprint-nya sendiri (operasionalisasi WEF 2026b):
+Setiap run melacak LLM footprint-nya sendiri (operasionalisasi WEF 2026b), konstanta di `config/llm.yaml → footprint:`:
 
 ```
-Energy (kWh)   ≈ tokens × 0.0003 / 1000        (proxy public estimate)
-Water (L)      ≈ tokens × 0.005 / 1000         (Zhang et al. 2025 proxy)
-CO₂eq (kg)     ≈ kWh × 0.4                      (US grid mix average)
+IT energy (kWh)   = (output + 0.1·input tokens)/1000 × 0.0003 × size multiplier (small 0.1 · medium 1 · large 3)
+Facility energy   = IT energy × PUE                     (per provider)
+Water on-site (L) = IT energy × WUE                     (Li et al. 2023: 0.55 L/kWh, US)
+Water off-site(L) = facility energy × EWIF              (Li et al. 2023: 3.14 L/kWh, US)
+CO₂eq (kg)        = facility energy × grid factor       (local: Jawa-Bali 0.85; cloud: US 0.4)
 ```
 
-> **Honest caveat:** angka adalah *order-of-magnitude*, bukan measurement. Konstanta proxy dikonfigurasi di `config/llm.yaml` → `footprint:`.
+> **Honest caveat:** angka adalah *order-of-magnitude*, bukan measurement. Faktor yang tidak diketahui (mis. EWIF grid Indonesia untuk run lokal) dilaporkan sebagai *missing*, bukan nol.
 
 ### PDF Reporting
 
 `reporting/pdf.py` → file `wef_agentic_<location-slug>_<scenario>.pdf`:
 
-- Cover + metadata + bounded-autonomy notice
-- Coordinator synthesis + Critic audit (charts embedded)
-- 3 per-agent sections dengan matplotlib charts
-- Nexus footprint table + references
+1. Coordinator synthesis · 2. Critic audit · 3. Nexus coupling & pemeriksaan deterministik · 4–6. Water / Energy / Food · 7. Nexus footprint · 8. References
 
-Charts (matplotlib untuk PDF, plotly untuk UI):
-
-- 💧 Water: monthly balance + soil moisture
-- ⚡ Energy: demand projection 2023-2050 dengan annotated endpoints
-- 🌾 Food: area+yield dual-axis + production bars
-- 🔍 Critic: donut distribusi findings (KONSISTEN / INKONSISTEN / MISSING / ERROR-HIGH)
-- 🧭 Coordinator: token usage per agent
+Charts (matplotlib untuk PDF, plotly untuk UI): water balance bulanan + soil moisture, proyeksi demand (2030 / horizon / 2050), luas+yield+produksi, donut temuan Critic, token per agen.
 
 ---
 
@@ -197,21 +220,14 @@ Charts (matplotlib untuk PDF, plotly untuk UI):
 **▶ Run Scenario**
 
 - Sidebar: provider switcher, model override, location selector (preset Sleman atau custom city)
-- Pilih 1 dari 5 skenario → live progress logs via `st.status` (per-agen timing, tokens, tool calls)
-- Dashboard cards 5 metrics: water deficit, demand 2030, SSL padi, CO₂eq, total tokens
+- Pilih 1 dari 5 skenario → live progress 4 fase (nexus → domain paralel → critic → coordinator), per-agen timing, tokens, model yang dilaporkan, retry
+- Dashboard cards: water deficit + stress, demand 2030 + tambahan pompa, SSL padi, CO₂eq, tokens
+- Panel pemeriksaan deterministik + peringatan
 - Download PDF report
 
-**📊 Compare Scenarios**
+**📊 Compare Scenarios** — tabel lintas skenario, radar trade-off (dinormalisasi 0-1), sintesis side-by-side
 
-- Multi-select 2-3 hasil dari history
-- Comparison table cross-scenario
-- Radar chart trade-off (water security · energy efficiency · food security · low-CO₂ · token efficiency, semua dinormalisasi 0-1)
-- Coordinator synthesis side-by-side
-
-**🔬 Data Sources**
-
-- Provenance panel: per-variable source + tier + confidence + note
-- JSON upload untuk manual override (validated terhadap `manual_override_schema`)
+**🔬 Data Sources** — provenance per-variable + JSON upload manual override
 
 ---
 
@@ -219,55 +235,29 @@ Charts (matplotlib untuk PDF, plotly untuk UI):
 
 ```
 wef-agentic/
-├── README.md
-├── pyproject.toml                  # deps + ruff config (RUF001/002 ignored)
-├── .env.example                    # env vars (WEF_AGENTIC_*, OLLAMA_*)
-├── .gitignore
-├── data/
-│   ├── raw/                        # untouched downloads
-│   ├── processed/                  # parquet cache (gitignored)
-│   └── external/                   # manual JSON overrides
+├── pyproject.toml                  # deps (+ extras: dev, claude) + ruff + pytest config
+├── .github/workflows/ci.yml        # ruff + pytest on Python 3.11
+├── data/{raw,processed,external}/  # downloads · parquet cache (gitignored) · manual overrides
+├── docs/runs/                      # run records
+├── scripts/
+│   ├── run_scenario.py             # CLI end-to-end run → docs/runs/*.json
+│   ├── generate_fixture.py         # synthetic Sleman climate fixture
+│   └── smoke_llm.py                # manual check against a real local Ollama
 ├── src/wef_agentic/
-│   ├── config/                     # settings.py, llm.yaml
-│   ├── geo/                        # Location, Open-Meteo geocoding, presets
-│   ├── data/
-│   │   ├── bps_static.py           # Sleman hardcoded BPS
-│   │   ├── country_defaults.py     # 20+ negara ISO defaults
-│   │   ├── openmeteo.py            # historical climate fetch
-│   │   ├── nasa_power.py           # alternative climate fetch
-│   │   ├── bootstrap.py            # cache priming CLI
-│   │   └── sources/                # ← Data Sources Framework
-│   │       ├── base.py             # DataPacket, DataSource ABC
-│   │       ├── registry.py         # 11 VariableSpec
-│   │       ├── resolver.py         # DataResolver priority cascade
-│   │       ├── manual_source.py
-│   │       ├── bps_static_source.py
-│   │       ├── openmeteo_source.py
-│   │       ├── worldbank_source.py
-│   │       └── proxy_source.py
-│   ├── physics/                    # water_balance, energy_demand, crop_yield
-│   ├── tools/                      # registry + water/energy/food (10 tools)
-│   ├── llm/
-│   │   ├── provider.py             # factory + env override
-│   │   ├── ollama_provider.py      # local + cloud
-│   │   ├── claude_agent_provider.py
-│   │   ├── footprint.py            # nexus tracking
-│   │   └── types.py
-│   ├── agents/                     # base + coordinator + critic + water/energy/food
-│   ├── orchestration/              # graph (water||energy||food → critic → coordinator), scenarios
+│   ├── config/                     # settings.py, llm.yaml, nexus.yaml
+│   ├── geo/                        # Location, geocoding, presets, resolve cache
+│   ├── data/                       # BPS static, country defaults, Open-Meteo, fixture, sources/
+│   ├── physics/                    # water_balance, crop_yield, energy_demand, coupling
+│   ├── tools/                      # registry + water/energy/food tools
+│   ├── llm/                        # providers, types, footprint
+│   ├── agents/                     # base + water/energy/food/critic/coordinator
+│   ├── orchestration/              # nexus (deterministic), graph (pipeline), runlog, scenarios
 │   ├── reporting/                  # charts (plotly), pdf_charts (matplotlib), pdf (reportlab)
-│   ├── readiness/                  # WEF 2026a function mapping
-│   ├── analysis/                   # cross-scenario helpers
 │   └── ui/                         # streamlit_app.py
 └── tests/
-    ├── smoke_no_llm.py             # imports + tools + physics (~1s)
-    ├── smoke_llm.py                # 1 agen via Ollama (~15s)
-    ├── smoke_e2e_sleman.py         # full 5-agen pipeline Sleman (~10min llama3.2:1b · ~60s cloud)
-    ├── smoke_e2e.py                # legacy multi-city variant
-    ├── generate_fixture.py         # regenerate calibrated fixture
-    ├── fixtures/
-    ├── unit/
-    └── integration/
+    ├── conftest.py                 # offline fixture data, network blocked, FakeProvider
+    ├── unit/                       # physics, coupling, footprint, providers, retry, tools
+    └── integration/                # full pipeline (Sleman + custom city), PDF, run record
 ```
 
 ---
@@ -275,69 +265,29 @@ wef-agentic/
 ## 🧪 Testing
 
 ```bash
-# 1-second sanity — imports, tools, physics, scenarios (no LLM)
-python tests/smoke_no_llm.py
+pytest                               # offline: synthetic fixture, no network, fake LLM (~15s)
+ruff check src tests scripts
 
-# Single agent via Ollama local
-python tests/smoke_llm.py
-
-# Full 5-agen pipeline Sleman fixture (llama3.2:1b lokal, ~10 menit)
-python tests/smoke_e2e_sleman.py
-
-# Production-grade run via Ollama Cloud (deepseek-v4-pro + kimi-k2.6)
-# Butuh OLLAMA_API_KEY di .env + WEF_AGENTIC_PROVIDER_OVERRIDE=ollama-cloud
-python tests/run_cloud_deepseek.py S2_JETP_Aligned
-# Output: docs/runs/run_<scenario>_deepseek_cloud_<timestamp>.{json,log}
-
-# Lint (RUF001/002 ignored untuk emoji/Indonesia)
-ruff check src/wef_agentic
-
-# Compile-check
-python -m compileall -q src/wef_agentic
+python scripts/smoke_llm.py gemma4:e4b    # optional: real local Ollama
 ```
 
-### Verified end-to-end timings (Sleman, S2 JETP-Aligned, 2026-05-17)
+CI (`.github/workflows/ci.yml`) menjalankan ruff + pytest di setiap push/PR.
 
-Pipeline penuh 5 agen pakai cached fixture Sleman, tergantung model backend:
+### Historical run (pre-coupling, 2026-05-17)
 
-| Backend | Phase 1 (parallel) | Phase 2 (critic) | Phase 3 (coord.) | Total | Tokens |
-|---|---:|---:|---:|---:|---:|
-| `llama3.2:1b` (local, smoke-only) | 18.9s | 414.9s | 145.5s | **579.3s** (~10 min) | 11,662 |
-| `gemma4:e4b` (local, production-grade) | *TBD* | *TBD* | *TBD* | *est. 60–120s* | — |
-| `deepseek-v4-pro:cloud` (domain+coord) / `kimi-k2.6:cloud` (critic), Ollama Cloud 3-concurrent | **31.1s** | **130.3s** | **47.9s** | **209.3s** (~3.5 min) | **19,813** |
+[`docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json`](docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json) — Ollama Cloud, `deepseek-v4-pro` (domain + coordinator) / `kimi-k2.6` (critic): 31.1s domain paralel · 130.3s critic · 47.9s coordinator · 19,813 tokens.
 
-#### Run Ollama Cloud — Deepseek v4 Pro + Kimi K2.6 (2026-05-17 10:58 UTC)
+Run ini dibuat **sebelum** perubahan berikut dan tidak lagi mewakili output framework:
 
-Verifikasi pertama production run via Ollama Cloud (`tests/run_cloud_deepseek.py`).
-Raw output tersimpan di [`docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json`](docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json) + `.log`.
+- Critic menghabiskan 3,000 token untuk reasoning sehingga output kosong, dan Coordinator tetap mensintesis tanpa audit. Sekarang: critic `max_tokens` 8000, retry, dan run gagal eksplisit jika tetap kosong.
+- Water stress saat itu konstanta skenario (7%), belum diturunkan dari water balance.
+- Footprint memakai konstanta per-token tunggal.
 
-| Agent | Model | Tokens (in / out) | Tool calls |
-|---|---|---:|---:|
-| water | `deepseek-v4-pro:cloud` | 2,025 / 1,469 | (parallel) |
-| energy | `deepseek-v4-pro:cloud` | 1,224 / 1,249 | (parallel) |
-| food | `deepseek-v4-pro:cloud` | 1,536 / 1,591 | (parallel) |
-| critic | `kimi-k2.6:cloud` | 2,697 / **3,000 (cap)** | 0 |
-| coordinator | `deepseek-v4-pro:cloud` | 2,443 / 2,579 | 0 |
+Jalankan ulang dengan `python scripts/run_scenario.py S2_JETP_Aligned` untuk run record format baru.
 
-**Nexus footprint untuk run ini:** Total 19,813 tokens · 0.00594 kWh · 0.099 L air · 2.4 g CO₂eq.
+### Sleman fixture
 
-**Coordinator synthesis (preview):**
-
-> Skenario JETP-Aligned 2030 di Kabupaten Sleman menunjukkan adanya tekanan silang (trade-off) yang signifikan antara ketahanan air, energi, dan pangan. Meskipun secara tahunan neraca air masih surplus, defisit musim kemarau yang melebar akibat penurunan presipitasi dan kenaikan suhu akan meningkatkan kebutuhan irigasi suplementer hingga 209 mm. Pada saat yang sama, produksi padi diproyeksikan turun 5% akibat penyusutan lahan dan cekaman air (water stress 7%), meskipun swasembada pangan lokal masih terjaga. Di sisi energi, permintaan listrik tumbuh 26% dan target bauran energi terbarukan 34% berpotensi meningkatkan ketergantungan pada pembangkit listrik tenaga air yang debitnya justru terancam oleh defisit musiman.
-
-**Trade-off temuan (dari coordinator):** Defisit air kemarau 135,9 mm → kebutuhan irigasi 209,1 mm. Produksi padi turun 5% (239,315 ton) akibat water stress + penyusutan lahan; SSL pangan lokal masih terjaga. Demand listrik tumbuh 26%, target EBT 34% bergantung PLTA yang debit-nya terancam defisit musiman.
-
-**Catatan teknis (penting untuk runs berikutnya):**
-
-- **Critic (`kimi-k2.6:cloud`) menghabiskan seluruh 3,000 token output pada reasoning trace (`thinking` field) sehingga `content` kosong.** Untuk reasoning models, `max_tokens` di `config/llm.yaml` perlu dinaikkan (rekomendasi: 6,000–8,000 untuk critic) atau provider perlu di-update agar concatenate `thinking + content`. Coordinator (juga deepseek-v4-pro) tidak terkena karena prompt sintesisnya lebih spesifik dan output-nya lebih ringkas.
-- Phase 1 paralel benar-benar concurrent (3 agen Ollama Cloud 3-slot), bottleneck di Phase 2 (critic) — di iteration berikutnya bisa dipercepat dengan reasoning budget yang lebih besar atau model non-reasoning untuk critic.
-- Footprint kWh/L/CO₂eq tetap *order-of-magnitude proxy* (lihat caveat di section Nexus Footprint).
-
-> **Catatan:** `llama3.2:1b` adalah model smoke-only (verify pipeline jalan), bukan untuk output produksi. Untuk run produktif gunakan `gemma4:e4b` local atau Ollama Cloud (3 concurrent paralelisasi domain agents). Critic + Coordinator dominan saat token output panjang — bottleneck di model kecil.
-
-### Sleman fixture re-calibrated (2026-05-16)
-
-- Precip 2617 mm/yr, ET₀ 1483 mm/yr — match BPS-BMKG (~2200 mm, ~1300-1500 mm)
+- Synthetic, dikalibrasi terhadap BPS-BMKG (~2200-2600 mm hujan, ~1300-1550 mm ET₀); tahun 2023 stasiun Mlati → yield model 6.7 t/ha vs BPS 6.5 t/ha.
 - File: `data/processed/openmeteo_sleman_1991-01-01_2024-12-31.parquet`
 
 ---
@@ -348,18 +298,16 @@ Raw output tersimpan di [`docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_
 - 🔴 **#43** Policy forecasting & scenario modelling — *low readiness* (**INTI**)
 - 🔴 **#55** Policy impact prediction — *low readiness* (**INTI**)
 
-> **Bounded autonomy:** Semua output framework ditandai `[ADVISORY-ONLY]` untuk functions di low-readiness area. Human-on-the-loop wajib sebelum decision-making.
+> **Bounded autonomy:** Semua output agen ditandai ADVISORY ONLY untuk functions di low-readiness area. Human-on-the-loop wajib sebelum decision-making.
 
 ---
 
 ## 🗺 Roadmap
 
 - **Phase 0 (DONE)** — MVP framework: 5 agen, 3 skenario, dual-provider
-- **Phase 1 (DONE, 2026-05-16)** — Data sources framework, multi-city, comparison mode, PDF report, 5 skenario, dashboard cards, calibrated fixture
-- **Phase 2 (pending)** — Policy Agent + 4 Stakeholder Agents (Farmer / Pemda / PLN / Community), SWAT+/OSeMOSYS/AquaCrop coupling, CMIP6 ensemble, Sobol sensitivity, MCDA, paper v0.1
+- **Phase 1 (DONE, 2026-05-16)** — Data sources framework, multi-city, comparison mode, PDF report, 5 skenario, dashboard cards, calibrated fixture; deterministic nexus coupling + checks, test suite + CI
+- **Phase 2 (pending)** — Policy Agent + 4 Stakeholder Agents (Farmer / Pemda / PLN / Community), SWAT+/OSeMOSYS/AquaCrop coupling, CMIP6 ensemble, Sobol sensitivity (termasuk parameter `nexus.yaml`), MCDA, paper v0.1
 - **Phase 3 (pending)** — Stakeholder workshop, real-time BMKG/BPS API integration (butuh registration key), paper v1.0
-
-Detail di [`../WEF-Agentic.md`](../WEF-Agentic.md) §8.
 
 ---
 

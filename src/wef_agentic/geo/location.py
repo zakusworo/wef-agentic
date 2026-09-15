@@ -33,6 +33,13 @@ class Location:
         return self.country_code.upper() in {"ID", "IDN"}
 
     @property
+    def has_local_data(self) -> bool:
+        """True for presets backed by hardcoded local statistics (currently BPS Sleman)."""
+        return self.source == "preset" and bool(
+            self.metadata.get("has_static_socioeconomic_data")
+        )
+
+    @property
     def display(self) -> str:
         parts = [self.name]
         if self.admin1 and self.admin1 != self.name:

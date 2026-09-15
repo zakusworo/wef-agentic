@@ -7,6 +7,10 @@ from typing import Any, Literal
 Role = Literal["system", "user", "assistant", "tool"]
 
 
+class EmptyCompletionError(RuntimeError):
+    """Model returned no answer text (e.g. a reasoning model spent its budget thinking)."""
+
+
 @dataclass
 class Message:
     role: Role
@@ -37,5 +41,11 @@ class LLMResponse:
     content: str
     usage: Usage
     provider: str
-    model: str
+    model: str                       # model the backend reports it actually used
+    done_reason: str | None = None   # normalized: "stop" | "length" | backend-specific
+    thinking: str = ""               # reasoning trace, if the backend exposes it
     meta: dict[str, Any] = field(default_factory=dict)
+
+    @property
+    def truncated(self) -> bool:
+        return self.done_reason == "length"

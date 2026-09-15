@@ -159,12 +159,7 @@ def generate_scenario_report(result, include_tool_outputs: bool = False) -> byte
     story.append(Spacer(1, 0.5 * cm))
 
     scenario = result.scenario
-    location = {}
-    for t in (result.water.tool_outputs or []):
-        data = t.get("data", {})
-        if isinstance(data, dict) and "location" in data:
-            location = data["location"]
-            break
+    location = result.nexus.location
 
     # Metadata table
     meta_data = [
@@ -239,11 +234,38 @@ def generate_scenario_report(result, include_tool_outputs: bool = False) -> byte
     story.extend(_split_paragraphs(result.critic.content, styles))
     _add_chart("critic")
 
+    # ── Deterministic nexus checks ───────────────────────────────────────────
+    story.append(PageBreak())
+    story.append(Paragraph("3. Nexus Coupling &amp; Pemeriksaan Deterministik", styles["h1"]))
+    story.append(Paragraph(
+        "Dihitung oleh framework sebelum LLM dipanggil; agen hanya menginterpretasi angka ini.",
+        styles["caption"],
+    ))
+    status_color = {"ok": "#16a34a", "warn": "#d97706", "fail": "#dc2626"}
+    check_rows = [["Status", "Check", "Detail"]] + [
+        [Paragraph(f"<font color='{status_color.get(c['status'], '#6b7280')}'><b>"
+                   f"{c['status'].upper()}</b></font>", styles["meta"]),
+         Paragraph(c["name"], styles["meta"]),
+         _safe_paragraph(_md_to_rl(c["detail"]), styles["meta"])]
+        for c in result.nexus.checks
+    ]
+    checks_table = Table(check_rows, colWidths=[1.8 * cm, 4.2 * cm, 11 * cm])
+    checks_table.setStyle(TableStyle([
+        ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#f3f4f6")),
+        ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+        ("FONTSIZE", (0, 0), (-1, -1), 9),
+        ("VALIGN", (0, 0), (-1, -1), "TOP"),
+        ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
+    ]))
+    story.append(checks_table)
+    for w in result.nexus.warnings:
+        story.append(_safe_paragraph(f"⚠ {_md_to_rl(w)}", styles["meta"]))
+
     # ── Per-agent outputs ────────────────────────────────────────────────────
     for label, output, num, chart_key in [
-        ("Water Agent", result.water, "3", "water"),
-        ("Energy Agent", result.energy, "4", "energy"),
-        ("Food Agent", result.food, "5", "food"),
+        ("Water Agent", result.water, "4", "water"),
+        ("Energy Agent", result.energy, "5", "energy"),
+        ("Food Agent", result.food, "6", "food"),
     ]:
         story.append(PageBreak())
         story.append(Paragraph(f"{num}. {label}", styles["h1"]))
@@ -268,15 +290,17 @@ def generate_scenario_report(result, include_tool_outputs: bool = False) -> byte
 
     # ── Nexus footprint ──────────────────────────────────────────────────────
     story.append(PageBreak())
-    story.append(Paragraph("6. Nexus Footprint (operasionalisasi WEF 2026b)", styles["h1"]))
+    story.append(Paragraph("7. Nexus Footprint (operasionalisasi WEF 2026b)", styles["h1"]))
     est = result.footprint.estimate()
     fp_data = [
         ["Metric", "Value", "Note"],
-        ["Total tokens", f"{est['total_tokens']:,}", "Sum input + output across all agents"],
-        ["Energy (kWh)", f"{est['energy_kwh']:.4f}",
-         "Proxy: 0.0003 kWh / 1k tokens (public estimate)"],
-        ["Water (L)", f"{est['water_l']:.4f}", "Proxy: Zhang et al. (2025)"],
-        ["CO₂eq (kg)", f"{est['co2_kg']:.4f}", "kWh × 0.4 (US grid mix avg)"],
+        ["Total tokens", f"{est['total_tokens']:,}", "Input + output (incl. reasoning & retries)"],
+        ["Energy (kWh)", f"{est['energy_kwh']:.5f}",
+         "Tokens × model-size class × PUE (per provider)"],
+        ["Water on-site (L)", f"{est['water_onsite_l']:.5f}", "IT kWh × WUE (Li et al. 2023)"],
+        ["Water off-site (L)", f"{est['water_offsite_l']:.5f}",
+         "Facility kWh × EWIF (Li et al. 2023)"],
+        ["CO₂eq (kg)", f"{est['co2_kg']:.5f}", "Facility kWh × provider grid factor"],
     ]
     fp_table = Table(fp_data, colWidths=[3.5 * cm, 3 * cm, 9 * cm])
     fp_table.setStyle(TableStyle([
@@ -308,6 +332,8 @@ def generate_scenario_report(result, include_tool_outputs: bool = False) -> byte
         ("GRID", (0, 0), (-1, -1), 0.5, colors.HexColor("#d1d5db")),
     ]))
     story.append(by_agent_table)
+    for note in est["notes"]:
+        story.append(Paragraph(f"⚠ {note}", styles["caption"]))
 
     story.append(Spacer(1, 0.5 * cm))
     story.append(Paragraph(
@@ -319,14 +345,16 @@ def generate_scenario_report(result, include_tool_outputs: bool = False) -> byte
 
     # ── References ───────────────────────────────────────────────────────────
     story.append(Spacer(1, 0.5 * cm))
-    story.append(Paragraph("7. References", styles["h1"]))
+    story.append(Paragraph("8. References", styles["h1"]))
     refs = [
         "WEF &amp; Capgemini (2026). <i>Making Agentic AI Work for Government: A Readiness "
         "Framework.</i> Insight Report, April 2026.",
         "WEF (2026). <i>Building Resilient and Scalable AI Value Chains: A Nexus Strategy.</i> "
         "Insight Report, May 2026.",
-        "Zhang, Q. et al. (2025). <i>Making AI less &quot;thirsty&quot;: Uncovering and addressing the "
-        "secret water footprint of AI models.</i> arXiv:2304.03271.",
+        "Li, P., Yang, J., Islam, M.A. &amp; Ren, S. (2023). <i>Making AI less &quot;thirsty&quot;: "
+        "Uncovering and addressing the secret water footprint of AI models.</i> arXiv:2304.03271.",
+        "Macknick, J. et al. (2012). Operational water consumption and withdrawal factors for "
+        "electricity generating technologies. <i>Environmental Research Letters</i> 7, 045802.",
         "Thornthwaite, C.W. &amp; Mather, J.R. (1957). Instructions and tables for computing "
         "potential evapotranspiration and the water balance.",
         "Doorenbos, J. &amp; Kassam, A.H. (1979). <i>Yield response to water.</i> FAO Irrigation "

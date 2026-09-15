@@ -1,4 +1,9 @@
-"""Pre-defined scenarios — location-agnostic, 5 scenarios (Phase 1)."""
+"""Pre-defined scenarios — location-agnostic, 5 scenarios (Phase 1).
+
+Water stress is NOT a scenario input: it is derived from the scenario's climate delta
+via the water balance (orchestration/nexus.py). For sensitivity runs, set
+`water_stress_override` to pin it explicitly (the run then carries a warning).
+"""
 from __future__ import annotations
 
 SCENARIOS = {
@@ -12,7 +17,6 @@ SCENARIOS = {
         "delta_temp_c": 0.7,
         "energy_scenario": "BAU",
         "renewable_share_2030": 0.23,
-        "water_stress_fraction": 0.05,
         "lp2b_protection": "moderate",
         "horizon": 2030,
         "water_baseline_year": 2023,
@@ -29,7 +33,6 @@ SCENARIOS = {
         "delta_temp_c": 1.0,
         "energy_scenario": "JETP_Aligned",
         "renewable_share_2030": 0.34,
-        "water_stress_fraction": 0.07,
         "lp2b_protection": "moderate",
         "horizon": 2030,
         "water_baseline_year": 2023,
@@ -46,7 +49,6 @@ SCENARIOS = {
         "delta_temp_c": 0.5,
         "energy_scenario": "NetZero_Sleman_2045",
         "renewable_share_2030": 0.45,
-        "water_stress_fraction": 0.04,
         "lp2b_protection": "strict",
         "horizon": 2045,
         "water_baseline_year": 2023,
@@ -63,7 +65,6 @@ SCENARIOS = {
         "delta_temp_c": 1.8,
         "energy_scenario": "BAU",
         "renewable_share_2030": 0.23,
-        "water_stress_fraction": 0.25,
         "lp2b_protection": "moderate",
         "horizon": 2030,
         "water_baseline_year": 2023,
@@ -81,7 +82,6 @@ SCENARIOS = {
         "delta_temp_c": 1.0,
         "energy_scenario": "BAU",
         "renewable_share_2030": 0.25,
-        "water_stress_fraction": 0.18,
         "lp2b_protection": "lax",
         "horizon": 2030,
         "water_baseline_year": 2023,
