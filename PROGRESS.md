@@ -1,6 +1,6 @@
 # WEF-Agentic — Progress Log
 
-_Last updated: 2026-09-15 · `main` @ `f021184` · CI green_
+_Last updated: 2026-09-15 · `main` after `0f94526` · CI green on the code commit_
 
 Handoff notes for the next working session. README describes *what the framework is*; this file tracks *where the work stands* and *what to do next*.
 
@@ -14,13 +14,24 @@ Handoff notes for the next working session. README describes *what the framework
 | Deterministic nexus coupling + consistency checks | ✅ Done (2026-09-15) |
 | LLM robustness (empty-completion retry, Claude provider fix) | ✅ Done, unit-tested only |
 | Offline test suite (48 tests) + GitHub Actions CI | ✅ Green |
+| README fully in English, with Mermaid architecture diagrams | ✅ Done (2026-09-15) |
 | Real LLM run with the new pipeline | ❌ Not yet done |
 | Calibration of coupling parameters (`config/nexus.yaml`) | ❌ Placeholders |
 | Paper numbers | ⚠️ Any draft numbers from before 2026-09-15 are outdated (see §4) |
 
 ---
 
-## 2. What changed in the 2026-09-15 session (commit `f021184`)
+## 2. What changed on 2026-09-15
+
+### Commits
+
+| Commit | What |
+|---|---|
+| `f021184` | Code: nexus coupling, LLM fixes, tests + CI (developed on branch `nexus-coupling-fixes`; CI passed, fast-forwarded to `main`, branch deleted) |
+| `045fc7e` | Docs: README translated to English, this `PROGRESS.md` added |
+| `0f94526` | Docs: ASCII architecture replaced by 3 Mermaid diagrams (system overview, nexus coupling, run lifecycle) |
+
+### Code changes (`f021184`)
 
 A code review found five problem areas; all were fixed.
 
@@ -40,14 +51,21 @@ A code review found five problem areas; all were fixed.
 4. **Engineering**: pytest suite with offline fixture + `FakeProvider`, CI workflow, removed unused deps (polars, xarray, geopandas, shapely), `claude-agent-sdk` moved to `[claude]` extra, deleted empty `analysis/` & `readiness/`, smoke scripts replaced by `scripts/run_scenario.py` (reproducible run records).
 5. **Footprint & docs**: model-size classes, PUE, on-site + off-site water, per-provider grid factor. Fixed citation: arXiv:2304.03271 is **Li et al. (2023)**, not "Zhang et al. (2025)". README rewritten to match code (scripted tool pipeline, not LLM tool-calling).
 
+### Documentation changes (`045fc7e`, `0f94526`)
+
+- README is fully English. Indonesian terms are glossed (e.g. LP2B = protected food-crop farmland policy); it notes that agents still write their analyses in formal Indonesian.
+- README Architecture section has 3 Mermaid diagrams, render-checked locally with mermaid-cli (light theme only).
+
 ---
 
-## 3. Architecture in one picture
+## 3. Architecture
+
+See the three diagrams in [README → Architecture](README.md#-architecture). In short:
 
 ```
 scenario ──► compute_nexus()  [deterministic, no LLM]
                tools/ + DataResolver → water balance → coupling → energy → food → checks
-                    │  NexusState (key_figures + checks + provenance)
+                    │  NexusState (key figures + checks + provenance)
                     ▼
             Water ‖ Energy ‖ Food agents (parallel, interpret only)
                     ▼
@@ -98,6 +116,7 @@ Observations to carry into the paper discussion:
 - [ ] Streamlit `use_container_width` is deprecated (removal date passed): switch to `width="stretch"`.
 - [ ] Decide whether to update `model_claude` in `llm.yaml` (currently `claude-opus-4-7` / `claude-sonnet-4-6`; newer Claude 5 models exist). This changes reproducibility vs earlier runs.
 - [ ] Optional: native LLM tool-calling (registry already has JSON schemas). Keep numbers deterministic if you do.
+- [ ] Check the README Mermaid diagrams in GitHub dark mode (only the light theme was checked).
 - [ ] Phase 2 roadmap: Policy + Stakeholder agents, SWAT+/OSeMOSYS/AquaCrop, CMIP6 ensemble, MCDA, paper v0.1.
 
 ---
@@ -114,13 +133,21 @@ streamlit run src/wef_agentic/ui/streamlit_app.py
 python scripts/run_scenario.py S2_JETP_Aligned [--location Bandung] [--provider ollama-local --model gemma4:e4b]
 ```
 
+Rendering README diagrams locally (uses the installed Google Chrome, no Chromium download):
+
+```bash
+echo '{"executablePath": "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "args": ["--no-sandbox"]}' > /tmp/pp.json
+PUPPETEER_SKIP_DOWNLOAD=1 npx -y @mermaid-js/mermaid-cli@11 -p /tmp/pp.json -i diagram.mmd -o diagram.png -b white -s 2
+```
+
 Environment notes:
 - `.env` needs `OLLAMA_API_KEY` for ollama-cloud; the Claude provider uses the logged-in Claude Code CLI.
 - The repo has **no local git identity**; commit with `git -c user.name="Zulfikar Aji Kusworo" -c user.email="greataji13@gmail.com" commit ...`.
-- `gh` is authenticated as `zakusworo` (keyring).
+- `gh` is authenticated as `zakusworo` (keyring). Node 22 is available for `npx`.
 
 ## 7. Conventions
 
 - Commits are authored by the user only — **no Claude co-author trailer**.
-- Work on a branch, wait for CI to pass, fast-forward merge to `main`, delete the branch.
+- Code changes: work on a branch, wait for CI to pass, fast-forward merge to `main`, delete the branch. Docs-only changes may go straight to `main`.
 - Numbers come from `compute_nexus`, never from LLM output. New physics goes in `physics/`, cross-sector glue in `orchestration/nexus.py`, parameters in `config/nexus.yaml` with a source or an `ASSUMPTION` tag.
+- When the pipeline or coupling changes, update the README Mermaid diagrams and render-check them.
