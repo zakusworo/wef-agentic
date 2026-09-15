@@ -34,36 +34,188 @@ Full specification: `WEF-Agentic.md` (internal design document, not included in 
 
 ## 🏗 Architecture
 
+The design separates **computing** from **interpreting**. All numbers come from a deterministic core; LLM agents only explain them, and are audited against them.
+
+### System overview
+
+```mermaid
+flowchart TB
+    subgraph INPUT["① Inputs"]
+        direction LR
+        SC["📋 Scenario<br/>climate Δ · policy · horizon"]
+        LOC["📍 Location<br/>Sleman preset · geocoded city"]
+    end
+
+    subgraph DATA["② Data layer · data/sources/"]
+        direction LR
+        SRC["<b>Tier 1</b> Manual override · BPS Sleman · Open-Meteo ERA5<br/><b>Tier 2</b> Gazetteer population · World Bank<br/><b>Tier 3</b> Country proxy"]
+        DR{{"DataResolver<br/>first available source<br/>→ DataPacket + provenance"}}
+        SRC --> DR
+    end
+
+    subgraph CORE["③ compute_nexus() · deterministic, no LLM"]
+        direction LR
+        TOOLS["tools/<br/>water · energy · food"]
+        PHYS["physics/<br/>water balance<br/>crop yield<br/>energy demand"]
+        CPL["coupling<br/>water stress<br/>irrigation pumping<br/>power-sector water"]
+        CHK["run_checks()<br/>mass balance · seasonality<br/>groundwater · population<br/>yield · input confidence"]
+        TOOLS --> PHYS --> CPL --> CHK
+    end
+
+    NS[("<b>NexusState</b><br/>key figures · checks · provenance")]
+
+    subgraph AGENTS["④ LLM interpretation · advisory only"]
+        direction LR
+        subgraph DOMAIN["in parallel"]
+            direction TB
+            WA["💧 Water Agent"]
+            EA["⚡ Energy Agent"]
+            FA["🌾 Food Agent"]
+        end
+        CR["🔍 Critic<br/>audits narratives<br/>against key figures"]
+        CO["🧭 Coordinator<br/>trade-offs<br/>recommendations"]
+        DOMAIN --> CR --> CO
+    end
+
+    subgraph PROVIDERS["LLM providers · llm/"]
+        direction LR
+        OL["Ollama local"] ~~~ OC["Ollama cloud"] ~~~ CS["Claude Agent SDK"]
+    end
+
+    subgraph OUTPUT["⑤ Outputs"]
+        direction LR
+        FP["🌐 Nexus footprint<br/>kWh · water · CO₂"] ~~~ RR["🧾 Run record"] ~~~ PDF["📄 PDF report"] ~~~ UI["🖥 Streamlit UI"]
+    end
+
+    INPUT --> CORE
+    DATA --> CORE
+    CORE --> NS
+    NS -->|"numbers to interpret and audit"| AGENTS
+    AGENTS <-.->|"chat · retry once on empty answer"| PROVIDERS
+    AGENTS --> OUTPUT
+    NS -.->|"checks · provenance"| OUTPUT
+
+    classDef input fill:#e0e7ff,stroke:#4f46e5,color:#1e1b4b
+    classDef data fill:#e5e7eb,stroke:#4b5563,color:#111827
+    classDef core fill:#d1fae5,stroke:#059669,color:#064e3b
+    classDef state fill:#059669,stroke:#064e3b,color:#ffffff,stroke-width:2px
+    classDef llm fill:#ede9fe,stroke:#7c3aed,color:#2e1065
+    classDef out fill:#ffedd5,stroke:#ea580c,color:#431407
+    class SC,LOC input
+    class SRC,DR data
+    class TOOLS,PHYS,CPL,CHK core
+    class NS state
+    class WA,EA,FA,CR,CO,OL,OC,CS llm
+    class FP,RR,PDF,UI out
+
+    style INPUT fill:#f5f7ff,stroke:#a5b4fc
+    style DATA fill:#f9fafb,stroke:#d1d5db
+    style CORE fill:#f0fdf4,stroke:#6ee7b7,stroke-width:2px
+    style AGENTS fill:#faf5ff,stroke:#c4b5fd
+    style DOMAIN fill:#f5f3ff,stroke:#c4b5fd,stroke-dasharray:4 3
+    style PROVIDERS fill:#faf5ff,stroke:#c4b5fd
+    style OUTPUT fill:#fff7ed,stroke:#fdba74
 ```
- scenario + Location
-        │
-        ▼
-┌──────────────────────────────────────────────────────────────────┐
-│ orchestration/nexus.py — compute_nexus()  (deterministic, no LLM) │
-│                                                                  │
-│  data/sources DataResolver ──► tools/ (water · energy · food)    │
-│                                  │                               │
-│  climate Δ ─► Thornthwaite-Mather (scenario & baseline climate)  │
-│                 ├─► water stress after irrigation ─► Doorenbos-  │
-│                 │     Kassam yield ─► production ─► SSL          │
-│                 └─► groundwater pumping (climate Δ) ─► +GWh      │
-│  demand × renewable share ─► CO₂ emissions + power-sector water  │
-│                                                                  │
-│  run_checks(): mass balance · seasonal mismatch · groundwater vs │
-│  recharge proxy · consistent population · yield plausibility ·   │
-│  low-confidence inputs                                           │
-└───────────────────────────────┬──────────────────────────────────┘
-                                │ NexusState (key figures + checks)
-            ┌───────────────────┼───────────────────┐
-            ▼                   ▼                   ▼
-       Water Agent        Energy Agent         Food Agent      (parallel)
-            └───────────────────┼───────────────────┘
-                                ▼
-            Critic Agent — audits narratives vs key figures + checks
-                                ▼
-            Coordinator — trade-off synthesis + recommendations
-                                ▼
-       footprint · run record · PDF (reporting/) · Streamlit (ui/)
+
+### Nexus coupling (inside `compute_nexus`)
+
+Numbers on the arrows are the defaults from `config/nexus.yaml`; several are screening assumptions.
+
+```mermaid
+flowchart LR
+    subgraph IN["Inputs"]
+        direction TB
+        CD["🌦 Scenario climate<br/>ΔP %, ΔT °C"]
+        BC["Baseline climate<br/>2023"]
+        AREA["🌾 Harvest area<br/>BPS or manual override"]
+        POP["👥 Population + growth<br/>same for both sectors"]
+    end
+
+    subgraph WATER["💧 Water"]
+        direction TB
+        TM["Thornthwaite-Mather<br/>monthly balance"]
+        RS["Raw water stress<br/>1 − ETa/PET"]
+        ES["Stress after irrigation"]
+        GW["Groundwater pumped<br/>scenario vs baseline"]
+        TM --> RS -->|"× (1 − supply 0.6)"| ES
+        TM -->|"dry-season deficit"| GW
+    end
+
+    subgraph FOOD["🌾 Food"]
+        direction TB
+        Y["Yield<br/>Doorenbos-Kassam, Ky 1.1"]
+        PROD["Rice production"]
+        SSL["Self-sufficiency<br/>SSL 2030"]
+        Y --> PROD --> SSL
+    end
+
+    subgraph ENERGY["⚡ Energy"]
+        direction TB
+        PUMP["Added pumping demand<br/>ρgH/η on Δ volume"]
+        DEM["Electricity demand<br/>elasticity + EV + induction"]
+        CO2["CO₂ emissions<br/>fossil share × grid factor"]
+        PSW["Power-sector water<br/>2.6 / 0.1 m³ per MWh · off-site"]
+        PUMP --> DEM
+        DEM --> CO2
+        DEM --> PSW
+    end
+
+    CD --> TM
+    BC --> TM
+    ES --> Y
+    AREA --> PROD
+    AREA -->|"÷ cropping intensity 2"| GW
+    GW --> PUMP
+    POP --> SSL
+    POP --> DEM
+
+    classDef input fill:#e5e7eb,stroke:#4b5563,color:#111827
+    classDef water fill:#dbeafe,stroke:#2563eb,color:#172554
+    classDef food fill:#dcfce7,stroke:#16a34a,color:#052e16
+    classDef energy fill:#fef3c7,stroke:#d97706,color:#451a03
+    class CD,BC,AREA,POP input
+    class TM,RS,ES,GW water
+    class Y,PROD,SSL food
+    class PUMP,DEM,CO2,PSW energy
+
+    style IN fill:#f9fafb,stroke:#d1d5db
+    style WATER fill:#eff6ff,stroke:#93c5fd,stroke-width:2px
+    style FOOD fill:#f0fdf4,stroke:#86efac,stroke-width:2px
+    style ENERGY fill:#fffbeb,stroke:#fcd34d,stroke-width:2px
+```
+
+### Run lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as UI or CLI
+    participant G as run_scenario
+    participant N as compute_nexus (worker thread)
+    participant D as Water, Energy, Food agents
+    participant C as Critic
+    participant K as Coordinator
+    participant L as LLM provider
+
+    U->>G: scenario + location
+    G->>N: asyncio.to_thread
+    N-->>G: NexusState (key figures, checks, provenance)
+    par three domain agents at once
+        G->>D: run(scenario, nexus)
+        D->>L: chat
+        L-->>D: interpretation
+    end
+    G->>C: audit(narratives, key figures, checks)
+    C->>L: chat
+    opt answer is empty (reasoning budget used up)
+        C->>L: retry once with 2× max_tokens
+        Note over C,L: still empty → EmptyCompletionError, run stops
+    end
+    L-->>C: audit findings
+    G->>K: synthesize(narratives, audit, key figures)
+    K->>L: chat
+    L-->>K: synthesis
+    G-->>U: ScenarioRunResult → footprint, run record, PDF
 ```
 
 ---
