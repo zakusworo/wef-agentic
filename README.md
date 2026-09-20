@@ -1,31 +1,107 @@
 # WEF-Agentic
 
-**A multi-city agentic AI framework for Water-Energy-Food Nexus governance**. It puts the WEF 2026 readiness functions into practice at the sub-national level and tracks the nexus footprint of its own LLM usage.
+WEF-Agentic is a runnable research demonstrator for examining linked water,
+energy and food decisions at city or regency scale. The deterministic model
+calculates the physical quantities first. Language-model agents then explain the
+results, check one another's claims and produce an advisory synthesis.
 
-It puts two WEF 2026 frameworks into practice:
+The repository is intended for software verification, scenario learning and
+method development. It is not a calibrated operational forecast, a water-allocation
+system or an automated policy decision-maker.
+
+The project applies two World Economic Forum 2026 frameworks:
 
 - **WEF (2026a)** *Making Agentic AI Work for Government: A Readiness Framework* (April 2026)
 - **WEF (2026b)** *Building Resilient and Scalable AI Value Chains: A Nexus Strategy* (May 2026)
 
-Project specification and Phase 2/3 acceptance criteria: [`WEF-Agentic.md`](WEF-Agentic.md). Session-to-session progress and next steps: [`PROGRESS.md`](PROGRESS.md).
+Project repository: https://github.com/zakusworo/wef-agentic
 
-> **Status:** Phase 1 complete: deterministic nexus coupling × 5 agents × 5 scenarios × multi-city × data sources framework × comparison mode × PDF export × offline test suite + CI.
+Project specification and Phase 2/3 acceptance criteria: [`WEF-Agentic.md`](WEF-Agentic.md).
+Session-to-session progress and next steps: [`PROGRESS.md`](PROGRESS.md).
+
+> **Status:** Phase 1 implementation is complete. The repository includes deterministic
+> nexus coupling, five agents, five scenarios, multi-city inputs, provenance, PDF
+> reports, a Streamlit demo and CI. Local calibration and learner evaluation remain open.
 
 ### Local demo and chapter project
 
 With the project environment installed, run `bash scripts/start_demo.sh` and open
 http://127.0.0.1:8501. The demo starts with a recorded Claude analysis and synthetic
-climate outputs; it requires no API call to view. Fresh runs use the selected provider.
+climate outputs, so viewing it does not require an API call. Fresh runs use the
+selected provider.
 The [ISTIC book-chapter subproject](subprojects/unesco-book-chapter/README.md) contains
 the EOI, chapter outline, exported figures and evidence limits.
 
 Use `python -m wef_agentic.data.bootstrap --force` to replace a synthetic cache with
-live climate data. Historical downloads use paced yearly requests. Run all five
-deterministic scenarios with `python scripts/run_sweep.py --output result.json`.
+downloaded Open-Meteo and NASA POWER data. Historical downloads use paced yearly
+requests. Run all five deterministic scenarios with `python scripts/run_sweep.py
+--output result.json`.
 Both sweep and scenario scripts accept `--baseline-year 2015` and optional
 `--growing-months 6 7 8 9`; the latter example is not a sourced local crop calendar.
 For Sobol analysis install `.[sensitivity]` and use `scripts/run_sensitivity.py`;
 `docs/sensitivity-example.json` contains illustrative, uncalibrated bounds.
+
+### What the current data can support
+
+The latest saved real-climate S2 run uses three Sleman Open-Meteo stations for
+1991–2024, the 2023 historical baseline, BPS-anchored local food inputs and
+screening assumptions for irrigation and pumping. It produced these values:
+
+| Quantity | S2 result | Interpretation |
+|---|---:|---|
+| Annual water stress after assumed irrigation | 0.0899 | Model output, not a local stress measurement |
+| Annual water deficit | 343.7 mm | 2023 baseline year under S2 climate deltas |
+| Groundwater pumped | 17.626 million m³/year | Depends on assumed supply, area and groundwater share |
+| Added irrigation pumping | 0.213 GWh/year | Electric-pump estimate; diesel energy is excluded |
+| Electricity demand in 2030 | 2,373 GWh/year | BPS-anchored energy pathway plus pumping delta |
+| Rice yield | 6.31 t/ha | Compared with the 6.5 t/ha observed anchor |
+| Rice self-sufficiency index | 1.711 | Index above 1 means projected production exceeds modelled demand |
+
+The same S2 scenario with a 2015 historical baseline gives stress 0.1307,
+yield 5.99 t/ha and self-sufficiency 1.626. This difference is a reason to
+inspect baseline-year choice before drawing a policy conclusion. The comparison
+is sensitivity evidence, not an attribution study of El Niño.
+
+The saved run records and exact input hashes are in [`docs/runs/`](docs/runs/).
+The chapter evidence inventory explains which results use synthetic data and which
+use downloaded climate data: [`subprojects/unesco-book-chapter/evidence/README.md`](subprojects/unesco-book-chapter/evidence/README.md).
+
+### Why Sleman is the starting case
+
+Sleman is used because it gives the project a real local context with enough
+structure to test the full WEF chain before expanding to other cities.
+
+1. **The data can be joined at the same administrative scale.** The BPS
+   publication [Kabupaten Sleman Dalam Angka 2024](https://slemankab.bps.go.id/id/publication/2024/02/28/a5194f8cfd3cc96a35805f6e/k)
+   brings together statistics from BPS and local agencies. The current static
+   adapter uses Sleman population, electricity demand, rice harvest area, rice
+   yield and land-loss inputs. These are anchors for a reproducible prototype,
+   not a substitute for a future data audit.
+2. **The policy questions are connected.** Rice production depends on land and
+   irrigation. Irrigation can require groundwater pumping and electricity. Energy
+   choices affect emissions and off-site power-sector water use. Tourism and land
+   conversion add a competing demand. That combination makes the case useful for
+   teaching causal links instead of presenting three disconnected sector reports.
+3. **The climate cache can show spatial differences.** The preset samples Pakem on
+   the Merapi slope, Mlati in the urban-irrigation zone and Prambanan in the
+   eastern-southern rice belt. The three stations are a modelling convenience for
+   comparison, not a complete hydrological network.
+4. **The setting supports a Global South learning example.** Sleman allows the
+   chapter to show how a small public-sector team can work with mixed evidence,
+   explicit assumptions and human review. The [Sleman tourism service](https://pariwisata.slemankab.go.id/2017/05/19/peran-desa-wisata-dalam-perekonomian-masyarakat-desa/)
+   describes village tourism in agricultural and recharge areas, which gives the
+   tourism scenario a local policy context rather than an invented market story.
+5. **The design can travel.** The location resolver accepts other cities. When local
+   harvest data are absent, the framework reports the food and pumping gap instead
+   of borrowing Sleman's farmland. A new case therefore has a clear data-collection
+   task before it has a misleadingly complete result.
+
+The case should be presented as a bounded starting point. It is not a statistical
+sample of Indonesia and it does not establish that the same parameters apply in
+another regency. The best next evidence is local calibration: irrigation delivery,
+electric and diesel pump shares, groundwater levels, crop calendars, energy demand
+and tourism water use. The resulting study can then compare modelled outcomes with
+observations and use stakeholder review to decide which trade-offs matter.
 
 ---
 
@@ -64,7 +140,7 @@ flowchart TB
 
     subgraph DATA["② Data layer · data/sources/"]
         direction LR
-        SRC["<b>Tier 1</b> Manual override · BPS Sleman · Open-Meteo ERA5<br/><b>Tier 2</b> Gazetteer population · World Bank<br/><b>Tier 3</b> Country proxy"]
+        SRC["<b>Tier 1</b> Manual override · BPS Sleman · Open-Meteo historical<br/><b>Tier 2</b> Gazetteer population · World Bank<br/><b>Tier 3</b> Country proxy"]
         DR{{"DataResolver<br/>first available source<br/>→ DataPacket + provenance"}}
         SRC --> DR
     end
@@ -241,6 +317,7 @@ sequenceDiagram
 ### 1. Install
 
 ```bash
+git clone https://github.com/zakusworo/wef-agentic
 cd wef-agentic
 python3.11 -m venv .venv
 source .venv/bin/activate           # Linux / macOS / WSL
@@ -267,13 +344,13 @@ OLLAMA_HOST=http://localhost:11434
 
 Per-agent defaults live in `src/wef_agentic/config/llm.yaml`. Environment overrides apply when set; leave them empty to use the YAML.
 
-### 3. Bootstrap Data (optional)
+### 3. Bootstrap Data
 
 ```bash
-# Fetch real Open-Meteo climate data + parquet cache (needs internet)
-python -m wef_agentic.data.bootstrap
+# Fetch real Open-Meteo climate data and NASA POWER data (needs internet)
+python -m wef_agentic.data.bootstrap --force
 
-# Or use the synthetic fixture calibrated to BPS-BMKG (offline, instant)
+# Or create the synthetic fixture for offline tests (instant, not observed data)
 python scripts/generate_fixture.py
 ```
 
@@ -284,6 +361,9 @@ streamlit run src/wef_agentic/ui/streamlit_app.py      # UI → http://localhost
 
 python scripts/run_scenario.py S2_JETP_Aligned          # CLI, saves a run record to docs/runs/
 python scripts/run_scenario.py S1_BAU_2030 --location Bandung --provider ollama-local --model gemma4:e4b
+
+# Reproduce all five deterministic scenarios without an LLM
+python scripts/run_sweep.py --output docs/runs/my-sweep.json
 ```
 
 ---
@@ -348,14 +428,24 @@ Deterministic checks (`ok` / `warn` / `fail`) feed into the Critic and Coordinat
 |---|---|---|---|
 | 🟢 1 | `ManualOverrideSource` | User JSON upload via UI | 0.99 |
 | 🟢 1 | `BPSStaticSource` | Sleman only (population, electricity, harvest area, farmland conversion, yield) | 0.95 |
-| 🟢 1 | `OpenMeteoSource` | Global, 3 climate variables, ERA5 reanalysis (10-year mean) | 0.92 |
+| 🟢 1 | `OpenMeteoSource` | Open-Meteo historical archive; resolver summaries use a recent ten-year window, while water-balance runs use the selected cached year | 0.92 |
 | 🟡 2 | `GeocodedPopulationSource` | GeoNames population from the geocoding match (city, not country) | 0.70 |
 | 🟡 2 | `WorldBankSource` | Country-level per-capita indicators (GDP, electricity) via REST API | 0.75 |
 | 🔴 3 | `CountryProxySource` | Last-resort static defaults per ISO code | 0.55 |
 
 World Bank no longer serves `socio.population` (that is a country total, not a city). If population is unknown altogether, a 100k fallback is used **with** 0.1-confidence provenance and a warning.
 
-**12 standardized variables** across the `climate.*`, `socio.*`, `energy.*`, `food.*` and `grid.*` domains. Manual overrides go in `data/external/override_<slug>.json`, following the schema from `registry.manual_override_schema()`.
+The confidence column is a source-priority score used to trigger warnings. It is
+not a confidence interval, an error bar or a claim that the input is statistically
+validated.
+
+**12 standardized variables** span the `climate.*`, `socio.*`, `energy.*`, `food.*` and `grid.*` domains. Manual overrides go in `data/external/override_<slug>.json`, following the schema from `registry.manual_override_schema()`.
+
+The default repository workflow keeps climate caches out of Git. `data/processed/`
+contains local parquet files after bootstrap or fixture generation; the chapter
+evidence folder stores checksums and references to the saved runs. NASA POWER is
+downloaded by bootstrap for comparison and provenance, but the current nexus water
+balance uses the Open-Meteo station data.
 
 ### Multi-City
 
@@ -407,13 +497,18 @@ Charts (matplotlib for the PDF, plotly for the UI): monthly water balance + soil
 
 ```
 wef-agentic/
-├── pyproject.toml                  # deps (+ extras: dev, claude) + ruff + pytest config
+├── pyproject.toml                  # deps (+ extras: dev, claude, sensitivity) + checks
+├── WEF-Agentic.md                  # project specification and Phase 2/3 contracts
 ├── PROGRESS.md                     # progress log and next steps
 ├── .github/workflows/ci.yml        # ruff + pytest on Python 3.11
 ├── data/{raw,processed,external}/  # downloads · parquet cache (gitignored) · manual overrides
-├── docs/runs/                      # run records
+├── docs/runs/                      # run records and deterministic sweeps
+├── subprojects/unesco-book-chapter/ # EOI, figures and evidence package
 ├── scripts/
 │   ├── run_scenario.py             # end-to-end CLI run → docs/runs/*.json
+│   ├── run_sweep.py                # five deterministic scenarios, no LLM
+│   ├── run_sensitivity.py          # optional Sobol analysis with SALib
+│   ├── start_demo.sh               # recorded Streamlit demo
 │   ├── generate_fixture.py         # synthetic Sleman climate fixture
 │   └── smoke_llm.py                # manual check against a real local Ollama
 ├── src/wef_agentic/
@@ -426,7 +521,7 @@ wef-agentic/
 │   ├── agents/                     # base + water/energy/food/critic/coordinator
 │   ├── orchestration/              # nexus (deterministic), graph (pipeline), runlog, scenarios
 │   ├── reporting/                  # charts (plotly), pdf_charts (matplotlib), pdf (reportlab)
-│   └── ui/                         # streamlit_app.py
+│   └── ui/                         # streamlit_app.py and recorded demo loader
 └── tests/
     ├── conftest.py                 # offline fixture data, network blocked, FakeProvider
     ├── unit/                       # physics, coupling, footprint, providers, retry, tools
@@ -448,7 +543,7 @@ CI (`.github/workflows/ci.yml`) runs ruff + pytest on every push and pull reques
 
 ### Historical run (pre-coupling, 2026-05-17)
 
-[`docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json`](docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json): Ollama Cloud, `deepseek-v4-pro` (domain + coordinator) / `kimi-k2.6` (critic). 31.1s parallel domain · 130.3s critic · 47.9s coordinator · 19,813 tokens.
+[`docs/runs/archive/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json`](docs/runs/archive/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json): Ollama Cloud, `deepseek-v4-pro` (domain + coordinator) / `kimi-k2.6` (critic). 31.1s parallel domain · 130.3s critic · 47.9s coordinator · 19,813 tokens.
 
 This run predates the changes below and no longer reflects the framework's output:
 
@@ -458,10 +553,18 @@ This run predates the changes below and no longer reflects the framework's outpu
 
 Re-run with `python scripts/run_scenario.py S2_JETP_Aligned` to get a run record in the new format.
 
-### Sleman fixture
+### Sleman climate inputs
 
-- Synthetic, calibrated against BPS-BMKG (~2200-2600 mm rainfall, ~1300-1550 mm ET₀); 2023 at the Mlati station → modelled yield 6.7 t/ha vs BPS 6.5 t/ha.
-- File: `data/processed/openmeteo_sleman_1991-01-01_2024-12-31.parquet`
+- **Synthetic fixture:** generated for offline tests and software demonstrations.
+  It follows a monsoon pattern and is not a station observation.
+- **Downloaded climate:** Open-Meteo historical data for three Sleman stations,
+  1991–2024, fetched by `bootstrap --force`; the current water model uses the
+  selected baseline year from this cache.
+- **Agriculture:** BPS static Sleman inputs anchor harvest area and observed yield.
+  Irrigation supply, groundwater share, pump head, pump efficiency and cropping
+  intensity remain screening assumptions in `src/wef_agentic/config/nexus.yaml`.
+- Local parquet files are gitignored. See `subprojects/unesco-book-chapter/evidence/`
+  for checksums and run references.
 
 ---
 
@@ -478,8 +581,8 @@ Re-run with `python scripts/run_scenario.py S2_JETP_Aligned` to get a run record
 ## 🗺 Roadmap
 
 - **Phase 0 (DONE)**: MVP framework with 5 agents, 3 scenarios, dual providers
-- **Phase 1 (DONE, 2026-05-16)**: data sources framework, multi-city, comparison mode, PDF report, 5 scenarios, dashboard cards, calibrated fixture; deterministic nexus coupling + checks, test suite + CI
-- **Phase 2 (pending)**: Policy Agent + 4 Stakeholder Agents (Farmer / Local Government / PLN / Community), SWAT+/OSeMOSYS/AquaCrop coupling, CMIP6 ensemble, Sobol sensitivity (including `nexus.yaml` parameters), MCDA, paper v0.1
+- **Phase 1 (implemented)**: data sources framework, multi-city, comparison mode, PDF report, 5 scenarios, dashboard cards, deterministic nexus coupling, consistency checks, real-climate bootstrap, test suite and CI. Local calibration is still pending.
+- **Phase 2 (partly prepared)**: Sobol sensitivity tooling and the external-model contracts are documented. Policy and stakeholder agents, SWAT+/OSeMOSYS/AquaCrop coupling, CMIP6 ensemble and MCDA still require study inputs and validation.
 - **Phase 3 (pending)**: stakeholder workshop, real-time BMKG/BPS API integration (requires a registration key), paper v1.0
 
 ---
