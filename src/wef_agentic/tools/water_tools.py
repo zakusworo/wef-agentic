@@ -78,6 +78,7 @@ def get_climate_summary(
             "delta_precip_pct": {"type": "number", "default": 0.0},
             "delta_temp_c": {"type": "number", "default": 0.0},
             "soil_water_capacity_mm": {"type": "number", "default": 150.0},
+            "growing_months": {"type": "array", "items": {"type": "integer", "minimum": 1, "maximum": 12}},
         },
         "required": ["location_query"],
     },
@@ -89,7 +90,13 @@ def run_water_balance(
     delta_precip_pct: float = 0.0,
     delta_temp_c: float = 0.0,
     soil_water_capacity_mm: float = 150.0,
+    growing_months: list[int] | None = None,
 ) -> dict[str, Any]:
+    if growing_months is not None and (
+        not growing_months or len(set(growing_months)) != len(growing_months)
+        or any(type(m) is not int or not 1 <= m <= 12 for m in growing_months)
+    ):
+        raise ValueError("growing_months must contain unique months from 1 to 12")
     location = resolve_or_raise(location_query)
     df = fetch_climate_for_location(location)
     monthly = aggregate_monthly(df)
@@ -102,6 +109,7 @@ def run_water_balance(
         if sub.empty:
             raise ValueError(f"Tidak ada data untuk year={year} di lokasi {location.display}")
         effective_station = sub["station"].iloc[0]
+        sub = sub[sub["station"] == effective_station].copy()
 
     sub = sub.sort_values("month").reset_index(drop=True)
     sub = scenario_apply_climate_change(
@@ -109,6 +117,11 @@ def run_water_balance(
     )
     result = thornthwaite_mather(sub, soil_water_capacity_mm=soil_water_capacity_mm)
     summary = result.annual_summary
+    stress_months = result.monthly
+    if growing_months is not None:
+        stress_months = stress_months[stress_months["month"].isin(growing_months)]
+        if set(stress_months["month"]) != set(growing_months):
+            raise ValueError("Climate data do not cover all growing months")
 
     return {
         "location": location.to_dict(),
@@ -117,9 +130,11 @@ def run_water_balance(
         "delta_precip_pct": delta_precip_pct,
         "delta_temp_c": delta_temp_c,
         "soil_water_capacity_mm": soil_water_capacity_mm,
+        "growing_months": growing_months,
+        "stress_basis": "growing_months" if growing_months else "annual",
         "summary": {k: round(v, 3) for k, v in summary.items()},
         "water_stress_raw": round(
-            water_stress_fraction(summary["total_eta_mm"], summary["total_pet_mm"]), 4
+            water_stress_fraction(stress_months["eta_mm"].sum(), stress_months["et0_mm"].sum()), 4
         ),
         "monthly": result.monthly[
             ["month", "precip_mm", "et0_mm", "eta_mm", "surplus_mm", "deficit_mm", "soil_moisture_mm"]

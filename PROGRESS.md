@@ -1,8 +1,50 @@
 # WEF-Agentic — Progress Log
 
-_Last updated: 2026-09-15 · `main` after `0f94526` · CI green on the code commit_
+_Last updated: 2026-09-20 · local branch `finish-pending-tasks`; changes not committed or pushed_
 
 Handoff notes for the next working session. README describes *what the framework is*; this file tracks *where the work stands* and *what to do next*.
+
+The new [project specification](WEF-Agentic.md) defines Phase 2/3 inputs, interfaces
+and acceptance criteria. It was created on 2026-09-20 at the user's request because
+the former internal specification was unavailable.
+
+## 2026-09-20 implementation and demo
+
+- Local Python 3.14 environment installed. 59 offline tests passed outside the
+  sandbox; threaded asyncio tests hang inside this sandbox. Ruff passed.
+- Fixed pumping baseline land area and the multi-station water-balance fallback;
+  added regression coverage and explicit growing-month / historical-year options.
+- Added deterministic sweep and optional SALib Sobol scripts. A 56-evaluation
+  synthetic smoke run passed; example bounds are not calibrated uncertainty ranges.
+- Migrated Streamlit width arguments, raised its minimum version, checked startup
+  and recorded-demo loading, and opened the demo in a browser at desktop/mobile
+  widths. Tabs respond; no document-level mobile overflow was detected.
+  Six chart containers rendered and the PDF download was verified in Chromium.
+- Full synthetic-climate Claude S2 run succeeded in 210.66 seconds. All five
+  narratives were nonempty, ended with `stop`, and needed one attempt. Reported
+  models matched requested Sonnet 4.6 / Opus 4.7. This does not test forced
+  output-budget exhaustion. Ollama Cloud validation still needs a key.
+- Real Open-Meteo 1991–2024 data for three stations and NASA POWER downloaded.
+  Fixed oversized requests by fetching paced yearly chunks; added bootstrap
+  `--force` because the previous command silently reused synthetic caches.
+- Real-climate S2 Claude run completed in 200.26 seconds; all five agents returned
+  nonempty responses on their first attempt with `stop`. No deterministic checks
+  failed; seasonality and low-confidence warnings remain. Record:
+  `docs/runs/run_S2_JETP_Aligned_sleman_claude-agent-sdk_20260920_144208.json`.
+  Deterministic five-scenario sweeps were saved for both 2023 and 2015 climate baselines.
+- Archived the obsolete May run. Rendered all three README diagrams in default
+  and dark Mermaid themes; native GitHub dark-mode rendering remains unverified.
+- Kept existing Claude model defaults for reproducibility after confirming they
+  work live. Newer models can be evaluated with explicit overrides.
+- Created [runnable demo](scripts/start_demo.sh), [specification](WEF-Agentic.md),
+  and separate [ISTIC chapter subproject](subprojects/unesco-book-chapter/README.md).
+  The EOI is drafted, not submitted. Recorded demo data remain synthetic even
+  after the local cache is replaced with real climate data.
+
+Remaining scientific work: local calibration and crop calendars, electric/diesel
+pump shares, hydropower and grid water factors, sensitivity convergence, and
+empirical learning/stakeholder validation. Advanced Phase 2/3 components remain
+design work with data requirements in the specification, not implemented engines.
 
 ---
 
@@ -101,20 +143,20 @@ Observations to carry into the paper discussion:
 ### Must do before trusting outputs
 - [ ] **Real LLM run with the new pipeline**: `python scripts/run_scenario.py S2_JETP_Aligned --provider ollama-cloud`. Confirm the critic is non-empty, check `attempts`/`done_reason` in the run record, and compare timings with the old run.
 - [ ] **Live-test the Claude provider** (`--provider claude-agent-sdk`): confirm the reported model matches the requested one and that `CLAUDE_CODE_MAX_OUTPUT_TOKENS` is honoured (only unit-tested so far).
-- [ ] **Replace the synthetic fixture with real climate data**: `python -m wef_agentic.data.bootstrap`, then re-run all 5 scenarios.
+- [x] **Fetch real climate data**: `python -m wef_agentic.data.bootstrap --force`; all five deterministic scenarios rerun in `docs/runs/sweep_openmeteo_20260920.json`. This is not five live LLM runs.
 - [ ] **Calibrate `config/nexus.yaml` `ASSUMPTION` values**: irrigation supply fraction, groundwater share, pump head/efficiency, cropping intensity. Sources to chase: Distan Sleman, BBWS Serayu-Opak, PLN UP3 Yogyakarta. Note that diesel pumps are common and their energy is not grid demand.
-- [ ] Delete or archive `docs/runs/run_S2_JETP_Aligned_deepseek_cloud_20260517_110212.json` (pre-coupling, empty critic).
+- [x] Archived the obsolete May run in `docs/runs/archive/` with an explanatory note.
 
 ### Modelling improvements
 - [ ] Growing-season stress (rice months / 2–3 seasons) instead of annual `1 − ETa/PET`; revisit the S4 narrative.
-- [ ] Drought-year selection (e.g. 2015/2019 El Niño) instead of only a delta on 2023.
-- [ ] Pumping uses horizon irrigated area for both scenario and baseline, so the land-loss effect on pumping is ignored.
+- [x] Historical-year selection via `--baseline-year` in scenario and sweep scripts; 2015 regression covered.
+- [x] Pumping now compares baseline physical area with horizon physical area; land-loss regression passes.
 - [ ] Hydropower/PLTMH water dependence not modelled; Indonesian grid water intensity (EWIF) missing, so local-run off-site water is reported as missing.
-- [ ] Sobol sensitivity on `nexus.yaml` parameters (Phase 2 roadmap).
+- [x] Sobol tooling for irrigation/power-water parameters, explicit bounds and saved samples/results. Scientific convergence and defensible bounds remain open.
 
 ### Code / housekeeping
-- [ ] Streamlit `use_container_width` is deprecated (removal date passed): switch to `width="stretch"`.
-- [ ] Decide whether to update `model_claude` in `llm.yaml` (currently `claude-opus-4-7` / `claude-sonnet-4-6`; newer Claude 5 models exist). This changes reproducibility vs earlier runs.
+- [x] Streamlit migrated to `width="stretch"`; startup and recorded demo checked.
+- [x] Retain current Claude model defaults for reproducibility; validated live on this machine.
 - [ ] Optional: native LLM tool-calling (registry already has JSON schemas). Keep numbers deterministic if you do.
 - [ ] Check the README Mermaid diagrams in GitHub dark mode (only the light theme was checked).
 - [ ] Phase 2 roadmap: Policy + Stakeholder agents, SWAT+/OSeMOSYS/AquaCrop, CMIP6 ensemble, MCDA, paper v0.1.

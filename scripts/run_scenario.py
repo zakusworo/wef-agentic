@@ -45,6 +45,10 @@ def _print_event(phase: str, payload: dict) -> None:
 
 async def main(args: argparse.Namespace) -> dict:
     scenario = get_scenario(args.scenario, location_query=args.location)
+    if args.baseline_year is not None:
+        scenario["water_baseline_year"] = args.baseline_year
+    if args.growing_months is not None:
+        scenario["growing_months"] = args.growing_months
     print("=" * 70)
     print(f"WEF-Agentic run — {args.scenario} @ {scenario['location_query']}")
     print(f"Provider override : {os.environ.get('WEF_AGENTIC_PROVIDER_OVERRIDE') or '(yaml)'}")
@@ -69,6 +73,8 @@ if __name__ == "__main__":
     parser.add_argument("--location", default=None, help="override scenario location (default: sleman)")
     parser.add_argument("--provider", default=None, help="sets WEF_AGENTIC_PROVIDER_OVERRIDE")
     parser.add_argument("--model", default=None, help="sets WEF_AGENTIC_MODEL_OVERRIDE")
+    parser.add_argument("--baseline-year", type=int, help="historical climate year, e.g. 2015 or 2019")
+    parser.add_argument("--growing-months", type=int, nargs="+", help="observed crop calendar months (1–12)")
     cli = parser.parse_args()
     if cli.provider:
         os.environ["WEF_AGENTIC_PROVIDER_OVERRIDE"] = cli.provider

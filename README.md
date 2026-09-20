@@ -7,9 +7,25 @@ It puts two WEF 2026 frameworks into practice:
 - **WEF (2026a)** *Making Agentic AI Work for Government: A Readiness Framework* (April 2026)
 - **WEF (2026b)** *Building Resilient and Scalable AI Value Chains: A Nexus Strategy* (May 2026)
 
-Full specification: `WEF-Agentic.md` (internal design document, not included in this repository). Session-to-session progress and next steps: [`PROGRESS.md`](PROGRESS.md).
+Project specification and Phase 2/3 acceptance criteria: [`WEF-Agentic.md`](WEF-Agentic.md). Session-to-session progress and next steps: [`PROGRESS.md`](PROGRESS.md).
 
 > **Status:** Phase 1 complete: deterministic nexus coupling × 5 agents × 5 scenarios × multi-city × data sources framework × comparison mode × PDF export × offline test suite + CI.
+
+### Local demo and chapter project
+
+With the project environment installed, run `bash scripts/start_demo.sh` and open
+http://127.0.0.1:8501. The demo starts with a recorded Claude analysis and synthetic
+climate outputs; it requires no API call to view. Fresh runs use the selected provider.
+The [ISTIC book-chapter subproject](subprojects/unesco-book-chapter/README.md) contains
+the EOI, chapter outline, exported figures and evidence limits.
+
+Use `python -m wef_agentic.data.bootstrap --force` to replace a synthetic cache with
+live climate data. Historical downloads use paced yearly requests. Run all five
+deterministic scenarios with `python scripts/run_sweep.py --output result.json`.
+Both sweep and scenario scripts accept `--baseline-year 2015` and optional
+`--growing-months 6 7 8 9`; the latter example is not a sourced local crop calendar.
+For Sobol analysis install `.[sensitivity]` and use `scripts/run_sensitivity.py`;
+`docs/sensitivity-example.json` contains illustrative, uncalibrated bounds.
 
 ---
 
@@ -126,7 +142,7 @@ flowchart LR
     subgraph IN["Inputs"]
         direction TB
         CD["🌦 Scenario climate<br/>ΔP %, ΔT °C"]
-        BC["Baseline climate<br/>2023"]
+        BC["Baseline climate<br/>selected historical year"]
         AREA["🌾 Harvest area<br/>BPS or manual override"]
         POP["👥 Population + growth<br/>same for both sectors"]
     end
@@ -134,9 +150,9 @@ flowchart LR
     subgraph WATER["💧 Water"]
         direction TB
         TM["Thornthwaite-Mather<br/>monthly balance"]
-        RS["Raw water stress<br/>1 − ETa/PET"]
+        RS["Raw water stress<br/>1 − ETa/PET over selected months"]
         ES["Stress after irrigation"]
-        GW["Groundwater pumped<br/>scenario vs baseline"]
+        GW["Groundwater pumped<br/>future vs baseline land area and climate"]
         TM --> RS -->|"× (1 − supply 0.6)"| ES
         TM -->|"dry-season deficit"| GW
     end

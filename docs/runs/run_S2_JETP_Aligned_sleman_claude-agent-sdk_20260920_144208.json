@@ -1,0 +1,1256 @@
+{
+  "timestamp_utc": "2026-09-20T14:42:08.849158+00:00",
+  "git": {
+    "sha": "e1fc17dbd8f4679b3e373ae798ed0456df2df247",
+    "dirty": true
+  },
+  "package_version": "0.1.0",
+  "scenario": {
+    "name": "S2 — JETP-Aligned 2030",
+    "description": "Aligned dengan JETP CIPP pathway",
+    "location_query": "sleman",
+    "climate": "Baseline + warming SSP2-4.5",
+    "policy": "EBT 34% by 2030, LP2B moderate, induction cooker partial",
+    "delta_precip_pct": -3.0,
+    "delta_temp_c": 1.0,
+    "energy_scenario": "JETP_Aligned",
+    "renewable_share_2030": 0.34,
+    "lp2b_protection": "moderate",
+    "horizon": 2030,
+    "water_baseline_year": 2023,
+    "water_station": null,
+    "food_crop": "padi"
+  },
+  "config": {
+    "llm": {
+      "defaults": {
+        "provider": "ollama-cloud",
+        "model": "deepseek-v4-pro:cloud",
+        "model_local": "gemma4:e4b",
+        "model_claude": "claude-sonnet-4-6",
+        "max_tokens": 2048,
+        "temperature": 0.2
+      },
+      "retry": {
+        "max_tokens_cap": 16000
+      },
+      "agents": {
+        "coordinator": {
+          "provider": "ollama-cloud",
+          "model": "deepseek-v4-pro:cloud",
+          "model_local": "gemma4:e4b",
+          "model_claude": "claude-opus-4-7",
+          "max_tokens": 6000,
+          "temperature": 0.3
+        },
+        "water": {
+          "provider": "ollama-cloud",
+          "model": "deepseek-v4-pro:cloud",
+          "model_local": "gemma4:e4b",
+          "model_claude": "claude-sonnet-4-6",
+          "max_tokens": 2048,
+          "temperature": 0.2
+        },
+        "energy": {
+          "provider": "ollama-cloud",
+          "model": "deepseek-v4-pro:cloud",
+          "model_local": "gemma4:e4b",
+          "model_claude": "claude-sonnet-4-6",
+          "max_tokens": 2048,
+          "temperature": 0.2
+        },
+        "food": {
+          "provider": "ollama-cloud",
+          "model": "deepseek-v4-pro:cloud",
+          "model_local": "gemma4:e4b",
+          "model_claude": "claude-sonnet-4-6",
+          "max_tokens": 2048,
+          "temperature": 0.2
+        },
+        "critic": {
+          "provider": "ollama-cloud",
+          "model": "kimi-k2.6:cloud",
+          "model_local": "gemma4:e4b",
+          "model_claude": "claude-opus-4-7",
+          "max_tokens": 8000,
+          "temperature": 0.1
+        }
+      },
+      "footprint": {
+        "kwh_per_1k_output_tokens": 0.0003,
+        "input_token_weight": 0.1,
+        "size_multiplier": {
+          "small": 0.1,
+          "medium": 1.0,
+          "large": 3.0
+        },
+        "size_patterns": [
+          {
+            "pattern": ":e?[1-9](\\.\\d+)?b\\b|haiku",
+            "size": "small"
+          },
+          {
+            "pattern": "opus|deepseek-v4-pro|kimi-k2",
+            "size": "large"
+          }
+        ],
+        "providers": {
+          "ollama-local": {
+            "pue": 1.0,
+            "wue_onsite_l_per_kwh": 0.0,
+            "ewif_l_per_kwh": null,
+            "co2_kg_per_kwh": 0.85
+          },
+          "ollama-cloud": {
+            "pue": 1.2,
+            "wue_onsite_l_per_kwh": 0.55,
+            "ewif_l_per_kwh": 3.14,
+            "co2_kg_per_kwh": 0.4
+          },
+          "claude-agent-sdk": {
+            "pue": 1.2,
+            "wue_onsite_l_per_kwh": 0.55,
+            "ewif_l_per_kwh": 3.14,
+            "co2_kg_per_kwh": 0.4
+          }
+        },
+        "ollama_cloud_flat_monthly_usd": 20,
+        "amortization_runs_per_month": 1000
+      }
+    },
+    "nexus": {
+      "irrigation": {
+        "application_efficiency": 0.65,
+        "supply_fraction": 0.6,
+        "groundwater_share": 0.3,
+        "pump_head_m": 30.0,
+        "pump_efficiency": 0.45,
+        "cropping_intensity": 2.0
+      },
+      "power_sector_water": {
+        "fossil_m3_per_mwh": 2.6,
+        "renewable_m3_per_mwh": 0.1
+      },
+      "checks": {
+        "groundwater_warn_fraction_of_surplus": 0.25,
+        "yield_plausibility_tolerance": 0.25,
+        "low_confidence_threshold": 0.6
+      },
+      "fallbacks": {
+        "population_when_unknown": 100000
+      }
+    }
+  },
+  "nexus": {
+    "key_figures": {
+      "lokasi": "Sleman",
+      "tahun_dasar_air": 2023,
+      "horizon": 2030,
+      "air": {
+        "stress_basis": "annual",
+        "growing_months": null,
+        "hujan_mm": 1803.4,
+        "pet_mm": 1529.5,
+        "eta_mm": 1185.8,
+        "surplus_mm": 617.6,
+        "defisit_mm": 343.7,
+        "water_stress_tanpa_irigasi": 0.2247,
+        "water_stress_setelah_irigasi": 0.0899,
+        "kebutuhan_irigasi_bruto_mm": 528.7,
+        "air_tanah_dipompa_juta_m3": 17.626
+      },
+      "energi": {
+        "demand_tahun_dasar_gwh": 1880.0,
+        "demand_2030_gwh": 2373.0,
+        "demand_horizon_gwh": 2373.0,
+        "tambahan_pompa_irigasi_akibat_iklim_gwh": 0.213,
+        "porsi_ebt_2030": 0.34,
+        "faktor_emisi_grid_kg_per_kwh": 0.85,
+        "emisi_2030_mt_co2": 1.331,
+        "air_konsumsi_pembangkit_2030_juta_m3_offsite": 4.15
+      },
+      "pangan": {
+        "tersedia": true,
+        "luas_panen_dasar_ha": 39000.0,
+        "luas_panen_horizon_ha": 37040.0,
+        "yield_model_t_ha": 6.31,
+        "yield_observasi_t_ha": 6.5,
+        "produksi_2030_t": 233639.8,
+        "produksi_horizon_t": 233639.8,
+        "ssl_2030": 1.711,
+        "populasi_2030": 1187385
+      }
+    },
+    "checks": [
+      {
+        "name": "water_mass_balance",
+        "status": "ok",
+        "detail": "P − ETa − surplus − ΔS = 0.000 mm"
+      },
+      {
+        "name": "seasonal_mismatch",
+        "status": "warn",
+        "detail": "Surplus tahunan 618 mm terjadi di bulan [2, 3, 4], defisit 344 mm di bulan [5, 6, 7, 8, 9, 10]: surplus tahunan tidak menutup defisit musim kering tanpa tampungan atau air tanah."
+      },
+      {
+        "name": "groundwater_vs_recharge_proxy",
+        "status": "ok",
+        "detail": "Air tanah dipompa 95 mm/tahun di lahan irigasi vs surplus (proxy recharge maksimum) 618 mm; ambang peringatan 25%."
+      },
+      {
+        "name": "population_consistency",
+        "status": "ok",
+        "detail": "Populasi dasar sektor energi 1,138,691 vs pangan 1,138,691."
+      },
+      {
+        "name": "yield_plausibility",
+        "status": "ok",
+        "detail": "Yield model 6.31 t/ha vs observasi 6.50 t/ha (selisih 3%)."
+      },
+      {
+        "name": "low_confidence_inputs",
+        "status": "warn",
+        "detail": "food.rice_consumption_kg_per_capita (country-proxy-defaults, conf 0.55); grid.emission_factor_kg_co2_per_kwh (country-proxy-defaults, conf 0.55)"
+      }
+    ],
+    "warnings": [],
+    "provenance": [
+      {
+        "variable": "energy.consumption_gwh_annual",
+        "value": 1880,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "bps-sleman-static",
+        "fetched_at": "2026-09-20T14:38:48.820744",
+        "year": 2023,
+        "unit": "GWh/year",
+        "confidence": 0.95,
+        "tier": 1,
+        "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+      },
+      {
+        "variable": "food.rice_area_ha",
+        "value": 39000,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "bps-sleman-static",
+        "fetched_at": "2026-09-20T14:38:48.817236",
+        "year": 2023,
+        "unit": "ha",
+        "confidence": 0.95,
+        "tier": 1,
+        "note": "BPS Sleman, Statistik Pertanian 2023."
+      },
+      {
+        "variable": "food.rice_land_loss_ha_per_year",
+        "value": 280,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "bps-sleman-static",
+        "fetched_at": "2026-09-20T14:38:48.817311",
+        "year": 2023,
+        "unit": "ha/year",
+        "confidence": 0.95,
+        "tier": 1,
+        "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+      },
+      {
+        "variable": "food.rice_yield_t_per_ha",
+        "value": 6.5,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "bps-sleman-static",
+        "fetched_at": "2026-09-20T14:38:48.817365",
+        "year": 2023,
+        "unit": "t/ha",
+        "confidence": 0.95,
+        "tier": 1,
+        "note": "BPS Sleman, Statistik Pertanian 2023."
+      },
+      {
+        "variable": "socio.population",
+        "value": 1138691,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "bps-sleman-static",
+        "fetched_at": "2026-09-20T14:38:48.826740",
+        "year": 2023,
+        "unit": "jiwa",
+        "confidence": 0.95,
+        "tier": 1,
+        "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+      },
+      {
+        "variable": "food.rice_consumption_kg_per_capita",
+        "value": 115,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "country-proxy-defaults",
+        "fetched_at": "2026-09-20T14:38:48.826810",
+        "year": 2024,
+        "unit": "kg/year",
+        "confidence": 0.55,
+        "tier": 3,
+        "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+      },
+      {
+        "variable": "grid.emission_factor_kg_co2_per_kwh",
+        "value": 0.85,
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "source": "country-proxy-defaults",
+        "fetched_at": "2026-09-20T14:38:48.826657",
+        "year": 2024,
+        "unit": "kg CO2/kWh",
+        "confidence": 0.55,
+        "tier": 3,
+        "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+      }
+    ],
+    "coupling": {
+      "water_stress_raw": 0.2247,
+      "irrigation_supply_fraction": 0.6,
+      "water_stress_effective": 0.0899,
+      "irrigated_physical_area_ha": 18520.0,
+      "pumping_scenario": {
+        "gross_requirement_mm": 528.7384615384615,
+        "delivered_mm": 317.2430769230769,
+        "groundwater_mm": 95.17292307692307,
+        "groundwater_volume_m3": 17626025.35384615,
+        "pumping_kwh_per_m3": 0.18166666666666667,
+        "pumping_energy_gwh": 3.202061272615384
+      },
+      "pumping_baseline_climate": {
+        "gross_requirement_mm": 468.68769230769226,
+        "delivered_mm": 281.21261538461533,
+        "groundwater_mm": 84.3637846153846,
+        "groundwater_volume_m3": 16450937.999999998,
+        "pumping_kwh_per_m3": 0.18166666666666667,
+        "pumping_energy_gwh": 2.98858707
+      },
+      "extra_pumping_demand_gwh": 0.2134742026153842,
+      "power_sector_water_m3_2030": 4152746.151856714,
+      "parameters": {
+        "irrigation": {
+          "application_efficiency": 0.65,
+          "supply_fraction": 0.6,
+          "groundwater_share": 0.3,
+          "pump_head_m": 30.0,
+          "pump_efficiency": 0.45,
+          "cropping_intensity": 2.0
+        },
+        "power_sector_water": {
+          "fossil_m3_per_mwh": 2.6,
+          "renewable_m3_per_mwh": 0.1
+        }
+      }
+    }
+  },
+  "agents": [
+    {
+      "name": "water",
+      "provider": "claude-agent-sdk",
+      "requested_model": "claude-sonnet-4-6",
+      "reported_model": "claude-sonnet-4-6",
+      "tokens_in": 8378,
+      "tokens_out": 3349,
+      "attempts": 1,
+      "done_reason": "stop",
+      "truncated": false,
+      "thinking_chars": 0,
+      "system_prompt_sha256": "5b48557c7284b8bbe7b7c1281e230a3df1f9ec083ec57da2562c9cadba52ac21",
+      "prompt_sha256": "cd17acf206445acc8bb7cff774b0843c072e5e447d5528bdad6e550ec2270c44",
+      "content": "# Interpretasi Neraca Air — Skenario S2 (JETP-Aligned 2030)\n**Lokasi:** Sleman, D.I. Yogyakarta | **Model:** Thornthwaite-Mather | **Stasiun Referensi:** Mlati | **Tanggal Analisis:** 20 September 2026\n\n---\n\n## Narasi Interpretatif\n\nNeraca air tahunan Sleman di bawah skenario S2 secara agregat tampak tidak kritis — surplus tahunan sebesar **617,6 mm** melampaui defisit tahunan **343,7 mm**, dengan rasio P/PET sebesar 1,179. Namun, keseimbangan agregat ini bersifat menyesatkan secara operasional: seluruh surplus terkonsentrasi hanya pada tiga bulan basah (Februari–April, di mana surplus bulanan berkisar 104,7–346,1 mm), sementara defisit evapotranspirasi mencapai puncaknya justru pada September dan Oktober (masing-masing **117,6 mm dan 116,9 mm**) ketika simpanan lengas tanah menyentuh kondisi kritis hampir kosong (5,8–13,3 mm dari kapasitas 150 mm). Ketidaksejajaran temporal ini — surplus musim hujan yang tidak dapat \"disimpan\" untuk menutup defisit musim kemarau — merupakan inti risiko hidrologis di Sleman, khususnya di sub-DAS Code, Opak, dan Kuning yang memiliki rezim aliran intermiten. Di bawah delta iklim S2 (presipitasi −3,0%, suhu +1,0°C terhadap 2023), defisit meningkat dari *baseline* **304,6 mm menjadi 343,7 mm** — kenaikan **+39,1 mm atau +12,8%** — yang seluruhnya terbebani pada jendela kemarau yang sudah paling rentan, memperdalam tekanan termal dan keterbatasan evapotranspirasi aktual (ETa = 1.185,8 mm vs. PET = 1.529,5 mm).\n\nIrigasi menjadi penyangga utama: *water stress* turun dari **0,2247 (pra-irigasi) menjadi 0,0899 (pasca-irigasi)** setelah fraksi pasokan irigasi 60% diterapkan. Namun pencapaian ini membutuhkan biaya yang signifikan — kebutuhan irigasi kotormencapai **528,7 mm** (efisiensi aplikasi 0,65), dengan **95,2 mm setara lahan atau 17,626 juta m³** bersumber dari air tanah. Volume pemompaan ini langsung bersinggungan dengan isu krisis air tanah Sleman Tengah-Selatan yang sudah terdokumentasi, sekaligus menambah beban energi sebesar **3,202 GWh** — angka yang tidak trivial mengingat tekanan grid pasca-normalisasi subsidi listrik dalam kerangka JETP. Alih fungsi LP2B yang berlanjut (~280 ha/tahun) akan mengurangi luas sawah beririgasi, namun secara paradoks juga mengurangi permintaan pemompaan — pertukaran ini membutuhkan analisis terpisah di luar kapasitas model ini.\n\n---\n\n## Temuan Utama\n\n**Neraca Air & Musiman**\n- Surplus tahunan 617,6 mm vs. defisit 343,7 mm: secara agregat positif, tetapi tidak operasional karena temporal mismatch ekstrem\n- Defisit terkonsentrasi Juni–Oktober; puncak Agustus–Oktober (defisit kumulatif: 85,3 + 117,6 + 116,9 = **319,8 mm dalam 3 bulan**)\n- Lengas tanah sub-DAS Opak/Kuning diperkirakan mendekati titik layu permanen (5,8 mm) pada Oktober\n- Delta iklim S2 menambah defisit +39,1 mm (+12,8%) terhadap baseline — seluruh kenaikan jatuh pada bulan-bulan yang sudah paling kritis\n\n**Water Stress**\n- *Water stress* pra-irigasi: **0,2247** (tergolong sedang-tinggi untuk wilayah pertanian)\n- *Water stress* pasca-irigasi: **0,0899** — reduksi signifikan, tetapi bergantung penuh pada ketersediaan pasokan irigasi 60%\n- Jika fraksi pasokan irigasi turun (misalnya kegagalan saluran, konflik hulu, atau erupsi Merapi VEI 3+ yang mengganggu sub-DAS Boyong), *water stress* efektif dapat kembali mendekati nilai raw\n\n**Irigasi & Air Tanah**\n- Kebutuhan irigasi kotor: **528,7 mm** (defisit 343,7 mm ÷ efisiensi 0,65)\n- Volume air tanah untuk irigasi: **17,626 juta m³** — beban langsung pada akuifer Sleman Tengah-Selatan yang sudah mengalami penurunan muka air\n- Energi pemompaan: **3,202 GWh** — rentan terhadap eskalasi tarif listrik pasca-subsidi; biaya operasional petani berpotensi meningkat tajam\n\n**Risiko Fisik Skenario S2**\n- Presipitasi −3% dan suhu +1°C secara non-linear memperbesar defisit (bukan sekadar −3% dari defisit baseline), karena peningkatan PET ikut menekan ETa pada bulan-bulan kering\n- Tekanan pariwisata Borobudur-Prambanan-Merapi menambah kompetisi atas air permukaan sub-DAS Code dan Opak pada periode yang sama dengan puncak defisit pertanian\n\n---\n\n## Caveat Wajib\n\n> **⚠ ADVISORY ONLY — WEF 2026a Bounded Autonomy**\n> Output ini dihasilkan oleh Water Agent dengan model neraca air Thornthwaite-Mather yang bersifat *lumped* dan deterministik. **Beberapa dimensi penting TIDAK dapat dianalisis** oleh model ini, antara lain: (1) dinamika akuifer tiga dimensi dan laju pemulihan air tanah Sleman Tengah-Selatan; (2) variabilitas spasial antar sub-DAS Code, Opak, Kuning, dan Boyong; (3) dampak lahar/lahar hujan Merapi terhadap infrastruktur irigasi dan kualitas air; (4) interaksi permintaan air domestik-industri-pariwisata; (5) ketidakpastian probabilistik dari proyeksi iklim (hanya satu delta skenario yang dihitung). **Seluruh temuan dan implikasi kebijakan wajib divalidasi oleh analis hidrologi dan perencana daerah yang kompeten sebelum digunakan sebagai dasar pengambilan keputusan.**",
+      "tool_outputs": [
+        {
+          "tool": "get_climate_summary",
+          "data": {
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "year_range": [
+              1991,
+              2024
+            ],
+            "stations": {
+              "Mlati": {
+                "precip_mean_mm": 2607.8,
+                "precip_std_mm": 592.1,
+                "tmean_c": 24.8,
+                "et0_mean_mm": 1339.4
+              },
+              "Pakem": {
+                "precip_mean_mm": 2819.2,
+                "precip_std_mm": 683.1,
+                "tmean_c": 23.2,
+                "et0_mean_mm": 1298.9
+              },
+              "Prambanan": {
+                "precip_mean_mm": 2553.1,
+                "precip_std_mm": 521.6,
+                "tmean_c": 25.2,
+                "et0_mean_mm": 1379.9
+              }
+            }
+          }
+        },
+        {
+          "tool": "run_water_balance",
+          "data": {
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "station": "Mlati",
+            "year": 2023,
+            "delta_precip_pct": -3.0,
+            "delta_temp_c": 1.0,
+            "soil_water_capacity_mm": 150.0,
+            "growing_months": null,
+            "stress_basis": "annual",
+            "summary": {
+              "total_precip_mm": 1803.424,
+              "total_pet_mm": 1529.518,
+              "total_eta_mm": 1185.838,
+              "total_surplus_mm": 617.586,
+              "total_deficit_mm": 343.68,
+              "initial_soil_water_mm": 37.163,
+              "storage_change_mm": 0.0,
+              "mass_balance_residual_mm": 0.0,
+              "p_pet_ratio": 1.179,
+              "aridity_index": 0.848
+            },
+            "water_stress_raw": 0.2247,
+            "monthly": [
+              {
+                "month": 1,
+                "precip_mm": 214.0,
+                "et0_mm": 119.2,
+                "eta_mm": 119.2,
+                "surplus_mm": 0.0,
+                "deficit_mm": 0.0,
+                "soil_moisture_mm": 132.0
+              },
+              {
+                "month": 2,
+                "precip_mm": 453.7,
+                "et0_mm": 89.5,
+                "eta_mm": 89.5,
+                "surplus_mm": 346.1,
+                "deficit_mm": 0.0,
+                "soil_moisture_mm": 150.0
+              },
+              {
+                "month": 3,
+                "precip_mm": 291.7,
+                "et0_mm": 124.9,
+                "eta_mm": 124.9,
+                "surplus_mm": 166.8,
+                "deficit_mm": 0.0,
+                "soil_moisture_mm": 150.0
+              },
+              {
+                "month": 4,
+                "precip_mm": 221.0,
+                "et0_mm": 116.3,
+                "eta_mm": 116.3,
+                "surplus_mm": 104.7,
+                "deficit_mm": 0.0,
+                "soil_moisture_mm": 150.0
+              },
+              {
+                "month": 5,
+                "precip_mm": 87.0,
+                "et0_mm": 121.4,
+                "eta_mm": 117.7,
+                "surplus_mm": 0.0,
+                "deficit_mm": 3.7,
+                "soil_moisture_mm": 119.3
+              },
+              {
+                "month": 6,
+                "precip_mm": 77.7,
+                "et0_mm": 112.2,
+                "eta_mm": 102.2,
+                "surplus_mm": 0.0,
+                "deficit_mm": 10.0,
+                "soil_moisture_mm": 94.7
+              },
+              {
+                "month": 7,
+                "precip_mm": 90.9,
+                "et0_mm": 115.3,
+                "eta_mm": 105.1,
+                "surplus_mm": 0.0,
+                "deficit_mm": 10.2,
+                "soil_moisture_mm": 80.5
+              },
+              {
+                "month": 8,
+                "precip_mm": 6.7,
+                "et0_mm": 139.3,
+                "eta_mm": 53.9,
+                "surplus_mm": 0.0,
+                "deficit_mm": 85.3,
+                "soil_moisture_mm": 33.3
+              },
+              {
+                "month": 9,
+                "precip_mm": 13.1,
+                "et0_mm": 150.7,
+                "eta_mm": 33.1,
+                "surplus_mm": 0.0,
+                "deficit_mm": 117.6,
+                "soil_moisture_mm": 13.3
+              },
+              {
+                "month": 10,
+                "precip_mm": 42.9,
+                "et0_mm": 167.2,
+                "eta_mm": 50.4,
+                "surplus_mm": 0.0,
+                "deficit_mm": 116.9,
+                "soil_moisture_mm": 5.8
+              },
+              {
+                "month": 11,
+                "precip_mm": 163.3,
+                "et0_mm": 135.7,
+                "eta_mm": 135.7,
+                "surplus_mm": 0.0,
+                "deficit_mm": 0.0,
+                "soil_moisture_mm": 33.5
+              },
+              {
+                "month": 12,
+                "precip_mm": 141.5,
+                "et0_mm": 137.8,
+                "eta_mm": 137.8,
+                "surplus_mm": 0.0,
+                "deficit_mm": 0.0,
+                "soil_moisture_mm": 37.2
+              }
+            ]
+          }
+        },
+        {
+          "tool": "compute_irrigation_demand",
+          "data": {
+            "deficit_mm": 343.68,
+            "irrigation_demand_mm": 528.7,
+            "application_efficiency": 0.65
+          }
+        },
+        {
+          "tool": "nexus_coupling_water",
+          "data": {
+            "water_stress_raw": 0.2247,
+            "irrigation_supply_fraction": 0.6,
+            "water_stress_effective": 0.0899,
+            "irrigated_physical_area_ha": 18520.0,
+            "pumping_scenario": {
+              "gross_requirement_mm": 528.7384615384615,
+              "delivered_mm": 317.2430769230769,
+              "groundwater_mm": 95.17292307692307,
+              "groundwater_volume_m3": 17626025.35384615,
+              "pumping_kwh_per_m3": 0.18166666666666667,
+              "pumping_energy_gwh": 3.202061272615384
+            },
+            "baseline_climate_deficit_mm": 304.647
+          }
+        }
+      ]
+    },
+    {
+      "name": "energy",
+      "provider": "claude-agent-sdk",
+      "requested_model": "claude-sonnet-4-6",
+      "reported_model": "claude-sonnet-4-6",
+      "tokens_in": 7424,
+      "tokens_out": 3144,
+      "attempts": 1,
+      "done_reason": "stop",
+      "truncated": false,
+      "thinking_chars": 0,
+      "system_prompt_sha256": "62013447c00d742902c6d3659154263c5722befd8273fd27e0f14e5317e8e656",
+      "prompt_sha256": "046bd0d54d34d36bd3b67afb89f09d4bd6faf21fdff071c6ee3c996161a8dc67",
+      "content": "# Interpretasi Energi — Skenario S2: JETP-Aligned 2030\n**Lokasi:** Kabupaten Sleman, D.I. Yogyakarta | **Horizon:** 2030\n**Data kualitas:** *good (BPS-anchored)* — data historis terverifikasi ESDM + BPS Sleman\n\n---\n\n## Narasi\n\nKonsumsi listrik Kabupaten Sleman menunjukkan tren pertumbuhan yang konsisten berdasarkan data historis BPS–ESDM. Dari 1.450 GWh pada 2018, demand tumbuh menjadi 1.880 GWh pada 2023 — dengan sedikit kontraksi pada 2020 (1.520 GWh) yang mencerminkan dampak pandemi COVID-19 — dan diproyeksikan mencapai **2.373 GWh pada 2030** di bawah skenario JETP-Aligned. Pertumbuhan kumulatif sebesar ~26,2% dalam tujuh tahun (rata-rata ~3,4%/tahun) didorong oleh elastisitas pendapatan terhadap energi (0,75) dan pertumbuhan PDRB per kapita 5%/tahun, yang sebagian diredam oleh asumsi efisiensi energi 1%/tahun sesuai target JETP. Meskipun skenario ini mengasumsikan bauran energi terbarukan 34% pada 2030, tekanan beban residensial-komersial Sleman — yang diperparah oleh ekspansi pariwisata koridor Borobudur–Prambanan–Merapi dan dinamika pasca-subsidi listrik — tetap menjadi faktor struktural yang memerlukan pengelolaan sisi-permintaan (*demand-side management*) secara aktif.\n\nDari perspektif WEF Nexus, dua isu lintas sektor patut mendapat perhatian analitis. Pertama, **coupling air→energi** akibat perubahan iklim menambahkan 0,213 GWh kebutuhan pemompaan irigasi pada 2030 di atas baseline iklim (3,203 GWh vs. 2,989 GWh), mengindikasikan bahwa tekanan defisit air pada Sub-DAS Code, Opak, Kuning, dan Boyong — termasuk krisis air tanah Sleman Tengah-Selatan — secara langsung meningkatkan beban listrik sektor pertanian. Kedua, **coupling energi→air** menunjukkan bahwa sektor pembangkitan listrik (off-site) akan mengkonsumsi sekitar 4,15 juta m³ air pada 2030, menciptakan kompetisi laten atas sumber daya air yang sudah berada di bawah tekanan konversi lahan LP2B (~280 ha/tahun) dan risiko gangguan pasokan akibat aktivitas vulkanik Merapi (VEI 3+ recurrent).\n\n---\n\n## Temuan Utama\n\n### 📊 Demand Listrik\n- **Tahun dasar 2023:** 1.880 GWh/tahun *(sumber: BPS Sleman + PLN ULP Mungkid, confidence 0,95)*\n- **Proyeksi 2030 (skenario JETP-Aligned):** 2.373 GWh/tahun\n- **Pertumbuhan 2023→2030:** +493 GWh (+26,2% kumulatif; ~3,4%/tahun rata-rata)\n- **Trajektori tahunan:**\n\n| Tahun | Demand (GWh) | ∆ vs 2023 |\n|-------|-------------|-----------|\n| 2023  | 1.880       | —         |\n| 2024  | 1.944       | +3,4%     |\n| 2025  | 2.010       | +6,9%     |\n| 2026  | 2.078       | +10,5%    |\n| 2027  | 2.149       | +14,3%    |\n| 2028  | 2.221       | +18,1%    |\n| 2029  | 2.296       | +22,1%    |\n| **2030**  | **2.373** | **+26,2%** |\n\n---\n\n### 🌬️ Emisi CO₂\n- **Grid emission factor (Indonesia):** 0,85 kg CO₂/kWh\n- **Bauran EBT 2030:** 34%\n- **Emisi CO₂ 2030:** **1,331 juta ton CO₂/tahun** (dibebankan pada porsi fosil: 66% × 2.373 GWh × 0,85)\n- Tanpa peningkatan bauran EBT, emisi pada grid factor yang sama akan mencapai ~2,018 Mt CO₂ — artinya target 34% EBT menghindari sekitar **0,687 Mt CO₂/tahun**\n\n---\n\n### 💧 Coupling Air → Energi (Irigasi Pompa, Perubahan Iklim)\n- **Kebutuhan pemompaan baseline iklim (2030):** 2,989 GWh/tahun\n- **Kebutuhan pemompaan skenario perubahan iklim (2030):** 3,202 GWh/tahun\n- **Tambahan demand akibat perubahan iklim:** **+0,213 GWh/tahun** (+7,1% di atas baseline)\n- Volume air tanah yang harus dipompa (skenario iklim): 17,63 juta m³, vs. 16,45 juta m³ baseline — selisih **+1,18 juta m³** mencerminkan defisit pasokan irigasi permukaan Sub-DAS Code–Opak–Boyong yang semakin dalam\n- Intensitas pemompaan: 0,182 kWh/m³ (konstan antar skenario)\n\n---\n\n### ⚡💧 Coupling Energi → Air (Konsumsi Air Pembangkit, Off-site)\n- **Konsumsi air sektor pembangkitan (off-site) 2030:** **4,153 juta m³/tahun**\n- Angka ini merepresentasikan *hidden water footprint* dari grid listrik yang melayani Sleman, bukan dari pembangkit lokal; relevan untuk analisis ketahanan air regional D.I. Yogyakarta secara keseluruhan\n- Trade-off: peningkatan EBT (khususnya PLTS) berpotensi menurunkan water footprint pembangkitan secara signifikan\n\n---\n\n### ⚠️ Asumsi & Batasan Model\n- Model menggunakan **elastisitas sederhana** (income elasticity 0,75; pop elasticity 0,95) — **bukan OSeMOSYS Reference Energy System (RES) yang terkalibrasi**; tidak merepresentasikan variasi beban harian, kapasitas transmisi, atau dispatch renewables\n- EV share dan induction cooking diperhitungkan sebagai parameter latar (target 2050: 40% dan 50%) namun dampaknya pada 2030 masih marginal dalam model ini\n- Risiko **gangguan suplai akibat erupsi Merapi VEI 3+** tidak dimodelkan; dapat menggeser demand-supply balance secara tiba-tiba di luar rentang proyeksi ini\n- Konversi LP2B ~280 ha/tahun dapat mengurangi kebutuhan irigasi pertanian sekaligus meningkatkan beban residensial-komersial — efek net tidak dipisahkan dalam proyeksi ini\n\n---\n\n> **⚠️ ADVISORY ONLY — WEF 2026a Bounded Autonomy**\n> Seluruh angka dan interpretasi di atas merupakan **output advisory** yang dihasilkan oleh Energy Agent dalam sistem WEF-Agentic. Output ini berada dalam domain *low-readiness automation* (fungsi #43 Policy Forecasting / #55 Policy Impact Prediction) dan **wajib divalidasi oleh analis manusia** sebelum digunakan sebagai dasar pengambilan keputusan kebijakan, perencanaan anggaran, atau dokumen resmi. Framework tidak bertanggung jawab atas keputusan yang diambil semata-mata berdasarkan output ini tanpa review independen.",
+      "tool_outputs": [
+        {
+          "tool": "get_electricity_history",
+          "data": {
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "unit": "GWh/year",
+            "source": "BPS Sleman + ESDM",
+            "data": {
+              "2018": 1450,
+              "2019": 1530,
+              "2020": 1520,
+              "2021": 1610,
+              "2022": 1740,
+              "2023": 1880
+            },
+            "data_quality": "good (verified historical)",
+            "provenance": [
+              {
+                "variable": "energy.consumption_gwh_annual",
+                "value": 1880,
+                "location": {
+                  "name": "Sleman",
+                  "lat": -7.73,
+                  "lon": 110.36,
+                  "country": "Indonesia",
+                  "country_code": "ID",
+                  "admin1": "D.I. Yogyakarta",
+                  "admin2": "Kabupaten Sleman",
+                  "population": 1142528,
+                  "timezone": "Asia/Jakarta",
+                  "elevation_m": 200.0,
+                  "source": "preset"
+                },
+                "source": "bps-sleman-static",
+                "fetched_at": "2026-09-20T14:38:48.820744",
+                "year": 2023,
+                "unit": "GWh/year",
+                "confidence": 0.95,
+                "tier": 1,
+                "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+              }
+            ]
+          }
+        },
+        {
+          "tool": "project_energy_demand",
+          "data": {
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "scenario": "JETP_Aligned",
+            "horizon": 2030,
+            "assumptions": {
+              "base_year": 2023,
+              "base_demand_gwh": 1880,
+              "base_population": 1138691,
+              "base_pdrb_per_capita": 37.1,
+              "income_elasticity": 0.75,
+              "pop_elasticity": 0.95,
+              "pop_growth_pct": 0.6,
+              "gdp_pc_growth_pct": 5.0,
+              "efficiency_gain_pct": 1.0,
+              "ev_share_target_2050": 0.4,
+              "induction_share_target_2050": 0.5,
+              "extra_demand_at_horizon_gwh": 0.2134742026153842
+            },
+            "data_quality": "good (BPS-anchored)",
+            "endpoints": {
+              "demand_base_gwh": 1880.0,
+              "demand_2030_gwh": 2372.99780106098,
+              "demand_2050_gwh": null,
+              "demand_horizon_gwh": 2372.99780106098,
+              "irrigation_pumping_horizon_gwh": 0.2134742026153842
+            },
+            "yearly_summary": [
+              {
+                "year": 2023,
+                "demand_total_gwh": 1880.0
+              },
+              {
+                "year": 2024,
+                "demand_total_gwh": 1944.0
+              },
+              {
+                "year": 2025,
+                "demand_total_gwh": 2010.1
+              },
+              {
+                "year": 2026,
+                "demand_total_gwh": 2078.2
+              },
+              {
+                "year": 2027,
+                "demand_total_gwh": 2148.5
+              },
+              {
+                "year": 2028,
+                "demand_total_gwh": 2221.0
+              },
+              {
+                "year": 2029,
+                "demand_total_gwh": 2295.8
+              },
+              {
+                "year": 2030,
+                "demand_total_gwh": 2373.0
+              }
+            ],
+            "provenance": []
+          }
+        },
+        {
+          "tool": "estimate_emissions",
+          "data": {
+            "demand_gwh": 2372.99780106098,
+            "renewable_share": 0.34,
+            "country_code": "ID",
+            "grid_emission_factor_kg_co2_per_kwh": 0.85,
+            "co2_emissions_mt": 1.331
+          }
+        },
+        {
+          "tool": "nexus_coupling_energy",
+          "data": {
+            "extra_pumping_demand_at_horizon_gwh": 0.2134742026153842,
+            "pumping_scenario": {
+              "gross_requirement_mm": 528.7384615384615,
+              "delivered_mm": 317.2430769230769,
+              "groundwater_mm": 95.17292307692307,
+              "groundwater_volume_m3": 17626025.35384615,
+              "pumping_kwh_per_m3": 0.18166666666666667,
+              "pumping_energy_gwh": 3.202061272615384
+            },
+            "pumping_baseline_climate": {
+              "gross_requirement_mm": 468.68769230769226,
+              "delivered_mm": 281.21261538461533,
+              "groundwater_mm": 84.3637846153846,
+              "groundwater_volume_m3": 16450937.999999998,
+              "pumping_kwh_per_m3": 0.18166666666666667,
+              "pumping_energy_gwh": 2.98858707
+            },
+            "power_sector_water_m3_2030_offsite": 4152746.151856714
+          }
+        }
+      ]
+    },
+    {
+      "name": "food",
+      "provider": "claude-agent-sdk",
+      "requested_model": "claude-sonnet-4-6",
+      "reported_model": "claude-sonnet-4-6",
+      "tokens_in": 9818,
+      "tokens_out": 2915,
+      "attempts": 1,
+      "done_reason": "stop",
+      "truncated": false,
+      "thinking_chars": 0,
+      "system_prompt_sha256": "15d5aab9370f567eacc14174eab8670ef5468176e166d3d7c80264b72b9f8c2e",
+      "prompt_sha256": "08529119bf06dec574c80b1641cc42c9a1e218b0a2d6a50cd7be6ab6aec543bd",
+      "content": "## Interpretasi Sektor Pangan — Sleman, D.I. Yogyakarta\n**Skenario S2 — JETP-Aligned 2030 | Padi | LP2B: Moderate**\n\n---\n\n### Narasi\n\nSektor pangan Kabupaten Sleman pada horizon 2030 menghadapi tekanan ganda yang saling memperkuat: penyusutan lahan akibat alih fungsi LP2B yang belum terkendali sepenuhnya, serta penurunan produktivitas yang dipicu oleh defisit air irigasi. Data historis BPS menunjukkan luas panen padi menyusut konsisten dari **44.000 ha** (2018) menjadi **39.000 ha** (2023), atau rata-rata **280 ha/tahun** — laju yang digunakan framework sebagai asumsi proyeksi under skenario *LP2B protection: moderate*. Dengan laju tersebut, luas panen diproyeksikan mencapai **37.040 ha** pada 2030, berkurang 1.960 ha dari baseline 2023. Di sisi produktivitas, *coupling* air–pangan menghasilkan fraksi stres air efektif sebesar **8,99%** (diturunkan dari tekanan mentah 22,47% melalui suplai irigasi 60%), yang melalui persamaan Doorenbos-Kassam (ky = 1,1; Ymax = 7,0 t/ha) menghasilkan hasil panen terproyeksi **6,308 t/ha** — turun dari hasil observasi 6,5 t/ha pada 2023. Hasil perkalian luas × produktivitas memberikan **produksi 2030 sebesar 233.640 t gabah**.\n\nMeskipun terjadi penurunan produksi absolut (~12.363 t atau −5,0% dari baseline 2023), Tingkat Kecukupan Pangan (Self-Sufficiency Level/SSL) Sleman 2030 diproyeksikan **surplus pada angka 1,711** — artinya produksi lokal setara 1,71 kali kebutuhan konsumsi beras penduduk yang diestimasi mencapai 1.187.385 jiwa (asumsi pertumbuhan 0,6%/tahun dari basis BPS 2023). Surplus ini mencerminkan posisi Sleman sebagai lumbung pangan D.I. Yogyakarta. Namun perlu ditekankan bahwa data konsumsi per kapita 115 kg/tahun bersumber dari **proksi nasional (Tier 3, confidence 0,55)** — bukan data survei konsumsi lokal Sleman — sehingga angka SSL ini bersifat **indikatif dan memerlukan validasi dengan data Susenas/BKPD Sleman**.\n\n---\n\n### Temuan Utama (Bullet Findings)\n\n**Produksi & Lahan:**\n- 📉 Luas panen 2030: **37.040 ha** (turun dari 39.000 ha / 2023); kehilangan kumulatif ~1.960 ha selama 7 tahun (LP2B *moderate*)\n- 🌾 Produksi 2030: **233.640 t** gabah (turun dari 246.003 t / 2023; −5,0%)\n- 📊 Tren luas panen 2018–2023: −280 ha/tahun (konsisten, BPS Tier 1, confidence 0,95)\n\n**Produktivitas & Stres Air (Coupling Air→Pangan):**\n- 💧 Stres air mentah dari neraca air (*water balance post-irrigation*): **22,47%**\n- 🔄 Setelah koreksi suplai irigasi (60%): stres efektif **8,99%** — ini adalah *output coupling*, bukan asumsi skenario mandiri\n- 📉 Yield terproyeksi: **6,308 t/ha** (vs. 6,5 t/ha observasi 2023); selisih −0,192 t/ha dikaitkan langsung ke defisit air irigasi via Doorenbos-Kassam\n- ⚠️ Implikasi: padi sawah Sleman sangat sensitif terhadap ketersediaan air irigasi; penurunan pasokan >10% berpotensi memperparah gap yield\n\n**Ketahanan Pangan (SSL):**\n- ✅ SSL 2030: **1,711** — status **Surplus**\n- 👥 Populasi proyeksi 2030: **1.187.385** jiwa (laju 0,6%/tahun)\n- 🍚 Kebutuhan beras penduduk 2030: ~**136.549 t** (basis 115 kg/kapita/tahun — **⚠️ data proksi nasional, Tier 3**)\n- 📌 SSL > 1- 📌 SSL 1,711 > 1,0 menandakan Sleman tetap **net-eksportir beras** ke wilayah lain D.I. Yogyakarta pada 2030, meski volume surplus menyusut\n\n**Trade-off Nexus Air–Pangan:**\n- 🔁 Irigasi sawah merupakan pengguna air terbesar; suplai irigasi 60% mengandalkan kombinasi air permukaan (sub-DAS Code, Opak, Kuning, Boyong) dan pompa air tanah\n- 🪣 Krisis air tanah Sleman Tengah-Selatan memperlemah cadangan pompa; jika fraksi irigasi turun di bawah 60%, stres efektif naik → yield tergerus lebih jauh\n- ⚡ Beban pompa air tanah bersinggungan langsung dengan sektor energi (beban grid pasca-subsidi listrik); tekanan biaya energi dapat mengurangi intensitas pemompaan, memperburuk defisit irigasi\n- 🌋 Risiko Merapi VEI 3+ dapat mendistrupsi infrastruktur irigasi sub-DAS Boyong secara tiba-tiba; tidak termodelkan dalam proyeksi deterministik ini\n\n**Kesenjangan Data:**\n- ⚠️ Konsumsi beras per kapita: **proksi nasional 115 kg/tahun (Tier 3)** — dibutuhkan data Susenas Sleman atau survei BKPD DIY untuk akurasi SSL\n- ⚠️ Tidak ada data distribusi spasial LP2B terverifikasi GIS; laju 280 ha/tahun diasumsikan linier\n- ⚠️ Proyeksi 2050 tidak tersedia dalam output ini (`production_2050_t: null`)\n\n---\n\n### Catatan Metodologi\n\nModel produktivitas menggunakan **Doorenbos-Kassam empiris** (FAO Irrigation & Drainage Paper No. 33) — bukan model proses tanaman terkalibrasi seperti DSSAT atau AquaCrop. Pendekatan ini robust untuk estimasi wilayah namun tidak menangkap variabilitas mikroklimat, varietas spesifik, atau respons fisiologis tanaman terhadap cekaman ganda (suhu + kekeringan simultan).\n\n---\n\n> **⚠️ ADVISORY ONLY — WEF 2026a Bounded Autonomy**\n> Seluruh output ini bersifat **rekomendasi analitik**, ditargetkan pada fungsi *low-readiness* (#43 Policy Forecasting / #55 Policy Impact Prediction). Angka produksi, SSL, dan trade-off nexus **wajib diverifikasi dan di-review oleh analis manusia** sebelum digunakan sebagai dasar kebijakan, perencanaan anggaran, atau keputusan tata ruang. Data konsumsi per kapita berstatus Tier 3 (illustrative); SSL 1,711 harus diperlakukan sebagai estimasi awal, bukan angka definitif.",
+      "tool_outputs": [
+        {
+          "tool": "get_food_history",
+          "data": {
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "rice_harvest_area_ha": {
+              "2018": 44000,
+              "2019": 42500,
+              "2020": 41200,
+              "2021": 40500,
+              "2022": 39800,
+              "2023": 39000
+            },
+            "rice_yield_t_ha": {
+              "2018": 6.4,
+              "2019": 6.5,
+              "2020": 6.3,
+              "2021": 6.5,
+              "2022": 6.6,
+              "2023": 6.5
+            },
+            "trend_note": "Penurunan luas panen ~280 ha/tahun akibat alih fungsi LP2B",
+            "data_quality": "good (BPS verified)"
+          }
+        },
+        {
+          "tool": "project_crop_yield",
+          "data": {
+            "available": true,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "crop": "padi",
+            "scenario": "S2 — JETP-Aligned 2030",
+            "lp2b_protection": "moderate",
+            "water_stress_fraction": 0.0899,
+            "assumptions": {
+              "base_year": 2023,
+              "base_area_ha": 39000.0,
+              "lp2b_protection": "moderate",
+              "annual_loss_ha": 280.0,
+              "water_stress_fraction": 0.0899,
+              "ymax": 7.0,
+              "ky": 1.1
+            },
+            "observed_yield_t_ha": 6.5,
+            "data_quality": "good (BPS anchored)",
+            "endpoints": {
+              "production_2030_t": 233639.8008,
+              "production_2050_t": null,
+              "production_horizon_t": 233639.8008,
+              "area_horizon_ha": 37040.0,
+              "yield_t_ha": 6.30777
+            },
+            "yearly_summary": [
+              {
+                "year": 2023,
+                "area_ha": 39000.0,
+                "yield_t_ha": 6.3,
+                "production_t": 246003.0
+              },
+              {
+                "year": 2024,
+                "area_ha": 38720.0,
+                "yield_t_ha": 6.3,
+                "production_t": 244236.9
+              },
+              {
+                "year": 2025,
+                "area_ha": 38440.0,
+                "yield_t_ha": 6.3,
+                "production_t": 242470.7
+              },
+              {
+                "year": 2026,
+                "area_ha": 38160.0,
+                "yield_t_ha": 6.3,
+                "production_t": 240704.5
+              },
+              {
+                "year": 2027,
+                "area_ha": 37880.0,
+                "yield_t_ha": 6.3,
+                "production_t": 238938.3
+              },
+              {
+                "year": 2028,
+                "area_ha": 37600.0,
+                "yield_t_ha": 6.3,
+                "production_t": 237172.2
+              },
+              {
+                "year": 2029,
+                "area_ha": 37320.0,
+                "yield_t_ha": 6.3,
+                "production_t": 235406.0
+              },
+              {
+                "year": 2030,
+                "area_ha": 37040.0,
+                "yield_t_ha": 6.3,
+                "production_t": 233639.8
+              }
+            ],
+            "provenance": [
+              {
+                "variable": "food.rice_area_ha",
+                "value": 39000,
+                "location": {
+                  "name": "Sleman",
+                  "lat": -7.73,
+                  "lon": 110.36,
+                  "country": "Indonesia",
+                  "country_code": "ID",
+                  "admin1": "D.I. Yogyakarta",
+                  "admin2": "Kabupaten Sleman",
+                  "population": 1142528,
+                  "timezone": "Asia/Jakarta",
+                  "elevation_m": 200.0,
+                  "source": "preset"
+                },
+                "source": "bps-sleman-static",
+                "fetched_at": "2026-09-20T14:38:48.817236",
+                "year": 2023,
+                "unit": "ha",
+                "confidence": 0.95,
+                "tier": 1,
+                "note": "BPS Sleman, Statistik Pertanian 2023."
+              },
+              {
+                "variable": "food.rice_land_loss_ha_per_year",
+                "value": 280,
+                "location": {
+                  "name": "Sleman",
+                  "lat": -7.73,
+                  "lon": 110.36,
+                  "country": "Indonesia",
+                  "country_code": "ID",
+                  "admin1": "D.I. Yogyakarta",
+                  "admin2": "Kabupaten Sleman",
+                  "population": 1142528,
+                  "timezone": "Asia/Jakarta",
+                  "elevation_m": 200.0,
+                  "source": "preset"
+                },
+                "source": "bps-sleman-static",
+                "fetched_at": "2026-09-20T14:38:48.817311",
+                "year": 2023,
+                "unit": "ha/year",
+                "confidence": 0.95,
+                "tier": 1,
+                "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+              },
+              {
+                "variable": "food.rice_yield_t_per_ha",
+                "value": 6.5,
+                "location": {
+                  "name": "Sleman",
+                  "lat": -7.73,
+                  "lon": 110.36,
+                  "country": "Indonesia",
+                  "country_code": "ID",
+                  "admin1": "D.I. Yogyakarta",
+                  "admin2": "Kabupaten Sleman",
+                  "population": 1142528,
+                  "timezone": "Asia/Jakarta",
+                  "elevation_m": 200.0,
+                  "source": "preset"
+                },
+                "source": "bps-sleman-static",
+                "fetched_at": "2026-09-20T14:38:48.817365",
+                "year": 2023,
+                "unit": "t/ha",
+                "confidence": 0.95,
+                "tier": 1,
+                "note": "BPS Sleman, Statistik Pertanian 2023."
+              }
+            ],
+            "warnings": []
+          }
+        },
+        {
+          "tool": "compute_food_ssl",
+          "data": {
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "year": 2030,
+            "production_t": 233639.8008,
+            "population_base": 1138691,
+            "population_base_year": 2023,
+            "pop_growth_pct": 0.6,
+            "population": 1187385,
+            "per_capita_demand_kg": 115.0,
+            "ssl": 1.711,
+            "interpretation": "Surplus",
+            "provenance": [
+              {
+                "variable": "socio.population",
+                "value": 1138691,
+                "location": {
+                  "name": "Sleman",
+                  "lat": -7.73,
+                  "lon": 110.36,
+                  "country": "Indonesia",
+                  "country_code": "ID",
+                  "admin1": "D.I. Yogyakarta",
+                  "admin2": "Kabupaten Sleman",
+                  "population": 1142528,
+                  "timezone": "Asia/Jakarta",
+                  "elevation_m": 200.0,
+                  "source": "preset"
+                },
+                "source": "bps-sleman-static",
+                "fetched_at": "2026-09-20T14:38:48.826740",
+                "year": 2023,
+                "unit": "jiwa",
+                "confidence": 0.95,
+                "tier": 1,
+                "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+              },
+              {
+                "variable": "food.rice_consumption_kg_per_capita",
+                "value": 115,
+                "location": {
+                  "name": "Sleman",
+                  "lat": -7.73,
+                  "lon": 110.36,
+                  "country": "Indonesia",
+                  "country_code": "ID",
+                  "admin1": "D.I. Yogyakarta",
+                  "admin2": "Kabupaten Sleman",
+                  "population": 1142528,
+                  "timezone": "Asia/Jakarta",
+                  "elevation_m": 200.0,
+                  "source": "preset"
+                },
+                "source": "country-proxy-defaults",
+                "fetched_at": "2026-09-20T14:38:48.826810",
+                "year": 2024,
+                "unit": "kg/year",
+                "confidence": 0.55,
+                "tier": 3,
+                "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+              }
+            ]
+          }
+        },
+        {
+          "tool": "nexus_coupling_food",
+          "data": {
+            "water_stress_raw": 0.2247,
+            "irrigation_supply_fraction": 0.6,
+            "water_stress_effective": 0.0899
+          }
+        }
+      ]
+    },
+    {
+      "name": "critic",
+      "provider": "claude-agent-sdk",
+      "requested_model": "claude-opus-4-7",
+      "reported_model": "claude-opus-4-7",
+      "tokens_in": 10653,
+      "tokens_out": 4173,
+      "attempts": 1,
+      "done_reason": "stop",
+      "truncated": false,
+      "thinking_chars": 0,
+      "system_prompt_sha256": "8389cacc062a3582d493b03fd5ac6b60fbc1c8c23074a47fb6c88e6fb712006d",
+      "prompt_sha256": "f971fa2e8e0dff931e0fe74c8e551f21a048dd22171580f1899d0ee071cda375",
+      "content": "# Critic Agent — Audit Skenario S2 (JETP-Aligned 2030, Sleman)\n\n## ✓ KONSISTEN\n- **Fidelity angka kunci tinggi**: Water Agent (617,6 / 343,7 / 0,2247 / 0,0899 / 528,7 / 17,626), Energy Agent (1.880 / 2.373 / +0,213 / 34% / 0,85 / 1,331 Mt / 4,15 juta m³), dan Food Agent (39.000 / 37.040 / 6,31 ≈ 6,308 / 233.640 / 1,711 / 1.187.385) semuanya sesuai dengan angka kunci deterministik.\n- **Konsistensi lintas-agen**: Water Agent dan Energy Agent sama-sama melaporkan energi pemompaan iklim 3,202 GWh dan air tanah 17,63 juta m³; Food Agent menggunakan *water stress* efektif 8,99% yang identik dengan Water Agent — rantai *coupling* air→pangan dan air→energi terjaga.\n- **WARN #1 (seasonal_mismatch)**: Water Agent secara eksplisit dan menonjol mengangkat masalah temporal mismatch (surplus Feb–Apr vs defisit musim kering) — WARN teratasi.\n- **WARN #2 (rice_consumption Tier 3)**: Food Agent transparan menandai konsumsi 115 kg/kapita sebagai proksi nasional Tier 3, confidence 0,55.\n- **Transparansi limitasi**: ketiga agen memuat caveat *advisory-only* dan menyebutkan batasan model (Thornthwaite-Mather *lumped*; elastisitas sederhana bukan OSeMOSYS; Doorenbos-Kassam bukan DSSAT/AquaCrop).\n\n## ⚠ INKONSISTEN\n- **Angka minor tidak terdokumentasi di key**: Water Agent mengutip defisit baseline 304,6 mm dan angka bulanan (Sep 117,6; Okt 116,9 mm) yang tidak ada di *sumber kebenaran*. Bukan salah kutip, tetapi tidak dapat diverifikasi Critic — perlu ditandai sebagai \"derived, unverified\".\n- **Produksi 2023 Food Agent** disebut 246.003 t; rekonstruksi dari angka kunci (39.000 × 6,31) = 246.090 t. Selisih ~87 t (rounding), dapat diterima namun sebaiknya konsisten.\n- **Energy Agent tidak meng-acknowledge WARN #2 pada emission factor 0,85 kg/kWh** (country-proxy, conf 0,55). Angka emisi 1,331 Mt disajikan tanpa disclaimer ketidakpastian — ini gap serius.\n\n## ⚙ MISSING\n- **Energy Agent** tidak menyampaikan *uncertainty band* pada emisi 1,331 Mt CO₂ meskipun input emission factor berstatus low-confidence — kontradiksi implisit dengan prinsip *bounded autonomy*.\n- **Cross-check kebutuhan air pembangkit vs neraca lokal**: 4,15 juta m³ off-site tidak dikonfrontasi Water Agent terhadap surplus lokal — potensi *double counting* atau alokasi antar-daerah tidak dibahas.\n- **Bias sektoral**: Food Agent menyimpulkan \"surplus\" (SSL 1,711) tanpa cukup menekankan bahwa **kehilangan produksi 12.363 t (−5,0%)** dapat menjadi *early warning* penurunan struktural — narasi cenderung menenangkan.\n- **Trade-off LP2B**: Water Agent menyebut pertukaran LP2B↔pemompaan \"di luar kapasitas model\"; Energy Agent juga *punt*. Tidak ada agen yang mengintegrasikan.\n\n## 🚩 ERROR CONSEQUENCE HIGH (untuk review manusia)\n1. **SSL 1,711 (Food Agent)** — bergantung penuh pada konsumsi 115 kg/kapita Tier 3. Jika konsumsi riil Sleman (urbanisasi + diet-shift Yogya) turun ke ~90 kg atau naik ke ~140 kg, SSL bergeser ke rentang ~1,35–2,18. Keputusan tata ruang LP2B berdasarkan surplus ini berisiko *maladaptasi*.\n2. **Emisi 1,331 Mt CO₂ (Energy Agent)** — EF 0,85 kg/kWh adalah rata-rata nasional; grid Jamali aktual dapat berbeda ±15%. Angka ini sangat mungkin dipakai untuk klaim JETP-alignment — kesalahan bisa mengganggu akuntabilitas komitmen iklim.\n3. **Water stress efektif 0,0899 (Water Agent)** — mengasumsikan fraksi irigasi 60% stabil. Guncangan Merapi VEI 3+ pada sub-DAS Boyong atau kegagalan pompa akibat tarif listrik dapat mengembalikan stres ke 0,2247 — konsekuensi pada yield & SSL bersifat non-linear.\n4. **Volume pemompaan 17,626 juta m³** dari akuifer Sleman Tengah-Selatan — tidak ada agen yang menguji terhadap *sustainable yield* akuifer; risiko *ijin-based tanpa carrying-capacity check*.\n\n---\n> **⚠ CAVEAT WEF 2026a — ADVISORY ONLY**\n> Audit ini menarget fungsi #43 (Policy Forecasting) dan #55 (Policy Impact Prediction) yang berada di area *low-readiness*. Seluruh temuan Critic Agent bersifat rekomendasi internal dan **wajib di-review oleh analis manusia (hidrolog, perencana energi, ahli ketahanan pangan, dan Bappeda Sleman)** sebelum digunakan sebagai basis pengambilan keputusan. Critic Agent tidak menggantikan validasi domain manusia.",
+      "tool_outputs": []
+    },
+    {
+      "name": "coordinator",
+      "provider": "claude-agent-sdk",
+      "requested_model": "claude-opus-4-7",
+      "reported_model": "claude-opus-4-7",
+      "tokens_in": 12619,
+      "tokens_out": 4799,
+      "attempts": 1,
+      "done_reason": "stop",
+      "truncated": false,
+      "thinking_chars": 0,
+      "system_prompt_sha256": "00e9f2c09b78afff005ecf6b63d3b70f23e2cbf4223286f5ea938500a4f19db6",
+      "prompt_sha256": "adc9da466a9c0195849eb043d5645e441667925cd3db8fa8a4c80f28c2fa2765",
+      "content": "# Sintesis WEF Nexus — Skenario S2 (JETP-Aligned 2030), Kabupaten Sleman\n\n**Tanggal Sintesis:** 20 September 2026\n**Coordinator Agent — WEF-Agentic Framework**\n**Horizon Analitik:** 2030 | **Baseline:** 2023 | **Iklim:** SSP2-4.5 (P −3%, T +1°C)\n\n---\n\n## Ringkasan Eksekutif\n\nAnalisis terintegrasi Water–Energy–Food untuk Kabupaten Sleman di bawah skenario **JETP-Aligned 2030** mengungkap paradoks struktural yang khas wilayah lumbung pangan sub-nasional Indonesia: **agregat neraca yang tampak sehat secara tahunan menyembunyikan risiko operasional yang tajam secara musiman dan spasial**. Neraca air tahunan menunjukkan surplus **617,6 mm** melampaui defisit **343,7 mm**, namun surplus ini terkonsentrasi hanya pada Februari–April sementara defisit memuncak Agustus–Oktober — sebuah *temporal mismatch* yang tidak dapat diselesaikan tanpa tampungan buatan atau pemompaan air tanah. Sektor pangan tetap surplus dengan SSL **1,711** dan produksi **233.640 t** gabah pada 2030, tetapi ini dibayar dengan penurunan produksi absolut **−5,0%** dari baseline dan ketergantungan penuh pada suplai irigasi 60% yang menopang penurunan *water stress* dari 0,2247 ke **0,0899**. Sementara itu, demand listrik tumbuh menjadi **2.373 GWh** pada 2030 (+26,2% terhadap 2023), menghasilkan emisi **1,331 Mt CO₂** meskipun bauran EBT mencapai 34%.\n\nTitik pertemuan tiga sektor tersebut mengungkap **trade-off inti Sleman**: mempertahankan surplus pangan membutuhkan pemompaan air tanah sebesar **17,626 juta m³** dari akuifer Sleman Tengah-Selatan yang sudah dalam krisis, yang selanjutnya menambah beban listrik pertanian **3,202 GWh** pada saat tarif listrik pasca-normalisasi subsidi meningkat. Setiap upaya menekan salah satu vertex (misalnya menurunkan pemompaan untuk melindungi akuifer) akan merambat ke dua vertex lainnya (yield turun → SSL tergerus, atau beban surface water meningkat → konflik dengan pariwisata Borobudur–Prambanan–Merapi). Critic Agent secara eksplisit menandai bahwa angka-angka kunci — SSL 1,711, emisi 1,331 Mt, water stress 0,0899, dan volume pemompaan 17,626 juta m³ — bergantung pada asumsi yang **tidak diuji terhadap** *carrying capacity* akuifer, konsumsi beras lokal Susenas, faktor emisi grid Jamali aktual, dan kestabilan pasokan irigasi terhadap guncangan Merapi.\n\nRekomendasi utama adalah bahwa **Pemerintah Kabupaten Sleman perlu bergeser dari perencanaan sektoral silo menuju kerangka nexus operasional** yang secara eksplisit mengelola trade-off ini, dengan prioritas segera pada (i) audit *sustainable yield* akuifer, (ii) rain-harvesting/tampungan musiman untuk menutup *temporal mismatch*, (iii) proteksi LP2B yang lebih ketat daripada skenario *moderate* saat ini, dan (iv) validasi angka konsumsi beras lokal untuk mengoreksi SSL sebelum dijadikan basis kebijakan tata ruang.\n\n---\n\n## Temuan Utama (Bullet-Point)\n\n### 🔄 Trade-off Antar-Sektor (Coupling Terhitung)\n\n- **Air ↔ Pangan (coupling terkuat, terkalibrasi)**: *Water stress* efektif 0,0899 menghasilkan yield 6,31 t/ha (turun 3% dari observasi 6,5 t/ha) via Doorenbos-Kassam. Jika fraksi irigasi turun di bawah 60% (misalnya akibat kegagalan sub-DAS Boyong atau tarif pompa naik), *water stress* dapat kembali mendekati 0,2247 dengan efek **non-linear** pada yield dan SSL.\n- **Air → Energi (coupling langsung)**: Perubahan iklim S2 menambah **+0,213 GWh/tahun** pemompaan irigasi (dari 2,989 → 3,202 GWh), setara +1,18 juta m³ air tanah tambahan. Ini adalah *hidden cost* iklim yang membebani grid pasca-subsidi.\n- **Energi → Air (coupling laten)**: Sektor pembangkitan off-site melayani Sleman mengonsumsi **4,15 juta m³ air/tahun** — belum dikonfrontasi dengan neraca lokal, potensi *double-counting* alokasi antar-daerah (temuan Critic).\n- **Pangan ↔ Lahan ↔ Air (trilemma LP2B)**: Alih fungsi 280 ha/tahun mengurangi produksi (−1.960 ha akumulatif ke 2030) tetapi **secara paradoks juga menurunkan permintaan pemompaan** — tidak ada agen yang mengintegrasikan trade-off ini (gap analitik yang diakui Critic).\n\n### 📊 Angka Kunci Sektoral\n\n- **Air**: Surplus tahunan 617,6 mm; defisit 343,7 mm (kenaikan +12,8% dari baseline iklim); kebutuhan irigasi bruto 528,7 mm; air tanah dipompa 17,626 juta m³.\n- **Energi**: Demand 2030 = 2.373 GWh (+26,2% vs 2023); EBT 34%; emisi 1,331 Mt CO₂ (menghindari ~0,687 Mt terhadap grid tanpa peningkatan EBT).\n- **Pangan**: Luas panen 37.040 ha; produksi 233.640 t (−5,0%); SSL 1,711 (surplus); populasi 1.187.385 jiwa.\n\n### ⚠️ Risiko Non-Linear yang Tidak Termodelkan\n\n- **Merapi VEI 3+ recurrent**: Dapat mendisrupsi infrastruktur irigasi sub-DAS Boyong dan pasokan grid secara mendadak — tidak ada agen yang memodelkan ini.\n- **Akuifer Sleman Tengah-Selatan**: Volume pemompaan 17,626 juta m³ **tidak diuji terhadap** *sustainable yield* — potensi mining air tanah tanpa disadari (temuan Critic prioritas tinggi).\n- **Tekanan pariwisata Borobudur–Prambanan–Merapi**: Menambah kompetisi atas air permukaan sub-DAS Code dan Opak pada periode puncak defisit pertanian; tidak dimodelkan kuantitatif.\n- **Pergeseran konsumsi beras**: SSL 1,711 dapat bergeser ke rentang **1,35–2,18** jika konsumsi riil Sleman menyimpang dari proksi nasional 115 kg/kapita.\n\n---\n\n## Rekomendasi Prioritas untuk Pemerintah Kabupaten Sleman\n\n### 🔴 Prioritas Tinggi (Aksi 2026–2027)\n\n1. **Audit *Sustainable Yield* Akuifer Sleman Tengah-Selatan** — Bekerjasama dengan Balai Besar Wilayah Sungai Serayu-Opak dan Pusat Air Tanah Kementerian ESDM untuk mengukur laju recharge aktual dan menetapkan **kuota pemompaan berbasis daya dukung**, bukan izin volume. Volume 17,626 juta m³/tahun harus divalidasi terhadap batas keberlanjutan sebelum digunakan sebagai baseline perencanaan.\n2. **Validasi Konsumsi Beras Lokal via Susenas/BKPD DIY** — SSL 1,711 tidak boleh menjadi dasar keputusan konversi LP2B sampai konsumsi per kapita Sleman diverifikasi. Data Tier 3 (proksi nasional 115 kg) memiliki confidence hanya 0,55.\n3. **Perkuat LP2B dari *moderate* menjadi *strict*** — Penurunan produksi −5,0% pada 2030 adalah *early warning* penurunan struktural. Laju konversi 280 ha/tahun harus ditekan setidaknya 50% via mekanisme insentif fiskal dan penetapan zona LP2B permanen berbasis GIS.\n\n### 🟡 Prioritas Menengah (Aksi 2027–2029)\n\n4. **Bangun Tampungan Musiman untuk Menutup *Temporal Mismatch*** — Surplus 617,6 mm di Februari–April harus di-*harvest* melalui embung, sumur resapan, dan revitalisasi kanal Sub-DAS Code, Opak, Kuning untuk menutup defisit 319,8 mm pada Agustus–Oktober. Ini mengurangi beban akuifer sekaligus mengurangi beban listrik pemompaan.\n5. **Integrasikan JETP dengan Efisiensi Irigasi Pertanian** — Sektor pertanian adalah *end-user* listrik yang paling rentan terhadap normalisasi subsidi. Program PLTS-pompa irigasi terdistribusi dapat memotong coupling air→energi sekaligus mendukung target EBT 34%.\n6. **Kontingensi Merapi untuk Nexus** — Rencana kontingensi Sub-DAS Boyong yang selama ini fokus pada evakuasi harus diperluas ke **kontingensi irigasi dan grid** dengan koridor pasokan alternatif.\n\n### 🟢 Prioritas Kelembagaan (Aksi Kontinu)\n\n7. **Bentuk Meja Koordinasi WEF Nexus Bappeda-Dinas Pertanian-Dinas ESDM-BBWSO** — Tidak ada satu OPD pun yang saat ini secara formal bertanggung jawab atas trade-off lintas sektor.\n8. **Publikasikan *Uncertainty Band* pada Setiap Angka Kebijakan** — Emisi 1,331 Mt CO₂ memiliki ketidakpastian ±15% akibat EF grid Jamali; angka klaim JETP harus disertai rentang, bukan titik.\n\n---\n\n## Caveat & Limitasi Eksplisit\n\n- **Uncertainty Tier 3 (confidence 0,55)** pada dua input kritis: (i) konsumsi beras per kapita, (ii) faktor emisi grid 0,85 kg CO₂/kWh. SSL dan emisi CO₂ adalah **angka indikatif**, bukan definitif.\n- **Model Deterministik Tunggal** — Hanya satu delta iklim (P −3%, T +1°C) yang dihitung; tidak ada band probabilistik.\n- **Batas Model Struktural**: Thornthwaite-Mather *lumped* (tidak menangkap variabilitas antar sub-DAS Code/Opak/Kuning/Boyong); elastisitas sederhana energi (bukan OSeMOSYS RES); Doorenbos-Kassam (bukan DSSAT/AquaCrop).\n- **Risiko Bencana Tidak Terdinamika**: Merapi VEI 3+ tidak dimodelkan; lahar hujan tidak diperhitungkan dalam kualitas air.\n- **Angka Turunan Tidak Terverifikasi**: Water Agent mengutip defisit baseline 304,6 mm dan angka bulanan yang tidak terdapat dalam angka kunci deterministik — Critic menandai sebagai *derived, unverified*.\n- **Gap Analitik Diakui**: Trade-off LP2B ↔ pemompaan tidak diintegrasikan oleh satu pun agen; potensi *double-counting* konsumsi air pembangkit off-site (4,15 juta m³) belum dikonfrontasi dengan neraca lokal.\n\n---\n\n> ### ⚠ ADVISORY ONLY — WEF 2026a Bounded Autonomy\n>\n> **Output ini adalah rekomendasi analitik yang menarget fungsi *low-readiness* #43 (Policy Forecasting) dan #55 (Policy Impact Prediction).** Seluruh sintesis, temuan, dan rekomendasi di atas **wajib direview oleh tim analis manusia lintas-disiplin** — mencakup hidrolog, perencana energi, ahli ketahanan pangan, ahli kebencanaan Merapi, dan perencana wilayah Bappeda Kabupaten Sleman serta Bappeda D.I. Yogyakarta — sebelum digunakan sebagai dasar pengambilan keputusan kebijakan, alokasi anggaran, atau dokumen resmi. Framework WEF-Agentic tidak menggantikan validasi domain manusia dan tidak bertanggung jawab atas keputusan yang diambil semata-mata berdasarkan output ini tanpa review independen.\n>\n> **Kontak untuk klarifikasi metodologi:** analis penanggung jawab review (identifikasi terpisah).",
+      "tool_outputs": []
+    }
+  ],
+  "timings_sec": {
+    "nexus": 0.25,
+    "domain": 61.94,
+    "critic": 64.46,
+    "coordinator": 73.61,
+    "water": 61.94,
+    "energy": 56.8,
+    "food": 56.64,
+    "total": 200.26
+  },
+  "footprint": {
+    "total_tokens": 67272,
+    "energy_kwh": 0.016512336,
+    "water_l": 0.05941688904,
+    "water_onsite_l": 0.0075681540000000005,
+    "water_offsite_l": 0.051848735039999996,
+    "co2_kg": 0.0066049344,
+    "per_entry": [
+      {
+        "agent": "water",
+        "provider": "claude-agent-sdk",
+        "model": "claude-sonnet-4-6",
+        "size_class": "medium",
+        "tokens": 11727,
+        "energy_kwh": 0.0015072479999999999,
+        "water_onsite_l": 0.000690822,
+        "water_offsite_l": 0.00473275872,
+        "co2_kg": 0.0006028992
+      },
+      {
+        "agent": "energy",
+        "provider": "claude-agent-sdk",
+        "model": "claude-sonnet-4-6",
+        "size_class": "medium",
+        "tokens": 10568,
+        "energy_kwh": 0.001399104,
+        "water_onsite_l": 0.000641256,
+        "water_offsite_l": 0.00439318656,
+        "co2_kg": 0.0005596416
+      },
+      {
+        "agent": "food",
+        "provider": "claude-agent-sdk",
+        "model": "claude-sonnet-4-6",
+        "size_class": "medium",
+        "tokens": 12733,
+        "energy_kwh": 0.0014028479999999997,
+        "water_onsite_l": 0.000642972,
+        "water_offsite_l": 0.004404942719999999,
+        "co2_kg": 0.0005611392
+      },
+      {
+        "agent": "critic",
+        "provider": "claude-agent-sdk",
+        "model": "claude-opus-4-7",
+        "size_class": "large",
+        "tokens": 14826,
+        "energy_kwh": 0.005657364,
+        "water_onsite_l": 0.0025929585000000004,
+        "water_offsite_l": 0.01776412296,
+        "co2_kg": 0.0022629456
+      },
+      {
+        "agent": "coordinator",
+        "provider": "claude-agent-sdk",
+        "model": "claude-opus-4-7",
+        "size_class": "large",
+        "tokens": 17418,
+        "energy_kwh": 0.006545771999999999,
+        "water_onsite_l": 0.0030001455,
+        "water_offsite_l": 0.02055372408,
+        "co2_kg": 0.0026183088
+      }
+    ],
+    "notes": []
+  },
+  "provider_override": "claude-agent-sdk"
+}

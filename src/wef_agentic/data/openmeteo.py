@@ -4,6 +4,9 @@ Docs: https://open-meteo.com/en/docs/historical-weather-api
 """
 from __future__ import annotations
 
+import time
+from datetime import date
+
 import httpx
 import pandas as pd
 from tenacity import retry, stop_after_attempt, wait_exponential
@@ -29,7 +32,6 @@ DEFAULT_START = "1991-01-01"
 DEFAULT_END = "2024-12-31"
 
 
-@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
 def fetch_openmeteo_point(
     lat: float,
     lon: float,
@@ -38,6 +40,22 @@ def fetch_openmeteo_point(
     timezone: str = "Asia/Jakarta",
 ) -> pd.DataFrame:
     """Fetch daily historical weather untuk 1 titik."""
+    first, last = date.fromisoformat(start), date.fromisoformat(end)
+    if first > last:
+        raise ValueError("start must not be after end")
+    frames = []
+    for year in range(first.year, last.year + 1):
+        chunk_start = max(first, date(year, 1, 1)).isoformat()
+        chunk_end = min(last, date(year, 12, 31)).isoformat()
+        frames.append(_fetch_openmeteo_chunk(lat, lon, chunk_start, chunk_end, timezone))
+        if first.year != last.year:
+            # Historical requests are billed by duration; pace below 600 calls/min.
+            time.sleep(3)
+    return pd.concat(frames, ignore_index=True)
+
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=10))
+def _fetch_openmeteo_chunk(lat: float, lon: float, start: str, end: str, timezone: str):
     params = {
         "latitude": lat,
         "longitude": lon,

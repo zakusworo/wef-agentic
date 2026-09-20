@@ -68,6 +68,8 @@ class NexusState:
             "tahun_dasar_air": self.water_balance.get("year"),
             "horizon": self.energy_projection.get("horizon"),
             "air": {
+                "stress_basis": self.water_balance.get("stress_basis", "annual"),
+                "growing_months": self.water_balance.get("growing_months"),
                 "hujan_mm": round(wb["total_precip_mm"], 1),
                 "pet_mm": round(wb["total_pet_mm"], 1),
                 "eta_mm": round(wb["total_eta_mm"], 1),
@@ -116,9 +118,11 @@ def _check(name: str, status: str, detail: str) -> dict:
     return {"name": name, "status": status, "detail": detail}
 
 
-def compute_nexus(scenario: dict, location: Location | None = None) -> NexusState:
+def compute_nexus(
+    scenario: dict, location: Location | None = None, *, config: dict | None = None,
+) -> NexusState:
     """Run all deterministic models for `scenario`. Blocking (network/file IO)."""
-    cfg = load_nexus_config()
+    cfg = load_nexus_config() if config is None else config
     irr_cfg = cfg.get("irrigation") or {}
     psw_cfg = cfg.get("power_sector_water") or {}
 
@@ -135,6 +139,8 @@ def compute_nexus(scenario: dict, location: Location | None = None) -> NexusStat
 
     # ── Water ────────────────────────────────────────────────────────────────
     wb_kwargs: dict[str, Any] = {"location_query": query, "year": year}
+    if scenario.get("growing_months") is not None:
+        wb_kwargs["growing_months"] = scenario["growing_months"]
     if scenario.get("water_station"):
         wb_kwargs["station"] = scenario["water_station"]
     climate = call_tool("get_climate_summary", location_query=query)
@@ -172,23 +178,27 @@ def compute_nexus(scenario: dict, location: Location | None = None) -> NexusStat
     )
     warnings.extend(crop.get("warnings", []))
 
-    # ── Water → energy (irrigation pumping, climate-driven delta) ────────────
+    # ── Water → energy (irrigation pumping, climate and land-area delta) ──────
     pumping_scenario = pumping_baseline = None
     extra_pumping_gwh = 0.0
     physical_area_ha = None
     if crop.get("available"):
         physical_area_ha = crop["endpoints"]["area_horizon_ha"] / irr_cfg.get("cropping_intensity", 2.0)
         pump_kwargs = {
-            "physical_area_ha": physical_area_ha,
             "application_efficiency": irr_cfg.get("application_efficiency", 0.65),
             "supply_fraction": supply_fraction,
             "groundwater_share": irr_cfg.get("groundwater_share", 0.3),
             "head_m": irr_cfg.get("pump_head_m", 30.0),
             "pump_efficiency": irr_cfg.get("pump_efficiency", 0.45),
         }
-        pumping_scenario = irrigation_pumping(deficit_mm=wb["summary"]["total_deficit_mm"], **pump_kwargs)
+        pumping_scenario = irrigation_pumping(
+            deficit_mm=wb["summary"]["total_deficit_mm"],
+            physical_area_ha=physical_area_ha, **pump_kwargs,
+        )
         pumping_baseline = irrigation_pumping(
-            deficit_mm=wb_baseline["summary"]["total_deficit_mm"], **pump_kwargs
+            deficit_mm=wb_baseline["summary"]["total_deficit_mm"],
+            physical_area_ha=crop["assumptions"]["base_area_ha"] / irr_cfg.get("cropping_intensity", 2.0),
+            **pump_kwargs,
         )
         extra_pumping_gwh = pumping_scenario["pumping_energy_gwh"] - pumping_baseline["pumping_energy_gwh"]
     else:

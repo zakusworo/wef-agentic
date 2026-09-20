@@ -3,6 +3,7 @@ import json
 import pytest
 
 from tests.conftest import BANDUNG, FakeProvider
+from wef_agentic.config.settings import load_nexus_config
 from wef_agentic.llm.types import EmptyCompletionError
 from wef_agentic.orchestration import build_run_record, compute_nexus, get_scenario, run_scenario
 from wef_agentic.reporting import generate_scenario_report
@@ -15,9 +16,28 @@ def test_water_stress_is_derived_from_climate_not_a_scenario_constant():
     for n in (wet, dry):
         assert n.crop_projection["water_stress_fraction"] == n.coupling["water_stress_effective"]
     assert dry.coupling["water_stress_raw"] > wet.coupling["water_stress_raw"]
-    assert dry.coupling["extra_pumping_demand_gwh"] > wet.coupling["extra_pumping_demand_gwh"] > 0
+    assert dry.coupling["extra_pumping_demand_gwh"] > wet.coupling["extra_pumping_demand_gwh"]
     pumping = dry.energy_projection["endpoints"]["irrigation_pumping_horizon_gwh"]
     assert pumping == pytest.approx(dry.coupling["extra_pumping_demand_gwh"])
+
+
+def test_land_loss_reduces_pumping_without_climate_change():
+    scenario = get_scenario("S5_Tourism_Boom")
+    scenario.update(delta_precip_pct=0.0, delta_temp_c=0.0)
+    nexus = compute_nexus(scenario)
+    assert nexus.coupling["extra_pumping_demand_gwh"] < 0
+    ratio = (nexus.crop_projection["endpoints"]["area_horizon_ha"]
+             / nexus.crop_projection["assumptions"]["base_area_ha"])
+    assert (nexus.coupling["pumping_scenario"]["groundwater_volume_m3"]
+            / nexus.coupling["pumping_baseline_climate"]["groundwater_volume_m3"]) == pytest.approx(ratio)
+
+
+def test_config_override_changes_physics_without_changing_defaults():
+    config = load_nexus_config()
+    config["irrigation"]["supply_fraction"] = 1.0
+    nexus = compute_nexus(get_scenario("S2_JETP_Aligned"), config=config)
+    assert nexus.coupling["water_stress_effective"] == 0
+    assert load_nexus_config()["irrigation"]["supply_fraction"] == 0.6
 
 
 def test_sleman_checks_pass_hard_consistency():

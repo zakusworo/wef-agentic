@@ -1,0 +1,24 @@
+{
+  "source": "Open-Meteo historical archive and NASA POWER",
+  "period": "1991-01-01 to 2024-12-31",
+  "retrieved": "2026-09-20",
+  "calibration": "Not calibrated",
+  "files": {
+    "openmeteo_sleman_1991-01-01_2024-12-31.parquet": {
+      "bytes": 489729,
+      "sha256": "c70b80004fad3f65aeef3392b18f023c06824601a2e2b5d149f52929a8fb05fe"
+    },
+    "openmeteo_sleman_monthly.parquet": {
+      "bytes": 58158,
+      "sha256": "fb18ec8c74796692bd0d3dd1606e2015912ecd230638dd6b71afaf33628f4c1d"
+    },
+    "openmeteo_sleman_annual.parquet": {
+      "bytes": 6247,
+      "sha256": "0ff2ad8c4e539a26b635f3b5d8bf1fe297df588d1e1bb6dce15f357c8db8e95b"
+    },
+    "nasa_power_sleman_-7.730_110.360.parquet": {
+      "bytes": 199075,
+      "sha256": "3973ebd180c42d8afd92c4ed6cdd4c393eb19ef32e6c14604e9ba6c0087890d0"
+    }
+  }
+}

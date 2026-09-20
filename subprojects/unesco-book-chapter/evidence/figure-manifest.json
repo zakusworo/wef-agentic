@@ -1,0 +1,23 @@
+{
+  "data_class": "fig01\u201303 synthetic demo; fig04 downloaded climate, uncalibrated",
+  "inputs": {
+    "docs/runs/sweep_synthetic_20260920.json": "cb2f4e5a6b8e74662fc3eff75163edb9f44ae74aaa4e5142d36b7af19db22876",
+    "docs/runs/run_S2_JETP_Aligned_sleman_claude-agent-sdk_20260920_143021.json": "d01057f49df958a145f008efe61b233042d7958818313fc3faee5abe58383864",
+    "docs/runs/sweep_openmeteo_20260920.json": "91b7b66df0b531fb39e7be5e80ddcebed81f4768da6c3dba310b2813806b5b65",
+    "docs/runs/sweep_openmeteo_2015_20260920.json": "41bfb730477bcc22757adc103ba382d6902ea30c0cd9a75822181c15b8d4c51a"
+  },
+  "figures": {
+    "fig01-synthetic-seasonal-water.pdf": "012fd04a5ed02c96f075d3be58b646c639e913b07cb7d77b0da7b04627902b27",
+    "fig01-synthetic-seasonal-water.png": "4c42e03a6c733e85711868e519703423c26ee50e79abf05105c9ec7746b34ee2",
+    "fig01-synthetic-seasonal-water.svg": "79f2484c19754c065ddc6491c1152ce7deff7c49c9599a29005462a2fc29356a",
+    "fig02-synthetic-scenario-comparison.pdf": "1c16350f1b3d8547c1fc4dfdce05e2036cb0ee7c9dab7d9cef0346c259c4085d",
+    "fig02-synthetic-scenario-comparison.png": "2904434be054c6c9f7928ef62c89b790a76f777616895d20965dfc789fd5ac0d",
+    "fig02-synthetic-scenario-comparison.svg": "4cc2b59ce8aff6d8ae6128618afa1a6ef90471dff3be946179336e474fb7c4b8",
+    "fig03-live-agent-timings.pdf": "440c44c164d77900103bfc0af164abf059a6eeab5f52a06961afd9f14924449d",
+    "fig03-live-agent-timings.png": "e16b81f809fc970e99fa57ab95bfe4a797c0f9f0c72c1ed5b78b3a0aba29326b",
+    "fig03-live-agent-timings.svg": "7277e27db9cc83fc0fb164d62550d2dc6d37ac901a99eaeb97b1d7427530443e",
+    "fig04-openmeteo-baseline-comparison.pdf": "68bf5c1c04e46b176006fc167df127881394f217cc5bc6ce2a4b6a296b950f27",
+    "fig04-openmeteo-baseline-comparison.png": "69d148ec62dfac51b609bf1407e9cb262efb2baae4a3f8d185a8575bbce4a130",
+    "fig04-openmeteo-baseline-comparison.svg": "0eebc8d2e46fdf02dcfa5959b96b9281dfef223189d406395e1b71ff5fed84d8"
+  }
+}

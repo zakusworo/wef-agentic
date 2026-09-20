@@ -1,0 +1,7 @@
+{
+  "irrigation.supply_fraction": [0.3, 0.8],
+  "irrigation.groundwater_share": [0.1, 0.5],
+  "irrigation.pump_head_m": [10.0, 50.0],
+  "irrigation.pump_efficiency": [0.3, 0.7],
+  "irrigation.cropping_intensity": [1.5, 3.0]
+}

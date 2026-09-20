@@ -58,6 +58,15 @@ if "results_history" not in st.session_state:
 if "last_result" not in st.session_state:
     st.session_state.last_result = None
 
+demo_mode = os.environ.get("WEF_AGENTIC_DEMO") == "1"
+if demo_mode and "demo_loaded" not in st.session_state:
+    from wef_agentic.ui.demo import load_demo
+
+    demo_result = load_demo()
+    st.session_state.last_result = demo_result
+    st.session_state.results_history["S2_JETP_Aligned__sleman"] = demo_result
+    st.session_state.demo_loaded = True
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Sidebar
@@ -89,7 +98,7 @@ with st.sidebar:
             "Nama kota/wilayah", value="",
             placeholder="cth: Bandung, Marrakesh, Nairobi...",
         )
-        if st.button("🔍 Resolve", use_container_width=True):
+        if st.button("🔍 Resolve", width="stretch"):
             if city_input.strip():
                 with st.spinner(f"Mencari '{city_input}'..."):
                     try:
@@ -132,7 +141,7 @@ with st.sidebar:
     provider_choice = st.selectbox(
         "Provider",
         options=["ollama-local", "ollama-cloud", "claude-agent-sdk"],
-        index=0,
+        index=2 if demo_mode else 0,
         help="Override semua agen. ollama-cloud butuh OLLAMA_API_KEY di .env.",
     )
     os.environ["WEF_AGENTIC_PROVIDER_OVERRIDE"] = provider_choice
@@ -160,17 +169,17 @@ with st.sidebar:
         "Pilih skenario",
         options=list(SCENARIOS.keys()),
         format_func=lambda k: SCENARIOS[k]["name"],
-        index=0,
+        index=1 if demo_mode else 0,
     )
 
     run_btn = st.button(
-        "▶ Run Scenario", type="primary", use_container_width=True,
+        "▶ Run Scenario", type="primary", width="stretch",
         disabled=(loc is None),
     )
 
     if st.session_state.results_history:
         if st.button(f"🗑 Clear history ({len(st.session_state.results_history)})",
-                     use_container_width=True):
+                     width="stretch"):
             st.session_state.results_history = {}
             st.rerun()
 
@@ -237,7 +246,7 @@ def _checks_panel(nexus):
         {"": icon.get(c["status"], "⚪"), "Check": c["name"], "Detail": c["detail"]}
         for c in nexus.checks
     ])
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
 
 
 def _footprint_panel(footprint):
@@ -250,7 +259,7 @@ def _footprint_panel(footprint):
     cols[4].metric("🌍 CO₂eq (kg)", f"{est['co2_kg']:.4f}")
     for note in est["notes"]:
         st.caption(f"⚠ {note}")
-    st.dataframe(pd.DataFrame(est["per_entry"]), use_container_width=True, hide_index=True)
+    st.dataframe(pd.DataFrame(est["per_entry"]), width="stretch", hide_index=True)
 
     by_agent = footprint.by_agent()
     if by_agent:
@@ -258,7 +267,7 @@ def _footprint_panel(footprint):
             {"agent": list(by_agent.keys()), "tokens": list(by_agent.values())}
         )
         fig = px.bar(df, x="agent", y="tokens", title="Token usage per agent")
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
 
 
 def _agent_card(label: str, output, icon: str = "", chart_fig=None):
@@ -266,7 +275,7 @@ def _agent_card(label: str, output, icon: str = "", chart_fig=None):
         st.markdown(output.content)
         if chart_fig is not None:
             st.divider()
-            st.plotly_chart(chart_fig, use_container_width=True)
+            st.plotly_chart(chart_fig, width="stretch")
         if output.tool_outputs:
             st.divider()
             st.caption("**Tool outputs (audit trail):**")
@@ -313,7 +322,7 @@ def _provenance_panel(location):
             })
 
     df = pd.DataFrame(rows)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.dataframe(df, width="stretch", hide_index=True)
 
 
 def _comparison_panel():
@@ -355,7 +364,7 @@ def _comparison_panel():
 
     df_metrics = pd.DataFrame(metrics_data)
     st.subheader("📊 Comparison Metrics")
-    st.dataframe(df_metrics, use_container_width=True, hide_index=True)
+    st.dataframe(df_metrics, width="stretch", hide_index=True)
 
     # ─── Radar chart (normalized) ───
     st.subheader("🎯 Trade-off Radar Chart")
@@ -387,7 +396,7 @@ def _comparison_panel():
         polar=dict(radialaxis=dict(visible=True, range=[0, 1])),
         showlegend=True, height=500,
     )
-    st.plotly_chart(fig, use_container_width=True)
+    st.plotly_chart(fig, width="stretch")
 
     # ─── Side-by-side coordinator synthesis ───
     st.subheader("🧭 Coordinator Synthesis per Scenario")
@@ -412,6 +421,9 @@ tab_run, tab_compare, tab_data = st.tabs(
 # ═══════════════════════════════════════════════════════════════════════════
 
 with tab_run:
+    if demo_mode:
+        st.info("Demo: hasil Claude yang direkam dengan data iklim sintetis dan parameter belum "
+                "dikalibrasi. Run Scenario menjalankan analisis baru melalui provider terpilih.")
     with st.expander("📋 Detail skenario + lokasi", expanded=False):
         col_a, col_b = st.columns(2)
         with col_a:
@@ -510,7 +522,7 @@ with tab_run:
                     file_name=(f"wef_agentic_{loc.slug}_"
                                 f"{result.scenario.get('name', 'report').replace(' ', '_')}.pdf"),
                     mime="application/pdf",
-                    use_container_width=True,
+                    width="stretch",
                 )
             except Exception as e:
                 st.error(f"PDF gen failed: {e}")
@@ -531,7 +543,7 @@ with tab_run:
         st.subheader("🧭 Coordinator Synthesis")
         st.markdown(result.coordinator.content)
         if charts["coordinator"] is not None:
-            st.plotly_chart(charts["coordinator"], use_container_width=True)
+            st.plotly_chart(charts["coordinator"], width="stretch")
 
         st.subheader("🔍 Critic Audit")
         col_text, col_chart = st.columns([2, 1])
@@ -539,7 +551,7 @@ with tab_run:
             st.markdown(result.critic.content)
         with col_chart:
             if charts["critic"] is not None:
-                st.plotly_chart(charts["critic"], use_container_width=True)
+                st.plotly_chart(charts["critic"], width="stretch")
 
         st.subheader("Detail per Agent")
         _agent_card("Water Agent", result.water, icon="💧", chart_fig=charts["water"])

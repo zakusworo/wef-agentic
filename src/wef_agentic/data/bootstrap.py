@@ -1,6 +1,7 @@
 """Bootstrap data fetching — jalankan sekali setelah install untuk cache dataset."""
 from __future__ import annotations
 
+import argparse
 import sys
 
 from rich.console import Console
@@ -17,10 +18,13 @@ console = Console()
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--force", action="store_true", help="replace existing climate caches with live data")
+    args = parser.parse_args()
     console.rule("[bold cyan]WEF-Agentic Data Bootstrap")
 
     tasks = [
-        ("Open-Meteo: 3 stasiun Sleman, 1991–2024", _bootstrap_openmeteo),
+        ("Open-Meteo: 3 stasiun Sleman, 1991–2024", lambda: _bootstrap_openmeteo(args.force)),
         ("NASA POWER: centroid Sleman, 1991–2024", _bootstrap_nasa_power),
     ]
 
@@ -47,12 +51,16 @@ def main() -> int:
     return 0
 
 
-def _bootstrap_openmeteo() -> None:
-    df = fetch_sleman_stations()
+def _bootstrap_openmeteo(force: bool = False) -> None:
+    df = fetch_sleman_stations(cache=not force)
     monthly = aggregate_monthly(df)
     annual = annual_summary(monthly)
     # Save aggregated views juga
     from wef_agentic.config.settings import PROCESSED_DIR
+    from wef_agentic.data.openmeteo import DEFAULT_END, DEFAULT_START
+    if force:
+        PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+        df.to_parquet(PROCESSED_DIR / f"openmeteo_sleman_{DEFAULT_START}_{DEFAULT_END}.parquet", index=False)
     monthly.to_parquet(PROCESSED_DIR / "openmeteo_sleman_monthly.parquet", index=False)
     annual.to_parquet(PROCESSED_DIR / "openmeteo_sleman_annual.parquet", index=False)
 

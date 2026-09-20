@@ -1,9 +1,37 @@
 import json
 
+import pytest
+
 from tests.conftest import BANDUNG
 from wef_agentic.data.sources import WorldBankSource
 from wef_agentic.geo import Location, remember_location
 from wef_agentic.tools import call_tool
+
+
+def test_growing_season_stress_uses_selected_months():
+    annual = call_tool("run_water_balance", location_query="sleman")
+    seasonal = call_tool("run_water_balance", location_query="sleman", growing_months=[7, 8, 9])
+    assert seasonal["monthly"] == annual["monthly"]
+    assert seasonal["summary"] == annual["summary"]
+    assert seasonal["stress_basis"] == "growing_months"
+    assert seasonal["water_stress_raw"] > annual["water_stress_raw"]
+
+
+@pytest.mark.parametrize("months", [[], [0], [13], [1, 1]])
+def test_invalid_growing_months_rejected(months):
+    with pytest.raises(ValueError, match="growing_months"):
+        call_tool("run_water_balance", location_query="sleman", growing_months=months)
+
+
+def test_historical_drought_year_is_used():
+    out = call_tool("run_water_balance", location_query="sleman", year=2015)
+    assert out["year"] == 2015
+    assert len(out["monthly"]) == 12
+
+
+def test_unknown_station_fallback_has_one_year_of_months():
+    out = call_tool("run_water_balance", location_query="sleman", station="missing")
+    assert len(out["monthly"]) == 12
 
 
 def test_sleman_crop_projection_is_bps_anchored():

@@ -1,0 +1,43 @@
+# Expression of interest
+
+**Tentative title:** Learning Water–Energy–Food Trade-offs with Transparent Agentic AI: A Scenario-Based Demonstration from Sleman, Indonesia
+
+**Preferred topic:** Part V: AI for Sustainable Agriculture, Water, and Energy Systems
+
+**Author:** Zulfikar Aji Kusworo
+
+**Affiliation:** Ministry of Energy and Mineral Resources of the Republic of Indonesia
+
+**Corresponding author:** Zulfikar Aji Kusworo, zakusworo@esdm.go.id
+
+**Project repository:** https://github.com/zakusworo/wef-agentic
+
+## Abstract
+
+Climate learning requires an understanding of how water, energy and food decisions
+interact, particularly where local data are incomplete and policy choices involve
+competing objectives. This chapter presents WEF-Agentic, a working scenario-based
+demonstrator situated in Sleman, Indonesia, for examining these interactions through
+transparent numerical modelling and AI-assisted interpretation.
+
+The system computes monthly water balance, irrigation-related water stress, crop
+production and electricity demand before generating any narrative. Water, energy
+and food agents interpret the resulting quantities; a critic examines consistency,
+and a coordinator summarizes trade-offs. The interface exposes assumptions,
+provenance and warnings alongside five scenarios. Recorded runs preserve model
+identities and outputs, allowing readers to compare what the numerical model
+calculates with what the language models say.
+
+The chapter will connect this workflow to practical climate-learning activities:
+tracing cross-sector effects, distinguishing observations from assumptions, comparing
+alternative futures, and questioning AI-generated recommendations. A reproducible
+software demonstration and documented scenario experiments will illustrate the
+approach. Synthetic verification data will be distinguished from reanalysis inputs,
+and uncalibrated parameters will be identified. The chapter will not infer learning
+gains or policy effectiveness from software operation alone.
+
+The contribution is a practical account of how constrained AI interpretation can
+support exploration of sustainability trade-offs while keeping uncertainty and
+human judgment visible. It will discuss adaptation to other Global South settings,
+requirements for local validation, and a proposed evaluation of learners' ability
+to explain and challenge model-based claims.

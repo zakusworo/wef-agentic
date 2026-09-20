@@ -1,0 +1,5197 @@
+{
+  "created_at": "2026-09-20T14:26:34.495944+00:00",
+  "kind": "deterministic-only; no LLM validation",
+  "git_sha": "e1fc17dbd8f4679b3e373ae798ed0456df2df247",
+  "git_dirty": true,
+  "config": {
+    "irrigation": {
+      "application_efficiency": 0.65,
+      "supply_fraction": 0.6,
+      "groundwater_share": 0.3,
+      "pump_head_m": 30.0,
+      "pump_efficiency": 0.45,
+      "cropping_intensity": 2.0
+    },
+    "power_sector_water": {
+      "fossil_m3_per_mwh": 2.6,
+      "renewable_m3_per_mwh": 0.1
+    },
+    "checks": {
+      "groundwater_warn_fraction_of_surplus": 0.25,
+      "yield_plausibility_tolerance": 0.25,
+      "low_confidence_threshold": 0.6
+    },
+    "fallbacks": {
+      "population_when_unknown": 100000
+    }
+  },
+  "climate_files_sha256": {
+    "openmeteo_sleman_1991-01-01_2024-12-31.parquet": "ca9d8f2acd2603886a3d9b6f2cc65fb7b8d3248990de57f6dff5e0aecbef73b8",
+    "openmeteo_sleman_annual.parquet": "baa5b24edcf43e867bd6040261b0892ebe2437bac21270abfe5e543198c49a5d",
+    "openmeteo_sleman_monthly.parquet": "309946f6d22e168dd6569a902092f5dafb4796c3e867ec451e63d35cf52a8124"
+  },
+  "results": [
+    {
+      "id": "S1_BAU_2030",
+      "scenario": {
+        "name": "S1 — BAU 2030",
+        "description": "Business-as-usual: tren existing tanpa intervensi tambahan",
+        "location_query": "sleman",
+        "climate": "Baseline (trend extrapolation)",
+        "policy": "RUPTL existing, LP2B moderate, no extra intervention",
+        "delta_precip_pct": -2.0,
+        "delta_temp_c": 0.7,
+        "energy_scenario": "BAU",
+        "renewable_share_2030": 0.23,
+        "lp2b_protection": "moderate",
+        "horizon": 2030,
+        "water_baseline_year": 2023,
+        "water_station": null,
+        "food_crop": "padi"
+      },
+      "nexus": {
+        "scenario_name": "S1 — BAU 2030",
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "location_context": {
+          "display": "Sleman, D.I. Yogyakarta, Indonesia",
+          "has_local_data": true,
+          "sub_das": [
+            "Code",
+            "Opak",
+            "Kuning",
+            "Boyong"
+          ],
+          "fires": [
+            "krisis air tanah Sleman Tengah-Selatan",
+            "alih fungsi LP2B (~280 ha/tahun)",
+            "beban grid pasca-subsidi listrik",
+            "ancaman Merapi VEI 3+ recurrent",
+            "tekanan hidrolik pariwisata Borobudur-Prambanan-Merapi"
+          ]
+        },
+        "climate_summary": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year_range": [
+            1991,
+            2024
+          ],
+          "stations": {
+            "Mlati": {
+              "precip_mean_mm": 2528.6,
+              "precip_std_mm": 150.9,
+              "tmean_c": 26.5,
+              "et0_mean_mm": 1498.0
+            },
+            "Pakem": {
+              "precip_mean_mm": 2963.1,
+              "precip_std_mm": 181.4,
+              "tmean_c": 24.9,
+              "et0_mean_mm": 1446.9
+            },
+            "Prambanan": {
+              "precip_mean_mm": 2282.0,
+              "precip_std_mm": 123.0,
+              "tmean_c": 26.7,
+              "et0_mean_mm": 1507.4
+            }
+          }
+        },
+        "water_balance": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": -2.0,
+          "delta_temp_c": 0.7,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2451.008,
+            "total_pet_mm": 1536.419,
+            "total_eta_mm": 1385.009,
+            "total_surplus_mm": 1065.999,
+            "total_deficit_mm": 151.41,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.595,
+            "aridity_index": 0.627
+          },
+          "water_stress_raw": 0.0985,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 480.6,
+              "et0_mm": 131.1,
+              "eta_mm": 131.1,
+              "surplus_mm": 349.5,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 279.6,
+              "et0_mm": 124.3,
+              "eta_mm": 124.3,
+              "surplus_mm": 155.3,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 417.9,
+              "et0_mm": 146.2,
+              "eta_mm": 146.2,
+              "surplus_mm": 271.7,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 195.5,
+              "et0_mm": 144.8,
+              "eta_mm": 144.8,
+              "surplus_mm": 50.7,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 168.9,
+              "et0_mm": 143.9,
+              "eta_mm": 143.9,
+              "surplus_mm": 25.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 59.3,
+              "et0_mm": 133.8,
+              "eta_mm": 118.0,
+              "surplus_mm": 0.0,
+              "deficit_mm": 15.8,
+              "soil_moisture_mm": 91.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 42.5,
+              "et0_mm": 122.4,
+              "eta_mm": 80.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 42.2,
+              "soil_moisture_mm": 53.6
+            },
+            {
+              "month": 8,
+              "precip_mm": 42.1,
+              "et0_mm": 123.3,
+              "eta_mm": 64.5,
+              "surplus_mm": 0.0,
+              "deficit_mm": 58.8,
+              "soil_moisture_mm": 31.2
+            },
+            {
+              "month": 9,
+              "precip_mm": 72.5,
+              "et0_mm": 114.8,
+              "eta_mm": 80.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 34.6,
+              "soil_moisture_mm": 23.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 179.8,
+              "et0_mm": 115.8,
+              "eta_mm": 115.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 87.6
+            },
+            {
+              "month": 11,
+              "precip_mm": 231.0,
+              "et0_mm": 114.0,
+              "eta_mm": 114.0,
+              "surplus_mm": 54.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 281.2,
+              "et0_mm": 122.0,
+              "eta_mm": 122.0,
+              "surplus_mm": 159.1,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "water_balance_baseline": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": 0.0,
+          "delta_temp_c": 0.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2501.029,
+            "total_pet_mm": 1494.571,
+            "total_eta_mm": 1358.063,
+            "total_surplus_mm": 1142.965,
+            "total_deficit_mm": 136.508,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.673,
+            "aridity_index": 0.598
+          },
+          "water_stress_raw": 0.0913,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 490.4,
+              "et0_mm": 127.5,
+              "eta_mm": 127.5,
+              "surplus_mm": 362.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 285.4,
+              "et0_mm": 120.9,
+              "eta_mm": 120.9,
+              "surplus_mm": 164.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 426.5,
+              "et0_mm": 142.3,
+              "eta_mm": 142.3,
+              "surplus_mm": 284.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 199.5,
+              "et0_mm": 140.8,
+              "eta_mm": 140.8,
+              "surplus_mm": 58.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 172.4,
+              "et0_mm": 140.0,
+              "eta_mm": 140.0,
+              "surplus_mm": 32.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 60.5,
+              "et0_mm": 130.1,
+              "eta_mm": 116.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 13.9,
+              "soil_moisture_mm": 94.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 43.4,
+              "et0_mm": 119.1,
+              "eta_mm": 80.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 38.3,
+              "soil_moisture_mm": 56.9
+            },
+            {
+              "month": 8,
+              "precip_mm": 43.0,
+              "et0_mm": 120.0,
+              "eta_mm": 65.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 54.1,
+              "soil_moisture_mm": 34.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 74.0,
+              "et0_mm": 111.7,
+              "eta_mm": 81.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 30.1,
+              "soil_moisture_mm": 26.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 183.5,
+              "et0_mm": 112.6,
+              "eta_mm": 112.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 97.4
+            },
+            {
+              "month": 11,
+              "precip_mm": 235.8,
+              "et0_mm": 110.9,
+              "eta_mm": 110.9,
+              "surplus_mm": 72.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 286.9,
+              "et0_mm": 118.7,
+              "eta_mm": 118.7,
+              "surplus_mm": 168.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "irrigation": {
+          "deficit_mm": 151.41,
+          "irrigation_demand_mm": 232.9,
+          "application_efficiency": 0.65
+        },
+        "coupling": {
+          "water_stress_raw": 0.0985,
+          "irrigation_supply_fraction": 0.6,
+          "water_stress_effective": 0.0394,
+          "irrigated_physical_area_ha": 18520.0,
+          "pumping_scenario": {
+            "gross_requirement_mm": 232.93846153846152,
+            "delivered_mm": 139.7630769230769,
+            "groundwater_mm": 41.92892307692307,
+            "groundwater_volume_m3": 7765236.5538461525,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.4106846406153843
+          },
+          "pumping_baseline_climate": {
+            "gross_requirement_mm": 210.0123076923077,
+            "delivered_mm": 126.00738461538461,
+            "groundwater_mm": 37.80221538461538,
+            "groundwater_volume_m3": 7371432.0,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.33914348
+          },
+          "extra_pumping_demand_gwh": 0.0715411606153844,
+          "power_sector_water_m3_2030": 4830274.98129972,
+          "parameters": {
+            "irrigation": {
+              "application_efficiency": 0.65,
+              "supply_fraction": 0.6,
+              "groundwater_share": 0.3,
+              "pump_head_m": 30.0,
+              "pump_efficiency": 0.45,
+              "cropping_intensity": 2.0
+            },
+            "power_sector_water": {
+              "fossil_m3_per_mwh": 2.6,
+              "renewable_m3_per_mwh": 0.1
+            }
+          }
+        },
+        "electricity_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "unit": "GWh/year",
+          "source": "BPS Sleman + ESDM",
+          "data": {
+            "2018": 1450,
+            "2019": 1530,
+            "2020": 1520,
+            "2021": 1610,
+            "2022": 1740,
+            "2023": 1880
+          },
+          "data_quality": "good (verified historical)",
+          "provenance": [
+            {
+              "variable": "energy.consumption_gwh_annual",
+              "value": 1880,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:33.966027",
+              "year": 2023,
+              "unit": "GWh/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+            }
+          ]
+        },
+        "energy_projection": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "scenario": "BAU",
+          "horizon": 2030,
+          "assumptions": {
+            "base_year": 2023,
+            "base_demand_gwh": 1880,
+            "base_population": 1138691,
+            "base_pdrb_per_capita": 37.1,
+            "income_elasticity": 0.75,
+            "pop_elasticity": 0.95,
+            "pop_growth_pct": 0.6,
+            "gdp_pc_growth_pct": 4.5,
+            "efficiency_gain_pct": 0.5,
+            "ev_share_target_2050": 0.1,
+            "induction_share_target_2050": 0.2,
+            "extra_demand_at_horizon_gwh": 0.0715411606153844
+          },
+          "data_quality": "good (BPS-anchored)",
+          "endpoints": {
+            "demand_base_gwh": 1880.0,
+            "demand_2030_gwh": 2385.3209784196147,
+            "demand_2050_gwh": null,
+            "demand_horizon_gwh": 2385.3209784196147,
+            "irrigation_pumping_horizon_gwh": 0.0715411606153844
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "demand_total_gwh": 1880.0
+            },
+            {
+              "year": 2024,
+              "demand_total_gwh": 1945.2
+            },
+            {
+              "year": 2025,
+              "demand_total_gwh": 2012.6
+            },
+            {
+              "year": 2026,
+              "demand_total_gwh": 2082.2
+            },
+            {
+              "year": 2027,
+              "demand_total_gwh": 2154.3
+            },
+            {
+              "year": 2028,
+              "demand_total_gwh": 2228.7
+            },
+            {
+              "year": 2029,
+              "demand_total_gwh": 2305.7
+            },
+            {
+              "year": 2030,
+              "demand_total_gwh": 2385.3
+            }
+          ],
+          "provenance": []
+        },
+        "emissions": {
+          "demand_gwh": 2385.3209784196147,
+          "renewable_share": 0.23,
+          "country_code": "ID",
+          "grid_emission_factor_kg_co2_per_kwh": 0.85,
+          "co2_emissions_mt": 1.561
+        },
+        "food_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "rice_harvest_area_ha": {
+            "2018": 44000,
+            "2019": 42500,
+            "2020": 41200,
+            "2021": 40500,
+            "2022": 39800,
+            "2023": 39000
+          },
+          "rice_yield_t_ha": {
+            "2018": 6.4,
+            "2019": 6.5,
+            "2020": 6.3,
+            "2021": 6.5,
+            "2022": 6.6,
+            "2023": 6.5
+          },
+          "trend_note": "Penurunan luas panen ~280 ha/tahun akibat alih fungsi LP2B",
+          "data_quality": "good (BPS verified)"
+        },
+        "crop_projection": {
+          "available": true,
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "crop": "padi",
+          "scenario": "S1 — BAU 2030",
+          "lp2b_protection": "moderate",
+          "water_stress_fraction": 0.0394,
+          "assumptions": {
+            "base_year": 2023,
+            "base_area_ha": 39000.0,
+            "lp2b_protection": "moderate",
+            "annual_loss_ha": 280.0,
+            "water_stress_fraction": 0.0394,
+            "ymax": 7.0,
+            "ky": 1.1
+          },
+          "observed_yield_t_ha": 6.5,
+          "data_quality": "good (BPS anchored)",
+          "endpoints": {
+            "production_2030_t": 248042.80479999998,
+            "production_2050_t": null,
+            "production_horizon_t": 248042.80479999998,
+            "area_horizon_ha": 37040.0,
+            "yield_t_ha": 6.696619999999999
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "area_ha": 39000.0,
+              "yield_t_ha": 6.7,
+              "production_t": 261168.2
+            },
+            {
+              "year": 2024,
+              "area_ha": 38720.0,
+              "yield_t_ha": 6.7,
+              "production_t": 259293.1
+            },
+            {
+              "year": 2025,
+              "area_ha": 38440.0,
+              "yield_t_ha": 6.7,
+              "production_t": 257418.1
+            },
+            {
+              "year": 2026,
+              "area_ha": 38160.0,
+              "yield_t_ha": 6.7,
+              "production_t": 255543.0
+            },
+            {
+              "year": 2027,
+              "area_ha": 37880.0,
+              "yield_t_ha": 6.7,
+              "production_t": 253668.0
+            },
+            {
+              "year": 2028,
+              "area_ha": 37600.0,
+              "yield_t_ha": 6.7,
+              "production_t": 251792.9
+            },
+            {
+              "year": 2029,
+              "area_ha": 37320.0,
+              "yield_t_ha": 6.7,
+              "production_t": 249917.9
+            },
+            {
+              "year": 2030,
+              "area_ha": 37040.0,
+              "yield_t_ha": 6.7,
+              "production_t": 248042.8
+            }
+          ],
+          "provenance": [
+            {
+              "variable": "food.rice_area_ha",
+              "value": 39000,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:33.962623",
+              "year": 2023,
+              "unit": "ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            },
+            {
+              "variable": "food.rice_land_loss_ha_per_year",
+              "value": 280,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:33.962688",
+              "year": 2023,
+              "unit": "ha/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+            },
+            {
+              "variable": "food.rice_yield_t_per_ha",
+              "value": 6.5,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:33.962736",
+              "year": 2023,
+              "unit": "t/ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            }
+          ],
+          "warnings": []
+        },
+        "food_ssl": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year": 2030,
+          "production_t": 248042.80479999998,
+          "population_base": 1138691,
+          "population_base_year": 2023,
+          "pop_growth_pct": 0.6,
+          "population": 1187385,
+          "per_capita_demand_kg": 115.0,
+          "ssl": 1.817,
+          "interpretation": "Surplus",
+          "provenance": [
+            {
+              "variable": "socio.population",
+              "value": 1138691,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:33.969961",
+              "year": 2023,
+              "unit": "jiwa",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+            },
+            {
+              "variable": "food.rice_consumption_kg_per_capita",
+              "value": 115,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "country-proxy-defaults",
+              "fetched_at": "2026-09-20T14:26:33.970058",
+              "year": 2024,
+              "unit": "kg/year",
+              "confidence": 0.55,
+              "tier": 3,
+              "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+            }
+          ]
+        },
+        "provenance": [
+          {
+            "variable": "energy.consumption_gwh_annual",
+            "value": 1880,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:33.966027",
+            "year": 2023,
+            "unit": "GWh/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+          },
+          {
+            "variable": "food.rice_area_ha",
+            "value": 39000,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:33.962623",
+            "year": 2023,
+            "unit": "ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "food.rice_land_loss_ha_per_year",
+            "value": 280,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:33.962688",
+            "year": 2023,
+            "unit": "ha/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+          },
+          {
+            "variable": "food.rice_yield_t_per_ha",
+            "value": 6.5,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:33.962736",
+            "year": 2023,
+            "unit": "t/ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "socio.population",
+            "value": 1138691,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:33.969961",
+            "year": 2023,
+            "unit": "jiwa",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+          },
+          {
+            "variable": "food.rice_consumption_kg_per_capita",
+            "value": 115,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:33.970058",
+            "year": 2024,
+            "unit": "kg/year",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          },
+          {
+            "variable": "grid.emission_factor_kg_co2_per_kwh",
+            "value": 0.85,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:33.969892",
+            "year": 2024,
+            "unit": "kg CO2/kWh",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          }
+        ],
+        "checks": [
+          {
+            "name": "water_mass_balance",
+            "status": "ok",
+            "detail": "P − ETa − surplus − ΔS = 0.000 mm"
+          },
+          {
+            "name": "seasonal_mismatch",
+            "status": "warn",
+            "detail": "Surplus tahunan 1066 mm terjadi di bulan [1, 2, 3, 4, 5, 11, 12], defisit 151 mm di bulan [6, 7, 8, 9]: surplus tahunan tidak menutup defisit musim kering tanpa tampungan atau air tanah."
+          },
+          {
+            "name": "groundwater_vs_recharge_proxy",
+            "status": "ok",
+            "detail": "Air tanah dipompa 42 mm/tahun di lahan irigasi vs surplus (proxy recharge maksimum) 1066 mm; ambang peringatan 25%."
+          },
+          {
+            "name": "population_consistency",
+            "status": "ok",
+            "detail": "Populasi dasar sektor energi 1,138,691 vs pangan 1,138,691."
+          },
+          {
+            "name": "yield_plausibility",
+            "status": "ok",
+            "detail": "Yield model 6.70 t/ha vs observasi 6.50 t/ha (selisih 3%)."
+          },
+          {
+            "name": "low_confidence_inputs",
+            "status": "warn",
+            "detail": "food.rice_consumption_kg_per_capita (country-proxy-defaults, conf 0.55); grid.emission_factor_kg_co2_per_kwh (country-proxy-defaults, conf 0.55)"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "id": "S2_JETP_Aligned",
+      "scenario": {
+        "name": "S2 — JETP-Aligned 2030",
+        "description": "Aligned dengan JETP CIPP pathway",
+        "location_query": "sleman",
+        "climate": "Baseline + warming SSP2-4.5",
+        "policy": "EBT 34% by 2030, LP2B moderate, induction cooker partial",
+        "delta_precip_pct": -3.0,
+        "delta_temp_c": 1.0,
+        "energy_scenario": "JETP_Aligned",
+        "renewable_share_2030": 0.34,
+        "lp2b_protection": "moderate",
+        "horizon": 2030,
+        "water_baseline_year": 2023,
+        "water_station": null,
+        "food_crop": "padi"
+      },
+      "nexus": {
+        "scenario_name": "S2 — JETP-Aligned 2030",
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "location_context": {
+          "display": "Sleman, D.I. Yogyakarta, Indonesia",
+          "has_local_data": true,
+          "sub_das": [
+            "Code",
+            "Opak",
+            "Kuning",
+            "Boyong"
+          ],
+          "fires": [
+            "krisis air tanah Sleman Tengah-Selatan",
+            "alih fungsi LP2B (~280 ha/tahun)",
+            "beban grid pasca-subsidi listrik",
+            "ancaman Merapi VEI 3+ recurrent",
+            "tekanan hidrolik pariwisata Borobudur-Prambanan-Merapi"
+          ]
+        },
+        "climate_summary": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year_range": [
+            1991,
+            2024
+          ],
+          "stations": {
+            "Mlati": {
+              "precip_mean_mm": 2528.6,
+              "precip_std_mm": 150.9,
+              "tmean_c": 26.5,
+              "et0_mean_mm": 1498.0
+            },
+            "Pakem": {
+              "precip_mean_mm": 2963.1,
+              "precip_std_mm": 181.4,
+              "tmean_c": 24.9,
+              "et0_mean_mm": 1446.9
+            },
+            "Prambanan": {
+              "precip_mean_mm": 2282.0,
+              "precip_std_mm": 123.0,
+              "tmean_c": 26.7,
+              "et0_mean_mm": 1507.4
+            }
+          }
+        },
+        "water_balance": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": -3.0,
+          "delta_temp_c": 1.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2425.998,
+            "total_pet_mm": 1554.354,
+            "total_eta_mm": 1396.183,
+            "total_surplus_mm": 1029.814,
+            "total_deficit_mm": 158.17,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.561,
+            "aridity_index": 0.641
+          },
+          "water_stress_raw": 0.1018,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 475.7,
+              "et0_mm": 132.6,
+              "eta_mm": 132.6,
+              "surplus_mm": 343.1,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 276.8,
+              "et0_mm": 125.8,
+              "eta_mm": 125.8,
+              "surplus_mm": 151.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 413.7,
+              "et0_mm": 148.0,
+              "eta_mm": 148.0,
+              "surplus_mm": 265.7,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 193.5,
+              "et0_mm": 146.4,
+              "eta_mm": 146.4,
+              "surplus_mm": 47.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 167.2,
+              "et0_mm": 145.6,
+              "eta_mm": 145.6,
+              "surplus_mm": 21.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 58.7,
+              "et0_mm": 135.3,
+              "eta_mm": 118.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 16.6,
+              "soil_moisture_mm": 90.0
+            },
+            {
+              "month": 7,
+              "precip_mm": 42.1,
+              "et0_mm": 123.8,
+              "eta_mm": 79.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 44.0,
+              "soil_moisture_mm": 52.2
+            },
+            {
+              "month": 8,
+              "precip_mm": 41.7,
+              "et0_mm": 124.8,
+              "eta_mm": 63.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 60.9,
+              "soil_moisture_mm": 30.0
+            },
+            {
+              "month": 9,
+              "precip_mm": 71.8,
+              "et0_mm": 116.1,
+              "eta_mm": 79.5,
+              "surplus_mm": 0.0,
+              "deficit_mm": 36.7,
+              "soil_moisture_mm": 22.3
+            },
+            {
+              "month": 10,
+              "precip_mm": 178.0,
+              "et0_mm": 117.1,
+              "eta_mm": 117.1,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 83.2
+            },
+            {
+              "month": 11,
+              "precip_mm": 228.7,
+              "et0_mm": 115.3,
+              "eta_mm": 115.3,
+              "surplus_mm": 46.5,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 278.3,
+              "et0_mm": 123.4,
+              "eta_mm": 123.4,
+              "surplus_mm": 154.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "water_balance_baseline": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": 0.0,
+          "delta_temp_c": 0.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2501.029,
+            "total_pet_mm": 1494.571,
+            "total_eta_mm": 1358.063,
+            "total_surplus_mm": 1142.965,
+            "total_deficit_mm": 136.508,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.673,
+            "aridity_index": 0.598
+          },
+          "water_stress_raw": 0.0913,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 490.4,
+              "et0_mm": 127.5,
+              "eta_mm": 127.5,
+              "surplus_mm": 362.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 285.4,
+              "et0_mm": 120.9,
+              "eta_mm": 120.9,
+              "surplus_mm": 164.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 426.5,
+              "et0_mm": 142.3,
+              "eta_mm": 142.3,
+              "surplus_mm": 284.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 199.5,
+              "et0_mm": 140.8,
+              "eta_mm": 140.8,
+              "surplus_mm": 58.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 172.4,
+              "et0_mm": 140.0,
+              "eta_mm": 140.0,
+              "surplus_mm": 32.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 60.5,
+              "et0_mm": 130.1,
+              "eta_mm": 116.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 13.9,
+              "soil_moisture_mm": 94.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 43.4,
+              "et0_mm": 119.1,
+              "eta_mm": 80.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 38.3,
+              "soil_moisture_mm": 56.9
+            },
+            {
+              "month": 8,
+              "precip_mm": 43.0,
+              "et0_mm": 120.0,
+              "eta_mm": 65.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 54.1,
+              "soil_moisture_mm": 34.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 74.0,
+              "et0_mm": 111.7,
+              "eta_mm": 81.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 30.1,
+              "soil_moisture_mm": 26.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 183.5,
+              "et0_mm": 112.6,
+              "eta_mm": 112.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 97.4
+            },
+            {
+              "month": 11,
+              "precip_mm": 235.8,
+              "et0_mm": 110.9,
+              "eta_mm": 110.9,
+              "surplus_mm": 72.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 286.9,
+              "et0_mm": 118.7,
+              "eta_mm": 118.7,
+              "surplus_mm": 168.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "irrigation": {
+          "deficit_mm": 158.17,
+          "irrigation_demand_mm": 243.3,
+          "application_efficiency": 0.65
+        },
+        "coupling": {
+          "water_stress_raw": 0.1018,
+          "irrigation_supply_fraction": 0.6,
+          "water_stress_effective": 0.0407,
+          "irrigated_physical_area_ha": 18520.0,
+          "pumping_scenario": {
+            "gross_requirement_mm": 243.3384615384615,
+            "delivered_mm": 146.0030769230769,
+            "groundwater_mm": 43.80092307692306,
+            "groundwater_volume_m3": 8111930.953846151,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.4736674566153842
+          },
+          "pumping_baseline_climate": {
+            "gross_requirement_mm": 210.0123076923077,
+            "delivered_mm": 126.00738461538461,
+            "groundwater_mm": 37.80221538461538,
+            "groundwater_volume_m3": 7371432.0,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.33914348
+          },
+          "extra_pumping_demand_gwh": 0.1345239766153843,
+          "power_sector_water_m3_2030": 4152607.9889612137,
+          "parameters": {
+            "irrigation": {
+              "application_efficiency": 0.65,
+              "supply_fraction": 0.6,
+              "groundwater_share": 0.3,
+              "pump_head_m": 30.0,
+              "pump_efficiency": 0.45,
+              "cropping_intensity": 2.0
+            },
+            "power_sector_water": {
+              "fossil_m3_per_mwh": 2.6,
+              "renewable_m3_per_mwh": 0.1
+            }
+          }
+        },
+        "electricity_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "unit": "GWh/year",
+          "source": "BPS Sleman + ESDM",
+          "data": {
+            "2018": 1450,
+            "2019": 1530,
+            "2020": 1520,
+            "2021": 1610,
+            "2022": 1740,
+            "2023": 1880
+          },
+          "data_quality": "good (verified historical)",
+          "provenance": [
+            {
+              "variable": "energy.consumption_gwh_annual",
+              "value": 1880,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.090763",
+              "year": 2023,
+              "unit": "GWh/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+            }
+          ]
+        },
+        "energy_projection": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "scenario": "JETP_Aligned",
+          "horizon": 2030,
+          "assumptions": {
+            "base_year": 2023,
+            "base_demand_gwh": 1880,
+            "base_population": 1138691,
+            "base_pdrb_per_capita": 37.1,
+            "income_elasticity": 0.75,
+            "pop_elasticity": 0.95,
+            "pop_growth_pct": 0.6,
+            "gdp_pc_growth_pct": 5.0,
+            "efficiency_gain_pct": 1.0,
+            "ev_share_target_2050": 0.4,
+            "induction_share_target_2050": 0.5,
+            "extra_demand_at_horizon_gwh": 0.1345239766153843
+          },
+          "data_quality": "good (BPS-anchored)",
+          "endpoints": {
+            "demand_base_gwh": 1880.0,
+            "demand_2030_gwh": 2372.91885083498,
+            "demand_2050_gwh": null,
+            "demand_horizon_gwh": 2372.91885083498,
+            "irrigation_pumping_horizon_gwh": 0.1345239766153843
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "demand_total_gwh": 1880.0
+            },
+            {
+              "year": 2024,
+              "demand_total_gwh": 1944.0
+            },
+            {
+              "year": 2025,
+              "demand_total_gwh": 2010.1
+            },
+            {
+              "year": 2026,
+              "demand_total_gwh": 2078.2
+            },
+            {
+              "year": 2027,
+              "demand_total_gwh": 2148.5
+            },
+            {
+              "year": 2028,
+              "demand_total_gwh": 2221.0
+            },
+            {
+              "year": 2029,
+              "demand_total_gwh": 2295.8
+            },
+            {
+              "year": 2030,
+              "demand_total_gwh": 2372.9
+            }
+          ],
+          "provenance": []
+        },
+        "emissions": {
+          "demand_gwh": 2372.91885083498,
+          "renewable_share": 0.34,
+          "country_code": "ID",
+          "grid_emission_factor_kg_co2_per_kwh": 0.85,
+          "co2_emissions_mt": 1.331
+        },
+        "food_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "rice_harvest_area_ha": {
+            "2018": 44000,
+            "2019": 42500,
+            "2020": 41200,
+            "2021": 40500,
+            "2022": 39800,
+            "2023": 39000
+          },
+          "rice_yield_t_ha": {
+            "2018": 6.4,
+            "2019": 6.5,
+            "2020": 6.3,
+            "2021": 6.5,
+            "2022": 6.6,
+            "2023": 6.5
+          },
+          "trend_note": "Penurunan luas panen ~280 ha/tahun akibat alih fungsi LP2B",
+          "data_quality": "good (BPS verified)"
+        },
+        "crop_projection": {
+          "available": true,
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "crop": "padi",
+          "scenario": "S2 — JETP-Aligned 2030",
+          "lp2b_protection": "moderate",
+          "water_stress_fraction": 0.0407,
+          "assumptions": {
+            "base_year": 2023,
+            "base_area_ha": 39000.0,
+            "lp2b_protection": "moderate",
+            "annual_loss_ha": 280.0,
+            "water_stress_fraction": 0.0407,
+            "ymax": 7.0,
+            "ky": 1.1
+          },
+          "observed_yield_t_ha": 6.5,
+          "data_quality": "good (BPS anchored)",
+          "endpoints": {
+            "production_2030_t": 247672.0344,
+            "production_2050_t": null,
+            "production_horizon_t": 247672.0344,
+            "area_horizon_ha": 37040.0,
+            "yield_t_ha": 6.68661
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "area_ha": 39000.0,
+              "yield_t_ha": 6.7,
+              "production_t": 260777.8
+            },
+            {
+              "year": 2024,
+              "area_ha": 38720.0,
+              "yield_t_ha": 6.7,
+              "production_t": 258905.5
+            },
+            {
+              "year": 2025,
+              "area_ha": 38440.0,
+              "yield_t_ha": 6.7,
+              "production_t": 257033.3
+            },
+            {
+              "year": 2026,
+              "area_ha": 38160.0,
+              "yield_t_ha": 6.7,
+              "production_t": 255161.0
+            },
+            {
+              "year": 2027,
+              "area_ha": 37880.0,
+              "yield_t_ha": 6.7,
+              "production_t": 253288.8
+            },
+            {
+              "year": 2028,
+              "area_ha": 37600.0,
+              "yield_t_ha": 6.7,
+              "production_t": 251416.5
+            },
+            {
+              "year": 2029,
+              "area_ha": 37320.0,
+              "yield_t_ha": 6.7,
+              "production_t": 249544.3
+            },
+            {
+              "year": 2030,
+              "area_ha": 37040.0,
+              "yield_t_ha": 6.7,
+              "production_t": 247672.0
+            }
+          ],
+          "provenance": [
+            {
+              "variable": "food.rice_area_ha",
+              "value": 39000,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.087643",
+              "year": 2023,
+              "unit": "ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            },
+            {
+              "variable": "food.rice_land_loss_ha_per_year",
+              "value": 280,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.087694",
+              "year": 2023,
+              "unit": "ha/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+            },
+            {
+              "variable": "food.rice_yield_t_per_ha",
+              "value": 6.5,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.087737",
+              "year": 2023,
+              "unit": "t/ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            }
+          ],
+          "warnings": []
+        },
+        "food_ssl": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year": 2030,
+          "production_t": 247672.0344,
+          "population_base": 1138691,
+          "population_base_year": 2023,
+          "pop_growth_pct": 0.6,
+          "population": 1187385,
+          "per_capita_demand_kg": 115.0,
+          "ssl": 1.814,
+          "interpretation": "Surplus",
+          "provenance": [
+            {
+              "variable": "socio.population",
+              "value": 1138691,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.094438",
+              "year": 2023,
+              "unit": "jiwa",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+            },
+            {
+              "variable": "food.rice_consumption_kg_per_capita",
+              "value": 115,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "country-proxy-defaults",
+              "fetched_at": "2026-09-20T14:26:34.094487",
+              "year": 2024,
+              "unit": "kg/year",
+              "confidence": 0.55,
+              "tier": 3,
+              "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+            }
+          ]
+        },
+        "provenance": [
+          {
+            "variable": "energy.consumption_gwh_annual",
+            "value": 1880,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.090763",
+            "year": 2023,
+            "unit": "GWh/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+          },
+          {
+            "variable": "food.rice_area_ha",
+            "value": 39000,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.087643",
+            "year": 2023,
+            "unit": "ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "food.rice_land_loss_ha_per_year",
+            "value": 280,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.087694",
+            "year": 2023,
+            "unit": "ha/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+          },
+          {
+            "variable": "food.rice_yield_t_per_ha",
+            "value": 6.5,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.087737",
+            "year": 2023,
+            "unit": "t/ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "socio.population",
+            "value": 1138691,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.094438",
+            "year": 2023,
+            "unit": "jiwa",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+          },
+          {
+            "variable": "food.rice_consumption_kg_per_capita",
+            "value": 115,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.094487",
+            "year": 2024,
+            "unit": "kg/year",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          },
+          {
+            "variable": "grid.emission_factor_kg_co2_per_kwh",
+            "value": 0.85,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.094367",
+            "year": 2024,
+            "unit": "kg CO2/kWh",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          }
+        ],
+        "checks": [
+          {
+            "name": "water_mass_balance",
+            "status": "ok",
+            "detail": "P − ETa − surplus − ΔS = 0.000 mm"
+          },
+          {
+            "name": "seasonal_mismatch",
+            "status": "warn",
+            "detail": "Surplus tahunan 1030 mm terjadi di bulan [1, 2, 3, 4, 5, 11, 12], defisit 158 mm di bulan [6, 7, 8, 9]: surplus tahunan tidak menutup defisit musim kering tanpa tampungan atau air tanah."
+          },
+          {
+            "name": "groundwater_vs_recharge_proxy",
+            "status": "ok",
+            "detail": "Air tanah dipompa 44 mm/tahun di lahan irigasi vs surplus (proxy recharge maksimum) 1030 mm; ambang peringatan 25%."
+          },
+          {
+            "name": "population_consistency",
+            "status": "ok",
+            "detail": "Populasi dasar sektor energi 1,138,691 vs pangan 1,138,691."
+          },
+          {
+            "name": "yield_plausibility",
+            "status": "ok",
+            "detail": "Yield model 6.69 t/ha vs observasi 6.50 t/ha (selisih 3%)."
+          },
+          {
+            "name": "low_confidence_inputs",
+            "status": "warn",
+            "detail": "food.rice_consumption_kg_per_capita (country-proxy-defaults, conf 0.55); grid.emission_factor_kg_co2_per_kwh (country-proxy-defaults, conf 0.55)"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "id": "S3_NetZero_2045",
+      "scenario": {
+        "name": "S3 — Net-Zero 2045",
+        "description": "PLTS rooftop masif + LP2B strict + EV/induction transition",
+        "location_query": "sleman",
+        "climate": "Baseline + warming SSP1-2.6",
+        "policy": "EBT 45% by 2030, LP2B strict, EV+induction full transition",
+        "delta_precip_pct": -1.0,
+        "delta_temp_c": 0.5,
+        "energy_scenario": "NetZero_Sleman_2045",
+        "renewable_share_2030": 0.45,
+        "lp2b_protection": "strict",
+        "horizon": 2045,
+        "water_baseline_year": 2023,
+        "water_station": null,
+        "food_crop": "padi"
+      },
+      "nexus": {
+        "scenario_name": "S3 — Net-Zero 2045",
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "location_context": {
+          "display": "Sleman, D.I. Yogyakarta, Indonesia",
+          "has_local_data": true,
+          "sub_das": [
+            "Code",
+            "Opak",
+            "Kuning",
+            "Boyong"
+          ],
+          "fires": [
+            "krisis air tanah Sleman Tengah-Selatan",
+            "alih fungsi LP2B (~280 ha/tahun)",
+            "beban grid pasca-subsidi listrik",
+            "ancaman Merapi VEI 3+ recurrent",
+            "tekanan hidrolik pariwisata Borobudur-Prambanan-Merapi"
+          ]
+        },
+        "climate_summary": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year_range": [
+            1991,
+            2024
+          ],
+          "stations": {
+            "Mlati": {
+              "precip_mean_mm": 2528.6,
+              "precip_std_mm": 150.9,
+              "tmean_c": 26.5,
+              "et0_mean_mm": 1498.0
+            },
+            "Pakem": {
+              "precip_mean_mm": 2963.1,
+              "precip_std_mm": 181.4,
+              "tmean_c": 24.9,
+              "et0_mean_mm": 1446.9
+            },
+            "Prambanan": {
+              "precip_mean_mm": 2282.0,
+              "precip_std_mm": 123.0,
+              "tmean_c": 26.7,
+              "et0_mean_mm": 1507.4
+            }
+          }
+        },
+        "water_balance": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": -1.0,
+          "delta_temp_c": 0.5,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2476.018,
+            "total_pet_mm": 1524.462,
+            "total_eta_mm": 1378.138,
+            "total_surplus_mm": 1097.88,
+            "total_deficit_mm": 146.324,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.624,
+            "aridity_index": 0.616
+          },
+          "water_stress_raw": 0.096,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 485.5,
+              "et0_mm": 130.1,
+              "eta_mm": 130.1,
+              "surplus_mm": 355.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 282.5,
+              "et0_mm": 123.3,
+              "eta_mm": 123.3,
+              "surplus_mm": 159.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 422.2,
+              "et0_mm": 145.1,
+              "eta_mm": 145.1,
+              "surplus_mm": 277.1,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 197.5,
+              "et0_mm": 143.6,
+              "eta_mm": 143.6,
+              "surplus_mm": 53.8,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 170.6,
+              "et0_mm": 142.8,
+              "eta_mm": 142.8,
+              "surplus_mm": 27.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 59.9,
+              "et0_mm": 132.7,
+              "eta_mm": 117.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 15.1,
+              "soil_moisture_mm": 92.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 42.9,
+              "et0_mm": 121.5,
+              "eta_mm": 80.5,
+              "surplus_mm": 0.0,
+              "deficit_mm": 40.9,
+              "soil_moisture_mm": 54.7
+            },
+            {
+              "month": 8,
+              "precip_mm": 42.6,
+              "et0_mm": 122.4,
+              "eta_mm": 65.1,
+              "surplus_mm": 0.0,
+              "deficit_mm": 57.3,
+              "soil_moisture_mm": 32.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 73.3,
+              "et0_mm": 113.9,
+              "eta_mm": 80.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 33.0,
+              "soil_moisture_mm": 24.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 181.6,
+              "et0_mm": 114.9,
+              "eta_mm": 114.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 91.3
+            },
+            {
+              "month": 11,
+              "precip_mm": 233.4,
+              "et0_mm": 113.1,
+              "eta_mm": 113.1,
+              "surplus_mm": 61.5,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 284.0,
+              "et0_mm": 121.1,
+              "eta_mm": 121.1,
+              "surplus_mm": 163.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "water_balance_baseline": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": 0.0,
+          "delta_temp_c": 0.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2501.029,
+            "total_pet_mm": 1494.571,
+            "total_eta_mm": 1358.063,
+            "total_surplus_mm": 1142.965,
+            "total_deficit_mm": 136.508,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.673,
+            "aridity_index": 0.598
+          },
+          "water_stress_raw": 0.0913,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 490.4,
+              "et0_mm": 127.5,
+              "eta_mm": 127.5,
+              "surplus_mm": 362.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 285.4,
+              "et0_mm": 120.9,
+              "eta_mm": 120.9,
+              "surplus_mm": 164.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 426.5,
+              "et0_mm": 142.3,
+              "eta_mm": 142.3,
+              "surplus_mm": 284.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 199.5,
+              "et0_mm": 140.8,
+              "eta_mm": 140.8,
+              "surplus_mm": 58.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 172.4,
+              "et0_mm": 140.0,
+              "eta_mm": 140.0,
+              "surplus_mm": 32.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 60.5,
+              "et0_mm": 130.1,
+              "eta_mm": 116.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 13.9,
+              "soil_moisture_mm": 94.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 43.4,
+              "et0_mm": 119.1,
+              "eta_mm": 80.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 38.3,
+              "soil_moisture_mm": 56.9
+            },
+            {
+              "month": 8,
+              "precip_mm": 43.0,
+              "et0_mm": 120.0,
+              "eta_mm": 65.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 54.1,
+              "soil_moisture_mm": 34.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 74.0,
+              "et0_mm": 111.7,
+              "eta_mm": 81.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 30.1,
+              "soil_moisture_mm": 26.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 183.5,
+              "et0_mm": 112.6,
+              "eta_mm": 112.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 97.4
+            },
+            {
+              "month": 11,
+              "precip_mm": 235.8,
+              "et0_mm": 110.9,
+              "eta_mm": 110.9,
+              "surplus_mm": 72.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 286.9,
+              "et0_mm": 118.7,
+              "eta_mm": 118.7,
+              "surplus_mm": 168.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "irrigation": {
+          "deficit_mm": 146.324,
+          "irrigation_demand_mm": 225.1,
+          "application_efficiency": 0.65
+        },
+        "coupling": {
+          "water_stress_raw": 0.096,
+          "irrigation_supply_fraction": 0.6,
+          "water_stress_effective": 0.0384,
+          "irrigated_physical_area_ha": 18576.0,
+          "pumping_scenario": {
+            "gross_requirement_mm": 225.11384615384617,
+            "delivered_mm": 135.06830769230768,
+            "groundwater_mm": 40.5204923076923,
+            "groundwater_volume_m3": 7527086.651076921,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.3674207416123074
+          },
+          "pumping_baseline_climate": {
+            "gross_requirement_mm": 210.0123076923077,
+            "delivered_mm": 126.00738461538461,
+            "groundwater_mm": 37.80221538461538,
+            "groundwater_volume_m3": 7371432.0,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.33914348
+          },
+          "extra_pumping_demand_gwh": 0.02827726161230748,
+          "power_sector_water_m3_2030": 3464987.122845289,
+          "parameters": {
+            "irrigation": {
+              "application_efficiency": 0.65,
+              "supply_fraction": 0.6,
+              "groundwater_share": 0.3,
+              "pump_head_m": 30.0,
+              "pump_efficiency": 0.45,
+              "cropping_intensity": 2.0
+            },
+            "power_sector_water": {
+              "fossil_m3_per_mwh": 2.6,
+              "renewable_m3_per_mwh": 0.1
+            }
+          }
+        },
+        "electricity_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "unit": "GWh/year",
+          "source": "BPS Sleman + ESDM",
+          "data": {
+            "2018": 1450,
+            "2019": 1530,
+            "2020": 1520,
+            "2021": 1610,
+            "2022": 1740,
+            "2023": 1880
+          },
+          "data_quality": "good (verified historical)",
+          "provenance": [
+            {
+              "variable": "energy.consumption_gwh_annual",
+              "value": 1880,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.229126",
+              "year": 2023,
+              "unit": "GWh/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+            }
+          ]
+        },
+        "energy_projection": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "scenario": "NetZero_Sleman_2045",
+          "horizon": 2045,
+          "assumptions": {
+            "base_year": 2023,
+            "base_demand_gwh": 1880,
+            "base_population": 1138691,
+            "base_pdrb_per_capita": 37.1,
+            "income_elasticity": 0.75,
+            "pop_elasticity": 0.95,
+            "pop_growth_pct": 0.5,
+            "gdp_pc_growth_pct": 5.5,
+            "efficiency_gain_pct": 1.5,
+            "ev_share_target_2050": 0.8,
+            "induction_share_target_2050": 0.95,
+            "extra_demand_at_horizon_gwh": 0.02827726161230748
+          },
+          "data_quality": "good (BPS-anchored)",
+          "endpoints": {
+            "demand_base_gwh": 1880.0,
+            "demand_2030_gwh": 2349.143812098501,
+            "demand_2050_gwh": null,
+            "demand_horizon_gwh": 3724.81529970701,
+            "irrigation_pumping_horizon_gwh": 0.02827726161230748
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "demand_total_gwh": 1880.0
+            },
+            {
+              "year": 2026,
+              "demand_total_gwh": 2070.0
+            },
+            {
+              "year": 2029,
+              "demand_total_gwh": 2276.4
+            },
+            {
+              "year": 2032,
+              "demand_total_gwh": 2500.8
+            },
+            {
+              "year": 2035,
+              "demand_total_gwh": 2744.8
+            },
+            {
+              "year": 2038,
+              "demand_total_gwh": 3010.3
+            },
+            {
+              "year": 2041,
+              "demand_total_gwh": 3299.2
+            },
+            {
+              "year": 2044,
+              "demand_total_gwh": 3613.8
+            },
+            {
+              "year": 2045,
+              "demand_total_gwh": 3724.8
+            }
+          ],
+          "provenance": []
+        },
+        "emissions": {
+          "demand_gwh": 2349.143812098501,
+          "renewable_share": 0.45,
+          "country_code": "ID",
+          "grid_emission_factor_kg_co2_per_kwh": 0.85,
+          "co2_emissions_mt": 1.098
+        },
+        "food_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "rice_harvest_area_ha": {
+            "2018": 44000,
+            "2019": 42500,
+            "2020": 41200,
+            "2021": 40500,
+            "2022": 39800,
+            "2023": 39000
+          },
+          "rice_yield_t_ha": {
+            "2018": 6.4,
+            "2019": 6.5,
+            "2020": 6.3,
+            "2021": 6.5,
+            "2022": 6.6,
+            "2023": 6.5
+          },
+          "trend_note": "Penurunan luas panen ~280 ha/tahun akibat alih fungsi LP2B",
+          "data_quality": "good (BPS verified)"
+        },
+        "crop_projection": {
+          "available": true,
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "crop": "padi",
+          "scenario": "S3 — Net-Zero 2045",
+          "lp2b_protection": "strict",
+          "water_stress_fraction": 0.0384,
+          "assumptions": {
+            "base_year": 2023,
+            "base_area_ha": 39000.0,
+            "lp2b_protection": "strict",
+            "annual_loss_ha": 84.0,
+            "water_stress_fraction": 0.0384,
+            "ymax": 7.0,
+            "ky": 1.1
+          },
+          "observed_yield_t_ha": 6.5,
+          "data_quality": "good (BPS anchored)",
+          "endpoints": {
+            "production_2030_t": 257526.33984,
+            "production_2050_t": null,
+            "production_horizon_t": 249078.89664,
+            "area_horizon_ha": 37152.0,
+            "yield_t_ha": 6.70432
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "area_ha": 39000.0,
+              "yield_t_ha": 6.7,
+              "production_t": 261468.5
+            },
+            {
+              "year": 2026,
+              "area_ha": 38748.0,
+              "yield_t_ha": 6.7,
+              "production_t": 259779.0
+            },
+            {
+              "year": 2029,
+              "area_ha": 38496.0,
+              "yield_t_ha": 6.7,
+              "production_t": 258089.5
+            },
+            {
+              "year": 2032,
+              "area_ha": 38244.0,
+              "yield_t_ha": 6.7,
+              "production_t": 256400.0
+            },
+            {
+              "year": 2035,
+              "area_ha": 37992.0,
+              "yield_t_ha": 6.7,
+              "production_t": 254710.5
+            },
+            {
+              "year": 2038,
+              "area_ha": 37740.0,
+              "yield_t_ha": 6.7,
+              "production_t": 253021.0
+            },
+            {
+              "year": 2041,
+              "area_ha": 37488.0,
+              "yield_t_ha": 6.7,
+              "production_t": 251331.5
+            },
+            {
+              "year": 2044,
+              "area_ha": 37236.0,
+              "yield_t_ha": 6.7,
+              "production_t": 249642.1
+            },
+            {
+              "year": 2045,
+              "area_ha": 37152.0,
+              "yield_t_ha": 6.7,
+              "production_t": 249078.9
+            }
+          ],
+          "provenance": [
+            {
+              "variable": "food.rice_area_ha",
+              "value": 39000,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.226083",
+              "year": 2023,
+              "unit": "ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            },
+            {
+              "variable": "food.rice_land_loss_ha_per_year",
+              "value": 280,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.226135",
+              "year": 2023,
+              "unit": "ha/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+            },
+            {
+              "variable": "food.rice_yield_t_per_ha",
+              "value": 6.5,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.226178",
+              "year": 2023,
+              "unit": "t/ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            }
+          ],
+          "warnings": []
+        },
+        "food_ssl": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year": 2030,
+          "production_t": 257526.33984,
+          "population_base": 1138691,
+          "population_base_year": 2023,
+          "pop_growth_pct": 0.5,
+          "population": 1179148,
+          "per_capita_demand_kg": 115.0,
+          "ssl": 1.899,
+          "interpretation": "Surplus",
+          "provenance": [
+            {
+              "variable": "socio.population",
+              "value": 1138691,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.233062",
+              "year": 2023,
+              "unit": "jiwa",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+            },
+            {
+              "variable": "food.rice_consumption_kg_per_capita",
+              "value": 115,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "country-proxy-defaults",
+              "fetched_at": "2026-09-20T14:26:34.233121",
+              "year": 2024,
+              "unit": "kg/year",
+              "confidence": 0.55,
+              "tier": 3,
+              "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+            }
+          ]
+        },
+        "provenance": [
+          {
+            "variable": "energy.consumption_gwh_annual",
+            "value": 1880,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.229126",
+            "year": 2023,
+            "unit": "GWh/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+          },
+          {
+            "variable": "food.rice_area_ha",
+            "value": 39000,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.226083",
+            "year": 2023,
+            "unit": "ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "food.rice_land_loss_ha_per_year",
+            "value": 280,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.226135",
+            "year": 2023,
+            "unit": "ha/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+          },
+          {
+            "variable": "food.rice_yield_t_per_ha",
+            "value": 6.5,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.226178",
+            "year": 2023,
+            "unit": "t/ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "socio.population",
+            "value": 1138691,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.233062",
+            "year": 2023,
+            "unit": "jiwa",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+          },
+          {
+            "variable": "food.rice_consumption_kg_per_capita",
+            "value": 115,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.233121",
+            "year": 2024,
+            "unit": "kg/year",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          },
+          {
+            "variable": "grid.emission_factor_kg_co2_per_kwh",
+            "value": 0.85,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.232976",
+            "year": 2024,
+            "unit": "kg CO2/kWh",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          }
+        ],
+        "checks": [
+          {
+            "name": "water_mass_balance",
+            "status": "ok",
+            "detail": "P − ETa − surplus − ΔS = 0.000 mm"
+          },
+          {
+            "name": "seasonal_mismatch",
+            "status": "warn",
+            "detail": "Surplus tahunan 1098 mm terjadi di bulan [1, 2, 3, 4, 5, 11, 12], defisit 146 mm di bulan [6, 7, 8, 9]: surplus tahunan tidak menutup defisit musim kering tanpa tampungan atau air tanah."
+          },
+          {
+            "name": "groundwater_vs_recharge_proxy",
+            "status": "ok",
+            "detail": "Air tanah dipompa 41 mm/tahun di lahan irigasi vs surplus (proxy recharge maksimum) 1098 mm; ambang peringatan 25%."
+          },
+          {
+            "name": "population_consistency",
+            "status": "ok",
+            "detail": "Populasi dasar sektor energi 1,138,691 vs pangan 1,138,691."
+          },
+          {
+            "name": "yield_plausibility",
+            "status": "ok",
+            "detail": "Yield model 6.70 t/ha vs observasi 6.50 t/ha (selisih 3%)."
+          },
+          {
+            "name": "low_confidence_inputs",
+            "status": "warn",
+            "detail": "food.rice_consumption_kg_per_capita (country-proxy-defaults, conf 0.55); grid.emission_factor_kg_co2_per_kwh (country-proxy-defaults, conf 0.55)"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "id": "S4_Climate_Stress",
+      "scenario": {
+        "name": "S4 — Climate Stress 2030",
+        "description": "SSP5-8.5 + ENSO-induced drought + erupsi Merapi VEI 3 di T+3",
+        "location_query": "sleman",
+        "climate": "Severe warming SSP5-8.5 + drought",
+        "policy": "Inertia (no climate adaptation), water stress amplified",
+        "delta_precip_pct": -15.0,
+        "delta_temp_c": 1.8,
+        "energy_scenario": "BAU",
+        "renewable_share_2030": 0.23,
+        "lp2b_protection": "moderate",
+        "horizon": 2030,
+        "water_baseline_year": 2023,
+        "water_station": null,
+        "food_crop": "padi",
+        "hazard": "Merapi VEI 3 di year+3, lahar dingin disrupts intake PDAM + irigasi"
+      },
+      "nexus": {
+        "scenario_name": "S4 — Climate Stress 2030",
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "location_context": {
+          "display": "Sleman, D.I. Yogyakarta, Indonesia",
+          "has_local_data": true,
+          "sub_das": [
+            "Code",
+            "Opak",
+            "Kuning",
+            "Boyong"
+          ],
+          "fires": [
+            "krisis air tanah Sleman Tengah-Selatan",
+            "alih fungsi LP2B (~280 ha/tahun)",
+            "beban grid pasca-subsidi listrik",
+            "ancaman Merapi VEI 3+ recurrent",
+            "tekanan hidrolik pariwisata Borobudur-Prambanan-Merapi"
+          ]
+        },
+        "climate_summary": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year_range": [
+            1991,
+            2024
+          ],
+          "stations": {
+            "Mlati": {
+              "precip_mean_mm": 2528.6,
+              "precip_std_mm": 150.9,
+              "tmean_c": 26.5,
+              "et0_mean_mm": 1498.0
+            },
+            "Pakem": {
+              "precip_mean_mm": 2963.1,
+              "precip_std_mm": 181.4,
+              "tmean_c": 24.9,
+              "et0_mean_mm": 1446.9
+            },
+            "Prambanan": {
+              "precip_mean_mm": 2282.0,
+              "precip_std_mm": 123.0,
+              "tmean_c": 26.7,
+              "et0_mean_mm": 1507.4
+            }
+          }
+        },
+        "water_balance": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": -15.0,
+          "delta_temp_c": 1.8,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2125.874,
+            "total_pet_mm": 1602.18,
+            "total_eta_mm": 1404.403,
+            "total_surplus_mm": 721.471,
+            "total_deficit_mm": 197.777,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.327,
+            "aridity_index": 0.754
+          },
+          "water_stress_raw": 0.1234,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 416.8,
+              "et0_mm": 136.7,
+              "eta_mm": 136.7,
+              "surplus_mm": 280.1,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 242.5,
+              "et0_mm": 129.6,
+              "eta_mm": 129.6,
+              "surplus_mm": 112.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 362.5,
+              "et0_mm": 152.5,
+              "eta_mm": 152.5,
+              "surplus_mm": 210.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 169.5,
+              "et0_mm": 151.0,
+              "eta_mm": 151.0,
+              "surplus_mm": 18.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 146.5,
+              "et0_mm": 150.1,
+              "eta_mm": 150.0,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 146.5
+            },
+            {
+              "month": 6,
+              "precip_mm": 51.4,
+              "et0_mm": 139.5,
+              "eta_mm": 116.5,
+              "surplus_mm": 0.0,
+              "deficit_mm": 23.0,
+              "soil_moisture_mm": 81.4
+            },
+            {
+              "month": 7,
+              "precip_mm": 36.8,
+              "et0_mm": 127.7,
+              "eta_mm": 73.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 53.8,
+              "soil_moisture_mm": 44.5
+            },
+            {
+              "month": 8,
+              "precip_mm": 36.5,
+              "et0_mm": 128.6,
+              "eta_mm": 56.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 71.7,
+              "soil_moisture_mm": 24.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 62.9,
+              "et0_mm": 119.7,
+              "eta_mm": 70.5,
+              "surplus_mm": 0.0,
+              "deficit_mm": 49.2,
+              "soil_moisture_mm": 16.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 156.0,
+              "et0_mm": 120.7,
+              "eta_mm": 120.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 51.7
+            },
+            {
+              "month": 11,
+              "precip_mm": 200.4,
+              "et0_mm": 118.9,
+              "eta_mm": 118.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 133.2
+            },
+            {
+              "month": 12,
+              "precip_mm": 243.9,
+              "et0_mm": 127.2,
+              "eta_mm": 127.2,
+              "surplus_mm": 99.8,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "water_balance_baseline": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": 0.0,
+          "delta_temp_c": 0.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2501.029,
+            "total_pet_mm": 1494.571,
+            "total_eta_mm": 1358.063,
+            "total_surplus_mm": 1142.965,
+            "total_deficit_mm": 136.508,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.673,
+            "aridity_index": 0.598
+          },
+          "water_stress_raw": 0.0913,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 490.4,
+              "et0_mm": 127.5,
+              "eta_mm": 127.5,
+              "surplus_mm": 362.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 285.4,
+              "et0_mm": 120.9,
+              "eta_mm": 120.9,
+              "surplus_mm": 164.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 426.5,
+              "et0_mm": 142.3,
+              "eta_mm": 142.3,
+              "surplus_mm": 284.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 199.5,
+              "et0_mm": 140.8,
+              "eta_mm": 140.8,
+              "surplus_mm": 58.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 172.4,
+              "et0_mm": 140.0,
+              "eta_mm": 140.0,
+              "surplus_mm": 32.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 60.5,
+              "et0_mm": 130.1,
+              "eta_mm": 116.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 13.9,
+              "soil_moisture_mm": 94.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 43.4,
+              "et0_mm": 119.1,
+              "eta_mm": 80.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 38.3,
+              "soil_moisture_mm": 56.9
+            },
+            {
+              "month": 8,
+              "precip_mm": 43.0,
+              "et0_mm": 120.0,
+              "eta_mm": 65.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 54.1,
+              "soil_moisture_mm": 34.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 74.0,
+              "et0_mm": 111.7,
+              "eta_mm": 81.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 30.1,
+              "soil_moisture_mm": 26.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 183.5,
+              "et0_mm": 112.6,
+              "eta_mm": 112.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 97.4
+            },
+            {
+              "month": 11,
+              "precip_mm": 235.8,
+              "et0_mm": 110.9,
+              "eta_mm": 110.9,
+              "surplus_mm": 72.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 286.9,
+              "et0_mm": 118.7,
+              "eta_mm": 118.7,
+              "surplus_mm": 168.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "irrigation": {
+          "deficit_mm": 197.777,
+          "irrigation_demand_mm": 304.3,
+          "application_efficiency": 0.65
+        },
+        "coupling": {
+          "water_stress_raw": 0.1234,
+          "irrigation_supply_fraction": 0.6,
+          "water_stress_effective": 0.0494,
+          "irrigated_physical_area_ha": 18520.0,
+          "pumping_scenario": {
+            "gross_requirement_mm": 304.27230769230766,
+            "delivered_mm": 182.5633846153846,
+            "groundwater_mm": 54.76901538461538,
+            "groundwater_volume_m3": 10143221.649230769,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.842685266276923
+          },
+          "pumping_baseline_climate": {
+            "gross_requirement_mm": 210.0123076923077,
+            "delivered_mm": 126.00738461538461,
+            "groundwater_mm": 37.80221538461538,
+            "groundwater_volume_m3": 7371432.0,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.33914348
+          },
+          "extra_pumping_demand_gwh": 0.5035417862769231,
+          "power_sector_water_m3_2030": 4831149.782566686,
+          "parameters": {
+            "irrigation": {
+              "application_efficiency": 0.65,
+              "supply_fraction": 0.6,
+              "groundwater_share": 0.3,
+              "pump_head_m": 30.0,
+              "pump_efficiency": 0.45,
+              "cropping_intensity": 2.0
+            },
+            "power_sector_water": {
+              "fossil_m3_per_mwh": 2.6,
+              "renewable_m3_per_mwh": 0.1
+            }
+          }
+        },
+        "electricity_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "unit": "GWh/year",
+          "source": "BPS Sleman + ESDM",
+          "data": {
+            "2018": 1450,
+            "2019": 1530,
+            "2020": 1520,
+            "2021": 1610,
+            "2022": 1740,
+            "2023": 1880
+          },
+          "data_quality": "good (verified historical)",
+          "provenance": [
+            {
+              "variable": "energy.consumption_gwh_annual",
+              "value": 1880,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.355701",
+              "year": 2023,
+              "unit": "GWh/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+            }
+          ]
+        },
+        "energy_projection": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "scenario": "BAU",
+          "horizon": 2030,
+          "assumptions": {
+            "base_year": 2023,
+            "base_demand_gwh": 1880,
+            "base_population": 1138691,
+            "base_pdrb_per_capita": 37.1,
+            "income_elasticity": 0.75,
+            "pop_elasticity": 0.95,
+            "pop_growth_pct": 0.6,
+            "gdp_pc_growth_pct": 4.5,
+            "efficiency_gain_pct": 0.5,
+            "ev_share_target_2050": 0.1,
+            "induction_share_target_2050": 0.2,
+            "extra_demand_at_horizon_gwh": 0.5035417862769231
+          },
+          "data_quality": "good (BPS-anchored)",
+          "endpoints": {
+            "demand_base_gwh": 1880.0,
+            "demand_2030_gwh": 2385.7529790452763,
+            "demand_2050_gwh": null,
+            "demand_horizon_gwh": 2385.7529790452763,
+            "irrigation_pumping_horizon_gwh": 0.5035417862769231
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "demand_total_gwh": 1880.0
+            },
+            {
+              "year": 2024,
+              "demand_total_gwh": 1945.2
+            },
+            {
+              "year": 2025,
+              "demand_total_gwh": 2012.7
+            },
+            {
+              "year": 2026,
+              "demand_total_gwh": 2082.4
+            },
+            {
+              "year": 2027,
+              "demand_total_gwh": 2154.5
+            },
+            {
+              "year": 2028,
+              "demand_total_gwh": 2229.0
+            },
+            {
+              "year": 2029,
+              "demand_total_gwh": 2306.1
+            },
+            {
+              "year": 2030,
+              "demand_total_gwh": 2385.8
+            }
+          ],
+          "provenance": []
+        },
+        "emissions": {
+          "demand_gwh": 2385.7529790452763,
+          "renewable_share": 0.23,
+          "country_code": "ID",
+          "grid_emission_factor_kg_co2_per_kwh": 0.85,
+          "co2_emissions_mt": 1.561
+        },
+        "food_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "rice_harvest_area_ha": {
+            "2018": 44000,
+            "2019": 42500,
+            "2020": 41200,
+            "2021": 40500,
+            "2022": 39800,
+            "2023": 39000
+          },
+          "rice_yield_t_ha": {
+            "2018": 6.4,
+            "2019": 6.5,
+            "2020": 6.3,
+            "2021": 6.5,
+            "2022": 6.6,
+            "2023": 6.5
+          },
+          "trend_note": "Penurunan luas panen ~280 ha/tahun akibat alih fungsi LP2B",
+          "data_quality": "good (BPS verified)"
+        },
+        "crop_projection": {
+          "available": true,
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "crop": "padi",
+          "scenario": "S4 — Climate Stress 2030",
+          "lp2b_protection": "moderate",
+          "water_stress_fraction": 0.0494,
+          "assumptions": {
+            "base_year": 2023,
+            "base_area_ha": 39000.0,
+            "lp2b_protection": "moderate",
+            "annual_loss_ha": 280.0,
+            "water_stress_fraction": 0.0494,
+            "ymax": 7.0,
+            "ky": 1.1
+          },
+          "observed_yield_t_ha": 6.5,
+          "data_quality": "good (BPS anchored)",
+          "endpoints": {
+            "production_2030_t": 245190.72479999997,
+            "production_2050_t": null,
+            "production_horizon_t": 245190.72479999997,
+            "area_horizon_ha": 37040.0,
+            "yield_t_ha": 6.619619999999999
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "area_ha": 39000.0,
+              "yield_t_ha": 6.6,
+              "production_t": 258165.2
+            },
+            {
+              "year": 2024,
+              "area_ha": 38720.0,
+              "yield_t_ha": 6.6,
+              "production_t": 256311.7
+            },
+            {
+              "year": 2025,
+              "area_ha": 38440.0,
+              "yield_t_ha": 6.6,
+              "production_t": 254458.2
+            },
+            {
+              "year": 2026,
+              "area_ha": 38160.0,
+              "yield_t_ha": 6.6,
+              "production_t": 252604.7
+            },
+            {
+              "year": 2027,
+              "area_ha": 37880.0,
+              "yield_t_ha": 6.6,
+              "production_t": 250751.2
+            },
+            {
+              "year": 2028,
+              "area_ha": 37600.0,
+              "yield_t_ha": 6.6,
+              "production_t": 248897.7
+            },
+            {
+              "year": 2029,
+              "area_ha": 37320.0,
+              "yield_t_ha": 6.6,
+              "production_t": 247044.2
+            },
+            {
+              "year": 2030,
+              "area_ha": 37040.0,
+              "yield_t_ha": 6.6,
+              "production_t": 245190.7
+            }
+          ],
+          "provenance": [
+            {
+              "variable": "food.rice_area_ha",
+              "value": 39000,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.352681",
+              "year": 2023,
+              "unit": "ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            },
+            {
+              "variable": "food.rice_land_loss_ha_per_year",
+              "value": 280,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.352744",
+              "year": 2023,
+              "unit": "ha/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+            },
+            {
+              "variable": "food.rice_yield_t_per_ha",
+              "value": 6.5,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.352796",
+              "year": 2023,
+              "unit": "t/ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            }
+          ],
+          "warnings": []
+        },
+        "food_ssl": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year": 2030,
+          "production_t": 245190.72479999997,
+          "population_base": 1138691,
+          "population_base_year": 2023,
+          "pop_growth_pct": 0.6,
+          "population": 1187385,
+          "per_capita_demand_kg": 115.0,
+          "ssl": 1.796,
+          "interpretation": "Surplus",
+          "provenance": [
+            {
+              "variable": "socio.population",
+              "value": 1138691,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.359664",
+              "year": 2023,
+              "unit": "jiwa",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+            },
+            {
+              "variable": "food.rice_consumption_kg_per_capita",
+              "value": 115,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "country-proxy-defaults",
+              "fetched_at": "2026-09-20T14:26:34.359721",
+              "year": 2024,
+              "unit": "kg/year",
+              "confidence": 0.55,
+              "tier": 3,
+              "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+            }
+          ]
+        },
+        "provenance": [
+          {
+            "variable": "energy.consumption_gwh_annual",
+            "value": 1880,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.355701",
+            "year": 2023,
+            "unit": "GWh/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+          },
+          {
+            "variable": "food.rice_area_ha",
+            "value": 39000,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.352681",
+            "year": 2023,
+            "unit": "ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "food.rice_land_loss_ha_per_year",
+            "value": 280,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.352744",
+            "year": 2023,
+            "unit": "ha/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+          },
+          {
+            "variable": "food.rice_yield_t_per_ha",
+            "value": 6.5,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.352796",
+            "year": 2023,
+            "unit": "t/ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "socio.population",
+            "value": 1138691,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.359664",
+            "year": 2023,
+            "unit": "jiwa",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+          },
+          {
+            "variable": "food.rice_consumption_kg_per_capita",
+            "value": 115,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.359721",
+            "year": 2024,
+            "unit": "kg/year",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          },
+          {
+            "variable": "grid.emission_factor_kg_co2_per_kwh",
+            "value": 0.85,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.359589",
+            "year": 2024,
+            "unit": "kg CO2/kWh",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          }
+        ],
+        "checks": [
+          {
+            "name": "water_mass_balance",
+            "status": "ok",
+            "detail": "P − ETa − surplus − ΔS = 0.000 mm"
+          },
+          {
+            "name": "seasonal_mismatch",
+            "status": "warn",
+            "detail": "Surplus tahunan 721 mm terjadi di bulan [1, 2, 3, 4, 12], defisit 198 mm di bulan [6, 7, 8, 9]: surplus tahunan tidak menutup defisit musim kering tanpa tampungan atau air tanah."
+          },
+          {
+            "name": "groundwater_vs_recharge_proxy",
+            "status": "ok",
+            "detail": "Air tanah dipompa 55 mm/tahun di lahan irigasi vs surplus (proxy recharge maksimum) 721 mm; ambang peringatan 25%."
+          },
+          {
+            "name": "population_consistency",
+            "status": "ok",
+            "detail": "Populasi dasar sektor energi 1,138,691 vs pangan 1,138,691."
+          },
+          {
+            "name": "yield_plausibility",
+            "status": "ok",
+            "detail": "Yield model 6.62 t/ha vs observasi 6.50 t/ha (selisih 2%)."
+          },
+          {
+            "name": "low_confidence_inputs",
+            "status": "warn",
+            "detail": "food.rice_consumption_kg_per_capita (country-proxy-defaults, conf 0.55); grid.emission_factor_kg_co2_per_kwh (country-proxy-defaults, conf 0.55)"
+          }
+        ],
+        "warnings": []
+      }
+    },
+    {
+      "id": "S5_Tourism_Boom",
+      "scenario": {
+        "name": "S5 — KSPN Borobudur Boom 2030",
+        "description": "2 juta+ wisatawan/tahun, konversi LP2B → hospitality, water demand naik",
+        "location_query": "sleman",
+        "climate": "Baseline + warming SSP2-4.5",
+        "policy": "Pariwisata-prioritas, LP2B lax, water extraction hotel ↑",
+        "delta_precip_pct": -3.0,
+        "delta_temp_c": 1.0,
+        "energy_scenario": "BAU",
+        "renewable_share_2030": 0.25,
+        "lp2b_protection": "lax",
+        "horizon": 2030,
+        "water_baseline_year": 2023,
+        "water_station": null,
+        "food_crop": "padi",
+        "context": "Beban hidrolik pariwisata Borobudur-Prambanan-Merapi trail"
+      },
+      "nexus": {
+        "scenario_name": "S5 — KSPN Borobudur Boom 2030",
+        "location": {
+          "name": "Sleman",
+          "lat": -7.73,
+          "lon": 110.36,
+          "country": "Indonesia",
+          "country_code": "ID",
+          "admin1": "D.I. Yogyakarta",
+          "admin2": "Kabupaten Sleman",
+          "population": 1142528,
+          "timezone": "Asia/Jakarta",
+          "elevation_m": 200.0,
+          "source": "preset"
+        },
+        "location_context": {
+          "display": "Sleman, D.I. Yogyakarta, Indonesia",
+          "has_local_data": true,
+          "sub_das": [
+            "Code",
+            "Opak",
+            "Kuning",
+            "Boyong"
+          ],
+          "fires": [
+            "krisis air tanah Sleman Tengah-Selatan",
+            "alih fungsi LP2B (~280 ha/tahun)",
+            "beban grid pasca-subsidi listrik",
+            "ancaman Merapi VEI 3+ recurrent",
+            "tekanan hidrolik pariwisata Borobudur-Prambanan-Merapi"
+          ]
+        },
+        "climate_summary": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year_range": [
+            1991,
+            2024
+          ],
+          "stations": {
+            "Mlati": {
+              "precip_mean_mm": 2528.6,
+              "precip_std_mm": 150.9,
+              "tmean_c": 26.5,
+              "et0_mean_mm": 1498.0
+            },
+            "Pakem": {
+              "precip_mean_mm": 2963.1,
+              "precip_std_mm": 181.4,
+              "tmean_c": 24.9,
+              "et0_mean_mm": 1446.9
+            },
+            "Prambanan": {
+              "precip_mean_mm": 2282.0,
+              "precip_std_mm": 123.0,
+              "tmean_c": 26.7,
+              "et0_mean_mm": 1507.4
+            }
+          }
+        },
+        "water_balance": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": -3.0,
+          "delta_temp_c": 1.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2425.998,
+            "total_pet_mm": 1554.354,
+            "total_eta_mm": 1396.183,
+            "total_surplus_mm": 1029.814,
+            "total_deficit_mm": 158.17,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.561,
+            "aridity_index": 0.641
+          },
+          "water_stress_raw": 0.1018,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 475.7,
+              "et0_mm": 132.6,
+              "eta_mm": 132.6,
+              "surplus_mm": 343.1,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 276.8,
+              "et0_mm": 125.8,
+              "eta_mm": 125.8,
+              "surplus_mm": 151.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 413.7,
+              "et0_mm": 148.0,
+              "eta_mm": 148.0,
+              "surplus_mm": 265.7,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 193.5,
+              "et0_mm": 146.4,
+              "eta_mm": 146.4,
+              "surplus_mm": 47.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 167.2,
+              "et0_mm": 145.6,
+              "eta_mm": 145.6,
+              "surplus_mm": 21.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 58.7,
+              "et0_mm": 135.3,
+              "eta_mm": 118.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 16.6,
+              "soil_moisture_mm": 90.0
+            },
+            {
+              "month": 7,
+              "precip_mm": 42.1,
+              "et0_mm": 123.8,
+              "eta_mm": 79.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 44.0,
+              "soil_moisture_mm": 52.2
+            },
+            {
+              "month": 8,
+              "precip_mm": 41.7,
+              "et0_mm": 124.8,
+              "eta_mm": 63.9,
+              "surplus_mm": 0.0,
+              "deficit_mm": 60.9,
+              "soil_moisture_mm": 30.0
+            },
+            {
+              "month": 9,
+              "precip_mm": 71.8,
+              "et0_mm": 116.1,
+              "eta_mm": 79.5,
+              "surplus_mm": 0.0,
+              "deficit_mm": 36.7,
+              "soil_moisture_mm": 22.3
+            },
+            {
+              "month": 10,
+              "precip_mm": 178.0,
+              "et0_mm": 117.1,
+              "eta_mm": 117.1,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 83.2
+            },
+            {
+              "month": 11,
+              "precip_mm": 228.7,
+              "et0_mm": 115.3,
+              "eta_mm": 115.3,
+              "surplus_mm": 46.5,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 278.3,
+              "et0_mm": 123.4,
+              "eta_mm": 123.4,
+              "surplus_mm": 154.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "water_balance_baseline": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "station": "Mlati",
+          "year": 2023,
+          "delta_precip_pct": 0.0,
+          "delta_temp_c": 0.0,
+          "soil_water_capacity_mm": 150.0,
+          "growing_months": null,
+          "stress_basis": "annual",
+          "summary": {
+            "total_precip_mm": 2501.029,
+            "total_pet_mm": 1494.571,
+            "total_eta_mm": 1358.063,
+            "total_surplus_mm": 1142.965,
+            "total_deficit_mm": 136.508,
+            "initial_soil_water_mm": 150.0,
+            "storage_change_mm": 0.0,
+            "mass_balance_residual_mm": 0.0,
+            "p_pet_ratio": 1.673,
+            "aridity_index": 0.598
+          },
+          "water_stress_raw": 0.0913,
+          "monthly": [
+            {
+              "month": 1,
+              "precip_mm": 490.4,
+              "et0_mm": 127.5,
+              "eta_mm": 127.5,
+              "surplus_mm": 362.9,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 2,
+              "precip_mm": 285.4,
+              "et0_mm": 120.9,
+              "eta_mm": 120.9,
+              "surplus_mm": 164.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 3,
+              "precip_mm": 426.5,
+              "et0_mm": 142.3,
+              "eta_mm": 142.3,
+              "surplus_mm": 284.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 4,
+              "precip_mm": 199.5,
+              "et0_mm": 140.8,
+              "eta_mm": 140.8,
+              "surplus_mm": 58.6,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 5,
+              "precip_mm": 172.4,
+              "et0_mm": 140.0,
+              "eta_mm": 140.0,
+              "surplus_mm": 32.4,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 6,
+              "precip_mm": 60.5,
+              "et0_mm": 130.1,
+              "eta_mm": 116.2,
+              "surplus_mm": 0.0,
+              "deficit_mm": 13.9,
+              "soil_moisture_mm": 94.3
+            },
+            {
+              "month": 7,
+              "precip_mm": 43.4,
+              "et0_mm": 119.1,
+              "eta_mm": 80.7,
+              "surplus_mm": 0.0,
+              "deficit_mm": 38.3,
+              "soil_moisture_mm": 56.9
+            },
+            {
+              "month": 8,
+              "precip_mm": 43.0,
+              "et0_mm": 120.0,
+              "eta_mm": 65.8,
+              "surplus_mm": 0.0,
+              "deficit_mm": 54.1,
+              "soil_moisture_mm": 34.1
+            },
+            {
+              "month": 9,
+              "precip_mm": 74.0,
+              "et0_mm": 111.7,
+              "eta_mm": 81.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 30.1,
+              "soil_moisture_mm": 26.5
+            },
+            {
+              "month": 10,
+              "precip_mm": 183.5,
+              "et0_mm": 112.6,
+              "eta_mm": 112.6,
+              "surplus_mm": 0.0,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 97.4
+            },
+            {
+              "month": 11,
+              "precip_mm": 235.8,
+              "et0_mm": 110.9,
+              "eta_mm": 110.9,
+              "surplus_mm": 72.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            },
+            {
+              "month": 12,
+              "precip_mm": 286.9,
+              "et0_mm": 118.7,
+              "eta_mm": 118.7,
+              "surplus_mm": 168.2,
+              "deficit_mm": 0.0,
+              "soil_moisture_mm": 150.0
+            }
+          ]
+        },
+        "irrigation": {
+          "deficit_mm": 158.17,
+          "irrigation_demand_mm": 243.3,
+          "application_efficiency": 0.65
+        },
+        "coupling": {
+          "water_stress_raw": 0.1018,
+          "irrigation_supply_fraction": 0.6,
+          "water_stress_effective": 0.0407,
+          "irrigated_physical_area_ha": 17736.0,
+          "pumping_scenario": {
+            "gross_requirement_mm": 243.3384615384615,
+            "delivered_mm": 146.0030769230769,
+            "groundwater_mm": 43.80092307692306,
+            "groundwater_volume_m3": 7768531.716923075,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.411283261907692
+          },
+          "pumping_baseline_climate": {
+            "gross_requirement_mm": 210.0123076923077,
+            "delivered_mm": 126.00738461538461,
+            "groundwater_mm": 37.80221538461538,
+            "groundwater_volume_m3": 7371432.0,
+            "pumping_kwh_per_m3": 0.18166666666666667,
+            "pumping_energy_gwh": 1.33914348
+          },
+          "extra_pumping_demand_gwh": 0.0721397819076921,
+          "power_sector_water_m3_2030": 4711010.114655792,
+          "parameters": {
+            "irrigation": {
+              "application_efficiency": 0.65,
+              "supply_fraction": 0.6,
+              "groundwater_share": 0.3,
+              "pump_head_m": 30.0,
+              "pump_efficiency": 0.45,
+              "cropping_intensity": 2.0
+            },
+            "power_sector_water": {
+              "fossil_m3_per_mwh": 2.6,
+              "renewable_m3_per_mwh": 0.1
+            }
+          }
+        },
+        "electricity_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "unit": "GWh/year",
+          "source": "BPS Sleman + ESDM",
+          "data": {
+            "2018": 1450,
+            "2019": 1530,
+            "2020": 1520,
+            "2021": 1610,
+            "2022": 1740,
+            "2023": 1880
+          },
+          "data_quality": "good (verified historical)",
+          "provenance": [
+            {
+              "variable": "energy.consumption_gwh_annual",
+              "value": 1880,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.491318",
+              "year": 2023,
+              "unit": "GWh/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+            }
+          ]
+        },
+        "energy_projection": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "scenario": "BAU",
+          "horizon": 2030,
+          "assumptions": {
+            "base_year": 2023,
+            "base_demand_gwh": 1880,
+            "base_population": 1138691,
+            "base_pdrb_per_capita": 37.1,
+            "income_elasticity": 0.75,
+            "pop_elasticity": 0.95,
+            "pop_growth_pct": 0.6,
+            "gdp_pc_growth_pct": 4.5,
+            "efficiency_gain_pct": 0.5,
+            "ev_share_target_2050": 0.1,
+            "induction_share_target_2050": 0.2,
+            "extra_demand_at_horizon_gwh": 0.0721397819076921
+          },
+          "data_quality": "good (BPS-anchored)",
+          "endpoints": {
+            "demand_base_gwh": 1880.0,
+            "demand_2030_gwh": 2385.321577040907,
+            "demand_2050_gwh": null,
+            "demand_horizon_gwh": 2385.321577040907,
+            "irrigation_pumping_horizon_gwh": 0.0721397819076921
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "demand_total_gwh": 1880.0
+            },
+            {
+              "year": 2024,
+              "demand_total_gwh": 1945.2
+            },
+            {
+              "year": 2025,
+              "demand_total_gwh": 2012.6
+            },
+            {
+              "year": 2026,
+              "demand_total_gwh": 2082.2
+            },
+            {
+              "year": 2027,
+              "demand_total_gwh": 2154.3
+            },
+            {
+              "year": 2028,
+              "demand_total_gwh": 2228.7
+            },
+            {
+              "year": 2029,
+              "demand_total_gwh": 2305.7
+            },
+            {
+              "year": 2030,
+              "demand_total_gwh": 2385.3
+            }
+          ],
+          "provenance": []
+        },
+        "emissions": {
+          "demand_gwh": 2385.321577040907,
+          "renewable_share": 0.25,
+          "country_code": "ID",
+          "grid_emission_factor_kg_co2_per_kwh": 0.85,
+          "co2_emissions_mt": 1.521
+        },
+        "food_history": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "rice_harvest_area_ha": {
+            "2018": 44000,
+            "2019": 42500,
+            "2020": 41200,
+            "2021": 40500,
+            "2022": 39800,
+            "2023": 39000
+          },
+          "rice_yield_t_ha": {
+            "2018": 6.4,
+            "2019": 6.5,
+            "2020": 6.3,
+            "2021": 6.5,
+            "2022": 6.6,
+            "2023": 6.5
+          },
+          "trend_note": "Penurunan luas panen ~280 ha/tahun akibat alih fungsi LP2B",
+          "data_quality": "good (BPS verified)"
+        },
+        "crop_projection": {
+          "available": true,
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "crop": "padi",
+          "scenario": "S5 — KSPN Borobudur Boom 2030",
+          "lp2b_protection": "lax",
+          "water_stress_fraction": 0.0407,
+          "assumptions": {
+            "base_year": 2023,
+            "base_area_ha": 39000.0,
+            "lp2b_protection": "lax",
+            "annual_loss_ha": 504.0,
+            "water_stress_fraction": 0.0407,
+            "ymax": 7.0,
+            "ky": 1.1
+          },
+          "observed_yield_t_ha": 6.5,
+          "data_quality": "good (BPS anchored)",
+          "endpoints": {
+            "production_2030_t": 237187.42992,
+            "production_2050_t": null,
+            "production_horizon_t": 237187.42992,
+            "area_horizon_ha": 35472.0,
+            "yield_t_ha": 6.68661
+          },
+          "yearly_summary": [
+            {
+              "year": 2023,
+              "area_ha": 39000.0,
+              "yield_t_ha": 6.7,
+              "production_t": 260777.8
+            },
+            {
+              "year": 2024,
+              "area_ha": 38496.0,
+              "yield_t_ha": 6.7,
+              "production_t": 257407.7
+            },
+            {
+              "year": 2025,
+              "area_ha": 37992.0,
+              "yield_t_ha": 6.7,
+              "production_t": 254037.7
+            },
+            {
+              "year": 2026,
+              "area_ha": 37488.0,
+              "yield_t_ha": 6.7,
+              "production_t": 250667.6
+            },
+            {
+              "year": 2027,
+              "area_ha": 36984.0,
+              "yield_t_ha": 6.7,
+              "production_t": 247297.6
+            },
+            {
+              "year": 2028,
+              "area_ha": 36480.0,
+              "yield_t_ha": 6.7,
+              "production_t": 243927.5
+            },
+            {
+              "year": 2029,
+              "area_ha": 35976.0,
+              "yield_t_ha": 6.7,
+              "production_t": 240557.5
+            },
+            {
+              "year": 2030,
+              "area_ha": 35472.0,
+              "yield_t_ha": 6.7,
+              "production_t": 237187.4
+            }
+          ],
+          "provenance": [
+            {
+              "variable": "food.rice_area_ha",
+              "value": 39000,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.488674",
+              "year": 2023,
+              "unit": "ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            },
+            {
+              "variable": "food.rice_land_loss_ha_per_year",
+              "value": 280,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.488723",
+              "year": 2023,
+              "unit": "ha/year",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+            },
+            {
+              "variable": "food.rice_yield_t_per_ha",
+              "value": 6.5,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.488764",
+              "year": 2023,
+              "unit": "t/ha",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Statistik Pertanian 2023."
+            }
+          ],
+          "warnings": []
+        },
+        "food_ssl": {
+          "location": {
+            "name": "Sleman",
+            "lat": -7.73,
+            "lon": 110.36,
+            "country": "Indonesia",
+            "country_code": "ID",
+            "admin1": "D.I. Yogyakarta",
+            "admin2": "Kabupaten Sleman",
+            "population": 1142528,
+            "timezone": "Asia/Jakarta",
+            "elevation_m": 200.0,
+            "source": "preset"
+          },
+          "year": 2030,
+          "production_t": 237187.42992,
+          "population_base": 1138691,
+          "population_base_year": 2023,
+          "pop_growth_pct": 0.6,
+          "population": 1187385,
+          "per_capita_demand_kg": 115.0,
+          "ssl": 1.737,
+          "interpretation": "Surplus",
+          "provenance": [
+            {
+              "variable": "socio.population",
+              "value": 1138691,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "bps-sleman-static",
+              "fetched_at": "2026-09-20T14:26:34.495308",
+              "year": 2023,
+              "unit": "jiwa",
+              "confidence": 0.95,
+              "tier": 1,
+              "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+            },
+            {
+              "variable": "food.rice_consumption_kg_per_capita",
+              "value": 115,
+              "location": {
+                "name": "Sleman",
+                "lat": -7.73,
+                "lon": 110.36,
+                "country": "Indonesia",
+                "country_code": "ID",
+                "admin1": "D.I. Yogyakarta",
+                "admin2": "Kabupaten Sleman",
+                "population": 1142528,
+                "timezone": "Asia/Jakarta",
+                "elevation_m": 200.0,
+                "source": "preset"
+              },
+              "source": "country-proxy-defaults",
+              "fetched_at": "2026-09-20T14:26:34.495355",
+              "year": 2024,
+              "unit": "kg/year",
+              "confidence": 0.55,
+              "tier": 3,
+              "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+            }
+          ]
+        },
+        "provenance": [
+          {
+            "variable": "energy.consumption_gwh_annual",
+            "value": 1880,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.491318",
+            "year": 2023,
+            "unit": "GWh/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "ESDM + estimasi proporsional PLN ULP Mungkid."
+          },
+          {
+            "variable": "food.rice_area_ha",
+            "value": 39000,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.488674",
+            "year": 2023,
+            "unit": "ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "food.rice_land_loss_ha_per_year",
+            "value": 280,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.488723",
+            "year": 2023,
+            "unit": "ha/year",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "Rata-rata 2015-2023, estimasi Distan Sleman & studi UGM."
+          },
+          {
+            "variable": "food.rice_yield_t_per_ha",
+            "value": 6.5,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.488764",
+            "year": 2023,
+            "unit": "t/ha",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Statistik Pertanian 2023."
+          },
+          {
+            "variable": "socio.population",
+            "value": 1138691,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "bps-sleman-static",
+            "fetched_at": "2026-09-20T14:26:34.495308",
+            "year": 2023,
+            "unit": "jiwa",
+            "confidence": 0.95,
+            "tier": 1,
+            "note": "BPS Sleman, Data Agregat per Kabupaten 2023."
+          },
+          {
+            "variable": "food.rice_consumption_kg_per_capita",
+            "value": 115,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.495355",
+            "year": 2024,
+            "unit": "kg/year",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          },
+          {
+            "variable": "grid.emission_factor_kg_co2_per_kwh",
+            "value": 0.85,
+            "location": {
+              "name": "Sleman",
+              "lat": -7.73,
+              "lon": 110.36,
+              "country": "Indonesia",
+              "country_code": "ID",
+              "admin1": "D.I. Yogyakarta",
+              "admin2": "Kabupaten Sleman",
+              "population": 1142528,
+              "timezone": "Asia/Jakarta",
+              "elevation_m": 200.0,
+              "source": "preset"
+            },
+            "source": "country-proxy-defaults",
+            "fetched_at": "2026-09-20T14:26:34.495244",
+            "year": 2024,
+            "unit": "kg CO2/kWh",
+            "confidence": 0.55,
+            "tier": 3,
+            "note": "Country default (ID) — illustrative, BUKAN data lokal. Override via manual JSON untuk akurasi."
+          }
+        ],
+        "checks": [
+          {
+            "name": "water_mass_balance",
+            "status": "ok",
+            "detail": "P − ETa − surplus − ΔS = 0.000 mm"
+          },
+          {
+            "name": "seasonal_mismatch",
+            "status": "warn",
+            "detail": "Surplus tahunan 1030 mm terjadi di bulan [1, 2, 3, 4, 5, 11, 12], defisit 158 mm di bulan [6, 7, 8, 9]: surplus tahunan tidak menutup defisit musim kering tanpa tampungan atau air tanah."
+          },
+          {
+            "name": "groundwater_vs_recharge_proxy",
+            "status": "ok",
+            "detail": "Air tanah dipompa 44 mm/tahun di lahan irigasi vs surplus (proxy recharge maksimum) 1030 mm; ambang peringatan 25%."
+          },
+          {
+            "name": "population_consistency",
+            "status": "ok",
+            "detail": "Populasi dasar sektor energi 1,138,691 vs pangan 1,138,691."
+          },
+          {
+            "name": "yield_plausibility",
+            "status": "ok",
+            "detail": "Yield model 6.69 t/ha vs observasi 6.50 t/ha (selisih 3%)."
+          },
+          {
+            "name": "low_confidence_inputs",
+            "status": "warn",
+            "detail": "food.rice_consumption_kg_per_capita (country-proxy-defaults, conf 0.55); grid.emission_factor_kg_co2_per_kwh (country-proxy-defaults, conf 0.55)"
+          }
+        ],
+        "warnings": []
+      }
+    }
+  ]
+}
