@@ -385,10 +385,19 @@ Agents write their analyses in formal Indonesian (target users: Indonesian local
 | **Water** | Interprets the water balance (annual & seasonal surplus/deficit), stress, irrigation, groundwater | `deepseek-v4-pro:cloud` |
 | **Energy** | Interprets demand projection, added irrigation pumping, emissions, power-sector water | `deepseek-v4-pro:cloud` |
 | **Food** | Interprets yield, production, SSL — or the data gap when no local harvest area exists | `deepseek-v4-pro:cloud` |
-| **Critic** | Number fidelity, cross-sector consistency, responses to WARN/FAIL checks, bias, error consequence (WEF 2026a) | `kimi-k2.6:cloud` (max_tokens 8000) |
+| **Critic** | Number fidelity, cross-sector consistency, responses to WARN/FAIL checks, bias, error consequence (WEF 2026a) | `glm-5.3-flash:cloud` (max_tokens 8000) |
 | **Coordinator** | Synthesizes trade-offs, uncertainty, recommendations for the location's local government | `deepseek-v4-pro:cloud` (max_tokens 6000) |
 
 Each agent has 3 model fields in the YAML (`model_local` / `model` / `model_claude`). Swapping providers changes only the backend, not the agent.
+
+The default Ollama Cloud critic is `glm-5.3-flash:cloud`. The [Ollama model page](https://ollama.com/library/glm-5.3-flash:cloud)
+lists this exact tag and describes GLM-5.3-Flash as a 320B-parameter model with 18B active
+parameters and an always-on reasoning mode. The project uses it because the
+critic needs a capable reasoning pass with a short, auditable output. The model's
+actual latency and answer quality still need to be measured in this pipeline;
+the configuration does not assume that benchmark claims transfer directly to
+these prompts. Use `WEF_AGENTIC_MODEL_OVERRIDE` to compare another model without
+editing YAML.
 
 **Empty answers are never passed on.** Reasoning models (e.g. Kimi K2.6) can spend their whole budget on `thinking`. The base agent retries once with a 2× budget (capped by `retry.max_tokens_cap` in `llm.yaml`); if the answer is still empty, the run fails with `EmptyCompletionError`. Tokens from every attempt count toward the footprint.
 

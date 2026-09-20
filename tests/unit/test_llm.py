@@ -2,6 +2,7 @@ import pytest
 
 from tests.conftest import FakeProvider
 from wef_agentic.agents import CriticAgent
+from wef_agentic.config.settings import load_llm_config
 from wef_agentic.llm.ollama_provider import OllamaProvider
 from wef_agentic.llm.provider import get_provider_for_agent
 from wef_agentic.llm.types import EmptyCompletionError, Message
@@ -13,6 +14,10 @@ def test_provider_override_uses_provider_specific_model_and_agent_budget(monkeyp
     assert isinstance(p, OllamaProvider)
     assert p.model == "gemma4:e4b"
     assert p.max_tokens == 8000
+
+
+def test_critic_default_cloud_model_is_glm_flash():
+    assert load_llm_config()["agents"]["critic"]["model"] == "glm-5.3-flash:cloud"
 
 
 def test_model_override_wins(monkeypatch):

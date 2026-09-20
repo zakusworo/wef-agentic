@@ -153,7 +153,7 @@ with st.sidebar:
         os.environ["WEF_AGENTIC_MODEL_OVERRIDE"] = model_choice
     elif provider_choice == "ollama-cloud":
         model_choice = st.selectbox(
-            "Model cloud", options=["deepseek-v4-pro:cloud", "kimi-k2.6:cloud"], index=0,
+            "Model cloud", options=["deepseek-v4-pro:cloud", "glm-5.3-flash:cloud"], index=0,
         )
         os.environ["WEF_AGENTIC_MODEL_OVERRIDE"] = model_choice
         if not (os.environ.get("OLLAMA_API_KEY") or settings.ollama_api_key):

@@ -24,6 +24,10 @@ the former internal specification was unavailable.
   narratives were nonempty, ended with `stop`, and needed one attempt. Reported
   models matched requested Sonnet 4.6 / Opus 4.7. This does not test forced
   output-budget exhaustion. Ollama Cloud validation still needs a key.
+- The default Ollama Cloud Critic model is now `glm-5.3-flash:cloud`, replacing
+  `kimi-k2.6:cloud`. Ollama documents the exact tag and describes 18B active
+  parameters with always-on reasoning. A like-for-like pipeline benchmark is
+  still required before claiming a latency or quality improvement.
 - Real Open-Meteo 1991–2024 data for three stations and NASA POWER downloaded.
   Fixed oversized requests by fetching paced yearly chunks; added bootstrap
   `--force` because the previous command silently reused synthetic caches.

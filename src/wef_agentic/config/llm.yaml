@@ -58,10 +58,10 @@ agents:
 
   critic:
     provider: ollama-cloud
-    model: kimi-k2.6:cloud
+    model: glm-5.3-flash:cloud
     model_local: gemma4:e4b
     model_claude: claude-opus-4-7
-    max_tokens: 8000        # kimi-k2.6 is a reasoning model: 3000 was fully spent on thinking
+    max_tokens: 8000        # GLM-5.3-Flash always reasons; keep enough room for the audit text
     temperature: 0.1
 
 # Nexus footprint estimation constants (WEF 2026b proxies) — see llm/footprint.py

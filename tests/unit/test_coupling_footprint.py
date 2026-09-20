@@ -76,7 +76,8 @@ def test_small_model_and_unknown_offsite_water_are_reported():
 
 @pytest.mark.parametrize(("model", "size"), [
     ("gemma4:e4b", "small"), ("llama3.2:1b", "small"), ("qwen3:32b", "medium"),
-    ("claude-sonnet-4-6", "medium"), ("kimi-k2.6:cloud", "large"), ("deepseek-v4-pro:cloud", "large"),
+    ("claude-sonnet-4-6", "medium"), ("glm-5.3-flash:cloud", "medium"),
+    ("kimi-k2.6:cloud", "large"), ("deepseek-v4-pro:cloud", "large"),
 ])
 def test_repo_config_size_classes(model, size):
     assert model_size_class(model) == size
