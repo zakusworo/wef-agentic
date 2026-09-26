@@ -20,9 +20,16 @@ the former internal specification was unavailable.
   crop results are unchanged by that share; only grid pumping demand changes.
   The default 1.0 preserves legacy all-electric screening and is flagged as an
   assumption. Non-grid fuel energy stays unknown. Local share calibration is pending.
-- Sensitivity runs at N=64, 128 and 256 were started with the real 2023 climate
-  cache and existing illustrative bounds. Records include baseline year, climate
-  hashes and Git revision; interpretation remains conditional on those bounds.
+- Sensitivity checks use the real 2023 climate cache and existing illustrative
+  bounds. N=128/256 runs were interrupted at the user's request to finish sooner;
+  N=16/32/64 completed (784 evaluations). Confidence intervals remain wide, so
+  convergence is not established. See [the report](docs/sensitivity-convergence-20260926.md).
+  Records include baseline year, climate hashes and Git revision; interpretation
+  remains conditional on those bounds.
+- GitHub CI passed for implementation commit `ebf9668` (run 36235794509).
+  Native GitHub dark mode was attempted on the published branch: page and Mermaid
+  iframe URLs selected dark mode, but no SVG rendered in the automated check.
+  Local Mermaid rendering passed; native rendering remains unverified.
 - Audited local study inputs in [calibration-inputs.md](docs/calibration-inputs.md).
   Climate caches exist; irrigation delivery, pump survey and crop-calendar inputs
   are absent. No unsupported calibration values were substituted.
@@ -30,9 +37,9 @@ the former internal specification was unavailable.
   larger budget, then raise `TruncatedCompletionError` if still truncated. Partial
   responses no longer reach downstream agents. Water/energy budgets are 4,096;
   critic is 12,000; retry cap remains 16,000. These YAML budgets apply across providers.
-- Validation after the fix: 67 offline tests passed, Ruff passed, and all three
-  README Mermaid diagrams rendered locally. GitHub CI has not been run for these
-  uncommitted changes. Tests cover retry accounting, budget restoration/capping,
+- Validation after the follow-up fixes: 75 offline tests passed, Ruff passed, and
+  all three README Mermaid diagrams rendered locally. Tests cover pump shares,
+  Claude error handling, retry accounting, budget restoration/capping,
   and preventing truncated domain/critic responses from reaching downstream agents.
 - Live S2 rerun completed in 222.85 seconds with 60,919 tokens including retries.
   All five final responses were nonempty, matched requested models and ended with
@@ -111,7 +118,7 @@ design work with data requirements in the specification, not implemented engines
 | Phase 1 framework (5 agents, 5 scenarios, multi-city, data sources, UI, PDF) | ✅ Done |
 | Deterministic nexus coupling + consistency checks | ✅ Done (2026-09-15) |
 | LLM robustness (empty-completion retry, Claude provider fix) | Empty/truncated responses retried once, then rejected if incomplete; live recovery verified September 26 |
-| Offline test suite + GitHub Actions CI | 67 offline tests and Ruff passed September 26; GitHub CI pending for local changes |
+| Offline test suite + GitHub Actions CI | 75 offline tests and Ruff passed September 26; GitHub CI passed for implementation commit ebf9668 |
 | README fully in English, with Mermaid architecture diagrams | ✅ Done (2026-09-15) |
 | Real LLM run with the new pipeline | Claude completed September 20; Ollama completed September 26 with all final responses untruncated |
 | Calibration of coupling parameters (`config/nexus.yaml`) | ❌ Placeholders |
@@ -212,12 +219,13 @@ Observations to carry into the paper discussion:
 - [x] Pumping now compares baseline physical area with horizon physical area; land-loss regression passes.
 - [ ] Hydropower/PLTMH water dependence not modelled; Indonesian grid water intensity (EWIF) missing, so local-run off-site water is reported as missing.
 - [x] Sobol tooling for irrigation/power-water parameters, explicit bounds and saved samples/results. Scientific convergence and defensible bounds remain open.
+- [x] Initial real-climate convergence ladder N=16/32/64; 784 evaluations recorded. Wider sampling and locally justified bounds remain pending; see [report](docs/sensitivity-convergence-20260926.md).
 
 ### Code / housekeeping
 - [x] Streamlit migrated to `width="stretch"`; startup and recorded demo checked.
 - [x] Retain current Claude model defaults for reproducibility; validated live on this machine.
 - [ ] Optional: native LLM tool-calling (registry already has JSON schemas). Keep numbers deterministic if you do.
-- [ ] Check the README Mermaid diagrams in GitHub dark mode (only the light theme was checked).
+- [ ] Confirm native GitHub Mermaid rendering visually: September 26 automated dark-mode check selected dark iframe URLs but detected no SVG. Local diagrams render successfully.
 - [ ] Phase 2 roadmap: Policy + Stakeholder agents, SWAT+/OSeMOSYS/AquaCrop, CMIP6 ensemble, MCDA, paper v0.1.
 
 ---

@@ -19,7 +19,7 @@ establish that the missing observations are unavailable from their publishers.
 | Irrigation supply fraction | Monthly delivered irrigation volume, command area and gross demand for the same area and period | Reconcile delivery boundary, conveyance losses and units; reserve separate validation years |
 | Groundwater share | Surface-water and groundwater deliveries by month and command area | Use volume shares, not pump counts; document missing abstractions |
 | Pump head and efficiency | Dynamic head, flow, measured electricity/fuel, operating hours and pump type | Separate electric and diesel equipment; establish energy-weighted representative values |
-| Electric/diesel split | Pump inventory linked to pumped volumes or measured energy | Do not equate equipment-count shares with energy shares; diesel energy must not become grid demand |
+| Electric/diesel split | Pump inventory linked to pumped volumes or measured energy | `electric_pump_share` now partitions volume; its default 1.0 is an assumption. Do not equate equipment-count shares with volume shares; non-grid fuel energy remains unknown |
 | Cropping intensity | Physical irrigated area and annual harvested area with matching geography and year | Document multiple harvests; do not use harvest area as physical area |
 | Growing-season stress | Planting/harvest dates by crop, season and irrigation area | Existing `--growing-months` supports a combined PET-weighted window; separate crop-stage responses are not implemented |
 | Hydropower | Flow series, environmental-flow requirement, head, efficiency, capacity and operating rules | Validate generation against observed output; separate turbine flow from consumptive losses |
