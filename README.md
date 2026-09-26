@@ -52,7 +52,7 @@ screening assumptions for irrigation and pumping. It produced these values:
 | Annual water stress after assumed irrigation | 0.0899 | Model output, not a local stress measurement |
 | Annual water deficit | 343.7 mm | 2023 baseline year under S2 climate deltas |
 | Groundwater pumped | 17.626 million m³/year | Depends on assumed supply, area and groundwater share |
-| Added irrigation pumping | 0.213 GWh/year | Electric-pump estimate; diesel energy is excluded |
+| Added irrigation pumping | 0.213 GWh/year | All-electric screening assumption; local electric/diesel volume share is uncalibrated |
 | Electricity demand in 2030 | 2,373 GWh/year | BPS-anchored energy pathway plus pumping delta |
 | Rice yield | 6.31 t/ha | Compared with the 6.5 t/ha observed anchor |
 | Rice self-sufficiency index | 1.711 | Index above 1 means projected production exceeds modelled demand |
@@ -183,7 +183,7 @@ flowchart TB
     DATA --> CORE
     CORE --> NS
     NS -->|"numbers to interpret and audit"| AGENTS
-    AGENTS <-.->|"chat · retry once on empty answer"| PROVIDERS
+    AGENTS <-.->|"chat · retry once on empty or truncated answer"| PROVIDERS
     AGENTS --> OUTPUT
     NS -.->|"checks · provenance"| OUTPUT
 
@@ -243,7 +243,7 @@ flowchart LR
 
     subgraph ENERGY["⚡ Energy"]
         direction TB
-        PUMP["Added pumping demand<br/>ρgH/η on Δ volume"]
+        PUMP["Added grid pumping demand<br/>ρgH/η on electric share of Δ volume"]
         DEM["Electricity demand<br/>elasticity + EV + induction"]
         CO2["CO₂ emissions<br/>fossil share × grid factor"]
         PSW["Power-sector water<br/>2.6 / 0.1 m³ per MWh · off-site"]
@@ -299,9 +299,9 @@ sequenceDiagram
     end
     G->>C: audit(narratives, key figures, checks)
     C->>L: chat
-    opt answer is empty (reasoning budget used up)
-        C->>L: retry once with 2× max_tokens
-        Note over C,L: still empty → EmptyCompletionError, run stops
+    opt answer is empty or truncated
+        C->>L: retry once (double budget if truncated, capped)
+        Note over C,L: still empty or truncated → explicit error, run stops
     end
     L-->>C: audit findings
     G->>K: synthesize(narratives, audit, key figures)
@@ -385,7 +385,7 @@ Agents write their analyses in formal Indonesian (target users: Indonesian local
 | **Water** | Interprets the water balance (annual & seasonal surplus/deficit), stress, irrigation, groundwater | `deepseek-v4-pro:cloud` |
 | **Energy** | Interprets demand projection, added irrigation pumping, emissions, power-sector water | `deepseek-v4-pro:cloud` |
 | **Food** | Interprets yield, production, SSL — or the data gap when no local harvest area exists | `deepseek-v4-pro:cloud` |
-| **Critic** | Number fidelity, cross-sector consistency, responses to WARN/FAIL checks, bias, error consequence (WEF 2026a) | `glm-5.3-flash:cloud` (max_tokens 8000) |
+| **Critic** | Number fidelity, cross-sector consistency, responses to WARN/FAIL checks, bias, error consequence (WEF 2026a) | `glm-5.3-flash:cloud` (max_tokens 12000) |
 | **Coordinator** | Synthesizes trade-offs, uncertainty, recommendations for the location's local government | `deepseek-v4-pro:cloud` (max_tokens 6000) |
 
 Each agent has 3 model fields in the YAML (`model_local` / `model` / `model_claude`). Swapping providers changes only the backend, not the agent.
@@ -399,7 +399,7 @@ the configuration does not assume that benchmark claims transfer directly to
 these prompts. Use `WEF_AGENTIC_MODEL_OVERRIDE` to compare another model without
 editing YAML.
 
-**Empty answers are never passed on.** Reasoning models (e.g. Kimi K2.6) can spend their whole budget on `thinking`. The base agent retries once with a 2× budget (capped by `retry.max_tokens_cap` in `llm.yaml`); if the answer is still empty, the run fails with `EmptyCompletionError`. Tokens from every attempt count toward the footprint.
+**Empty or truncated answers are never passed on.** Reasoning models can spend much of their output budget on `thinking`. The base agent retries an empty or truncated answer once. Truncation doubles the budget up to `retry.max_tokens_cap` (without reducing an already higher budget); an empty answer that was not truncated keeps its budget. If the retry is still empty or truncated, the run fails with `EmptyCompletionError` or `TruncatedCompletionError`. Tokens from both attempts count toward the footprint when the retry succeeds. Water and energy use 4,096 tokens each; the critic uses 12,000, with a retry cap of 16,000.
 
 ### 5 Scenarios
 
@@ -423,7 +423,7 @@ Parameters live in `src/wef_agentic/config/nexus.yaml`. Values tagged `ASSUMPTIO
 |---|---|
 | Climate → water | Monthly Thornthwaite-Mather with exponential retention `S = C·exp(−APWL/C)`; initial storage = spun-up steady state |
 | Water → food | `stress = (1 − ETa/PET) × (1 − supply_fraction)` → Doorenbos-Kassam `Ya/Ymax = 1 − Ky·stress` |
-| Water → energy | groundwater = deficit / efficiency × supply × groundwater share × physical area; `E = ρgH/η`; only the scenario − baseline-climate difference is added to demand, ramped to the horizon year |
+| Water → energy | groundwater = deficit / efficiency × supply × groundwater share × physical area; grid electricity = volume × electric pump share × `ρgH/η`; only the scenario − baseline-climate difference is added to demand, ramped to the horizon year |
 | Energy → water | power-sector water use = demand × (fossil share × 2.6 + renewable share × 0.1) m³/MWh — off-site, reported, not subtracted from the local balance |
 | Population | the energy and food sectors use the same base population and growth rate (checked) |
 
@@ -556,7 +556,7 @@ CI (`.github/workflows/ci.yml`) runs ruff + pytest on every push and pull reques
 
 This run predates the changes below and no longer reflects the framework's output:
 
-- The Critic spent all 3,000 tokens on reasoning, so its output was empty, and the Coordinator synthesized without an audit. Now: critic `max_tokens` 8000, a retry, and an explicit failure if the answer is still empty.
+- The Critic spent all 3,000 tokens on reasoning, so its output was empty, and the Coordinator synthesized without an audit. The critic now has a 12,000-token budget, one retry, and an explicit failure if the answer remains empty or truncated.
 - Water stress was then a scenario constant (7%), not derived from the water balance.
 - The footprint used a single per-token constant.
 

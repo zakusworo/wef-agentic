@@ -53,12 +53,19 @@ def irrigation_pumping(
     groundwater_share: float,
     head_m: float,
     pump_efficiency: float,
+    electric_pump_share: float = 1.0,
 ) -> dict:
-    """Groundwater volume and electricity needed to deliver irrigation against a deficit."""
+    """Groundwater volume and grid electricity for the electrically pumped volume share.
+
+    The remainder's fuel use is unknown; it is not converted with electric efficiency.
+    The supplied head/efficiency must represent the electric pumps.
+    """
     if not 0.0 < application_efficiency <= 1.0:
         raise ValueError("application_efficiency must be in (0, 1]")
     if not 0.0 <= groundwater_share <= 1.0:
         raise ValueError("groundwater_share must be in [0, 1]")
+    if not 0.0 <= electric_pump_share <= 1.0:
+        raise ValueError("electric_pump_share must be in [0, 1]")
 
     gross_requirement_mm = deficit_mm / application_efficiency
     delivered_mm = gross_requirement_mm * supply_fraction
@@ -70,8 +77,12 @@ def irrigation_pumping(
         "delivered_mm": delivered_mm,
         "groundwater_mm": groundwater_mm,
         "groundwater_volume_m3": groundwater_m3,
+        "electric_pump_share": electric_pump_share,
+        "electric_pumped_volume_m3": groundwater_m3 * electric_pump_share,
+        "non_grid_pumped_volume_m3": groundwater_m3 * (1.0 - electric_pump_share),
+        "non_grid_fuel_energy_gwh": None,
         "pumping_kwh_per_m3": kwh_per_m3,
-        "pumping_energy_gwh": groundwater_m3 * kwh_per_m3 / 1e6,
+        "pumping_energy_gwh": groundwater_m3 * electric_pump_share * kwh_per_m3 / 1e6,
     }
 
 

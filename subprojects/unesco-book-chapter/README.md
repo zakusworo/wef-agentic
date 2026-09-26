@@ -14,7 +14,7 @@ will be supplied to selected contributors. No acceptance is implied by this fold
 - [EOI title, author fields and abstract](proposal/EOI.md)
 - Submission copies: [DOCX](proposal/EOI-Zulfikar-Aji-Kusworo.docx) and
   [PDF](proposal/EOI-Zulfikar-Aji-Kusworo.pdf), with a 231-word abstract
-- [Email draft](proposal/email-draft.txt), not sent
+- [Email draft](proposal/email-draft.txt), retained as a local draft; the submitted email was not verified against this file
 - [Chapter outline and evaluation plan](manuscript/outline.md)
 - [Figure captions and evidence limits](figures/CAPTIONS.md)
 - [Supplied call](source/Call-for-contribution_08092026.PDF)
@@ -35,4 +35,5 @@ a second physics implementation. Synthetic software-demonstration figures must n
 be presented as measured Sleman conditions or calibrated projections. Keep real-data
 experiments in separately named files with their acquisition and parameter provenance.
 
-EOI status: draft prepared with confirmed author details; no email sent.
+EOI status: submitted and awaiting results, confirmed by the author on 26 September
+2026. The exact submission date and receipt are not recorded here.

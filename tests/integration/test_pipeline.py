@@ -4,7 +4,7 @@ import pytest
 
 from tests.conftest import BANDUNG, FakeProvider
 from wef_agentic.config.settings import load_nexus_config
-from wef_agentic.llm.types import EmptyCompletionError
+from wef_agentic.llm.types import EmptyCompletionError, TruncatedCompletionError
 from wef_agentic.orchestration import build_run_record, compute_nexus, get_scenario, run_scenario
 from wef_agentic.reporting import generate_scenario_report
 from wef_agentic.reporting.charts import build_all_charts
@@ -38,6 +38,18 @@ def test_config_override_changes_physics_without_changing_defaults():
     nexus = compute_nexus(get_scenario("S2_JETP_Aligned"), config=config)
     assert nexus.coupling["water_stress_effective"] == 0
     assert load_nexus_config()["irrigation"]["supply_fraction"] == 0.6
+
+
+def test_non_grid_pumps_do_not_add_electricity_demand():
+    scenario = get_scenario("S2_JETP_Aligned")
+    default = compute_nexus(scenario)
+    config = load_nexus_config()
+    config["irrigation"]["electric_pump_share"] = 0.0
+    non_grid = compute_nexus(scenario, config=config)
+    assert non_grid.coupling["extra_pumping_demand_gwh"] == 0
+    assert non_grid.coupling["pumping_scenario"]["groundwater_volume_m3"] == default.coupling["pumping_scenario"]["groundwater_volume_m3"]
+    assert non_grid.crop_projection["endpoints"] == default.crop_projection["endpoints"]
+    assert default.energy_projection["endpoints"]["demand_horizon_gwh"] - non_grid.energy_projection["endpoints"]["demand_horizon_gwh"] == pytest.approx(default.coupling["extra_pumping_demand_gwh"])
 
 
 def test_sleman_checks_pass_hard_consistency():
@@ -99,3 +111,13 @@ async def test_empty_critic_fails_the_run(monkeypatch):
     with pytest.raises(EmptyCompletionError):
         await run_scenario(get_scenario("S1_BAU_2030"))
     assert "coordinator" not in [c for c in providers if providers[c].calls]
+
+
+@pytest.mark.parametrize("agent", ["water", "critic"])
+async def test_truncated_analysis_is_not_passed_downstream(fake_providers, agent):
+    fake_providers[agent] = FakeProvider(replies=[("partial", "length"), ("partial", "length")])
+    with pytest.raises(TruncatedCompletionError, match=agent):
+        await run_scenario(get_scenario("S2_JETP_Aligned"))
+    assert not fake_providers["coordinator"].calls
+    if agent == "water":
+        assert not fake_providers["critic"].calls

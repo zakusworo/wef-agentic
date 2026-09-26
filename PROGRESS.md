@@ -1,12 +1,64 @@
 # WEF-Agentic — Progress Log
 
-_Last updated: 2026-09-20 · local branch `finish-pending-tasks`; changes not committed or pushed_
+_Last updated: 2026-09-26_
 
 Handoff notes for the next working session. README describes *what the framework is*; this file tracks *where the work stands* and *what to do next*.
 
 The new [project specification](WEF-Agentic.md) defines Phase 2/3 inputs, interfaces
 and acceptance criteria. It was created on 2026-09-20 at the user's request because
 the former internal specification was unavailable.
+
+## 2026-09-26 status update
+
+- Follow-up Claude output-limit probe (synthetic counting prompt, 128-token cap)
+  confirmed limit enforcement after the user renewed the expired OAuth session.
+  The SDK reports an error that the response exceeded 128 tokens, not a normal
+  `length` response. Saved `docs/runs/claude_output_limit_probe_20260926.json`.
+  This verifies rejection, not automatic retry of SDK error results. The provider
+  now includes SDK result text in errors and closes its stream when it raises.
+- Added an explicit grid-electric share of pumped volume. Total abstraction and
+  crop results are unchanged by that share; only grid pumping demand changes.
+  The default 1.0 preserves legacy all-electric screening and is flagged as an
+  assumption. Non-grid fuel energy stays unknown. Local share calibration is pending.
+- Sensitivity runs at N=64, 128 and 256 were started with the real 2023 climate
+  cache and existing illustrative bounds. Records include baseline year, climate
+  hashes and Git revision; interpretation remains conditional on those bounds.
+- Audited local study inputs in [calibration-inputs.md](docs/calibration-inputs.md).
+  Climate caches exist; irrigation delivery, pump survey and crop-calendar inputs
+  are absent. No unsupported calibration values were substituted.
+- Fixed nonempty truncation on branch `fix/ollama-truncation`: retry once with a
+  larger budget, then raise `TruncatedCompletionError` if still truncated. Partial
+  responses no longer reach downstream agents. Water/energy budgets are 4,096;
+  critic is 12,000; retry cap remains 16,000. These YAML budgets apply across providers.
+- Validation after the fix: 67 offline tests passed, Ruff passed, and all three
+  README Mermaid diagrams rendered locally. GitHub CI has not been run for these
+  uncommitted changes. Tests cover retry accounting, budget restoration/capping,
+  and preventing truncated domain/critic responses from reaching downstream agents.
+- Live S2 rerun completed in 222.85 seconds with 60,919 tokens including retries.
+  All five final responses were nonempty, matched requested models and ended with
+  `stop`, with no truncation. Food and critic each needed two attempts; other agents
+  needed one. Record:
+  `docs/runs/run_S2_JETP_Aligned_sleman_ollama-cloud_20260926_101553.json`.
+  Deterministic key figures match the pre-fix run exactly. Four numerical checks
+  passed; seasonality and low-confidence warnings remain. This validates completion
+  for this run, not narrative accuracy or scientific calibration.
+- The user confirmed that the UNESCO/ISTIC EOI has been submitted and is awaiting
+  results. The exact submission date and receipt were not recorded here.
+- The Ollama API key is configured in the Git-ignored local `.env`. With explicit
+  user authorization to send scenario data to Ollama Cloud, the live S2 run
+  completed outside the sandbox in 113.19 seconds (33,070 tokens).
+- All five agents returned nonempty text on their first attempt; reported models
+  matched requested models. However, water and energy (2,048 tokens each) and
+  critic (8,000 tokens) ended with `length` and visibly incomplete text. Food and
+  coordinator ended with `stop`. Connectivity passed; output completeness did not.
+  Before the fix, retries handled empty responses only, so these partial responses
+  were passed downstream. The fix and successful rerun are recorded above.
+- Record: `docs/runs/run_S2_JETP_Aligned_sleman_ollama-cloud_20260926_100900.json`.
+  Deterministic key figures exactly match the September 20 real-climate Claude
+  record; four checks passed and two warned (seasonality, low-confidence inputs).
+  Claude took 200.26 seconds, but this is not evidence of a quality-equivalent
+  speed improvement because three Ollama responses were truncated. No matched
+  Kimi-versus-GLM benchmark has been performed.
 
 ## 2026-09-20 implementation and demo
 
@@ -58,10 +110,10 @@ design work with data requirements in the specification, not implemented engines
 |---|---|
 | Phase 1 framework (5 agents, 5 scenarios, multi-city, data sources, UI, PDF) | ✅ Done |
 | Deterministic nexus coupling + consistency checks | ✅ Done (2026-09-15) |
-| LLM robustness (empty-completion retry, Claude provider fix) | ✅ Done, unit-tested only |
-| Offline test suite (48 tests) + GitHub Actions CI | ✅ Green |
+| LLM robustness (empty-completion retry, Claude provider fix) | Empty/truncated responses retried once, then rejected if incomplete; live recovery verified September 26 |
+| Offline test suite + GitHub Actions CI | 67 offline tests and Ruff passed September 26; GitHub CI pending for local changes |
 | README fully in English, with Mermaid architecture diagrams | ✅ Done (2026-09-15) |
-| Real LLM run with the new pipeline | ❌ Not yet done |
+| Real LLM run with the new pipeline | Claude completed September 20; Ollama completed September 26 with all final responses untruncated |
 | Calibration of coupling parameters (`config/nexus.yaml`) | ❌ Placeholders |
 | Paper numbers | ⚠️ Any draft numbers from before 2026-09-15 are outdated (see §4) |
 
@@ -145,13 +197,16 @@ Observations to carry into the paper discussion:
 ## 5. Next steps (prioritized)
 
 ### Must do before trusting outputs
-- [ ] **Real LLM run with the new pipeline**: `python scripts/run_scenario.py S2_JETP_Aligned --provider ollama-cloud`. Confirm the critic is non-empty, check `attempts`/`done_reason` in the run record, and compare timings with the old run.
-- [ ] **Live-test the Claude provider** (`--provider claude-agent-sdk`): confirm the reported model matches the requested one and that `CLAUDE_CODE_MAX_OUTPUT_TOKENS` is honoured (only unit-tested so far).
+- [x] **Real Ollama Cloud run with the new pipeline**: completed September 26; all agents nonempty, models matched, attempts and completion reasons checked. See the incomplete-output finding above.
+- [x] **Resolve Ollama output truncation**: raised water/energy/critic budgets, retry nonempty `length` responses once and reject persistent truncation. Live S2 rerun: all five final outputs complete; food/critic recovered on retry.
+- [x] **Live-test the Claude provider**: completed September 20 with requested/reported models matching and all five agents ending with `stop`.
+- [x] **Claude output-limit validation**: September 26 synthetic probe exceeded the configured 128-token maximum and was explicitly rejected by the SDK. Error-result retries are not claimed.
 - [x] **Fetch real climate data**: `python -m wef_agentic.data.bootstrap --force`; all five deterministic scenarios rerun in `docs/runs/sweep_openmeteo_20260920.json`. This is not five live LLM runs.
-- [ ] **Calibrate `config/nexus.yaml` `ASSUMPTION` values**: irrigation supply fraction, groundwater share, pump head/efficiency, cropping intensity. Sources to chase: Distan Sleman, BBWS Serayu-Opak, PLN UP3 Yogyakarta. Note that diesel pumps are common and their energy is not grid demand.
+- [ ] **Calibrate `config/nexus.yaml` `ASSUMPTION` values**: irrigation supply fraction, groundwater share, pump head/efficiency, cropping intensity. Local input audit and acquisition requirements: [calibration-inputs.md](docs/calibration-inputs.md). Sources to chase: Distan Sleman, BBWS Serayu-Opak, PLN UP3 Yogyakarta. Note that diesel pumps are common and their energy is not grid demand.
 - [x] Archived the obsolete May run in `docs/runs/archive/` with an explanatory note.
 
 ### Modelling improvements
+- [x] Separate grid-electric pumping volume from non-grid volume; test water conservation and zero grid demand at zero electric share. Local shares and non-grid fuel use still require observations.
 - [ ] Growing-season stress (rice months / 2–3 seasons) instead of annual `1 − ETa/PET`; revisit the S4 narrative.
 - [x] Historical-year selection via `--baseline-year` in scenario and sweep scripts; 2015 regression covered.
 - [x] Pumping now compares baseline physical area with horizon physical area; land-loss regression passes.

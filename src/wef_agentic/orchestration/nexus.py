@@ -86,6 +86,8 @@ class NexusState:
                 "demand_2030_gwh": _r(ep.get("demand_2030_gwh")),
                 "demand_horizon_gwh": _r(ep.get("demand_horizon_gwh")),
                 "tambahan_pompa_irigasi_akibat_iklim_gwh": round(c["extra_pumping_demand_gwh"], 3),
+                "porsi_volume_pompa_listrik_grid": pump.get("electric_pump_share"),
+                "energi_bahan_bakar_pompa_non_grid_gwh": pump.get("non_grid_fuel_energy_gwh"),
                 "porsi_ebt_2030": self.emissions["renewable_share"],
                 "faktor_emisi_grid_kg_per_kwh": self.emissions["grid_emission_factor_kg_co2_per_kwh"],
                 "emisi_2030_mt_co2": self.emissions["co2_emissions_mt"],
@@ -190,6 +192,7 @@ def compute_nexus(
             "groundwater_share": irr_cfg.get("groundwater_share", 0.3),
             "head_m": irr_cfg.get("pump_head_m", 30.0),
             "pump_efficiency": irr_cfg.get("pump_efficiency", 0.45),
+            "electric_pump_share": irr_cfg.get("electric_pump_share", 1.0),
         }
         pumping_scenario = irrigation_pumping(
             deficit_mm=wb["summary"]["total_deficit_mm"],
@@ -201,6 +204,10 @@ def compute_nexus(
             **pump_kwargs,
         )
         extra_pumping_gwh = pumping_scenario["pumping_energy_gwh"] - pumping_baseline["pumping_energy_gwh"]
+        warnings.append(
+            "Porsi volume pompa listrik grid adalah input asumsi, bukan hasil kalibrasi; "
+            "energi bahan bakar pompa non-grid tidak dihitung."
+        )
     else:
         warnings.append(
             "Luas lahan irigasi tidak diketahui → coupling air→energi (pompa irigasi) tidak dihitung."

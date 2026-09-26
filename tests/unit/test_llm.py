@@ -5,7 +5,7 @@ from wef_agentic.agents import CriticAgent
 from wef_agentic.config.settings import load_llm_config
 from wef_agentic.llm.ollama_provider import OllamaProvider
 from wef_agentic.llm.provider import get_provider_for_agent
-from wef_agentic.llm.types import EmptyCompletionError, Message
+from wef_agentic.llm.types import EmptyCompletionError, Message, TruncatedCompletionError
 
 
 def test_provider_override_uses_provider_specific_model_and_agent_budget(monkeypatch):
@@ -13,7 +13,7 @@ def test_provider_override_uses_provider_specific_model_and_agent_budget(monkeyp
     p = get_provider_for_agent("critic")
     assert isinstance(p, OllamaProvider)
     assert p.model == "gemma4:e4b"
-    assert p.max_tokens == 8000
+    assert p.max_tokens == 12000
 
 
 def test_critic_default_cloud_model_is_glm_flash():
@@ -61,6 +61,28 @@ async def test_retry_budget_is_capped():
     prov = FakeProvider(replies=[("", "length"), ("ok", "stop")], max_tokens=12000)
     await CriticAgent(provider=prov)._call_llm("audit")
     assert prov.calls[1]["max_tokens"] == 16000
+
+
+async def test_nonempty_truncated_answer_is_replaced_with_complete_retry():
+    prov = FakeProvider(replies=[("partial", "length"), ("complete", "stop")], max_tokens=4096)
+    r = await CriticAgent(provider=prov)._call_llm("audit")
+    assert r.content == "complete"
+    assert not r.truncated
+    assert [c["max_tokens"] for c in prov.calls] == [4096, 8192]
+    assert prov.max_tokens == 4096
+    assert (r.usage.input_tokens, r.usage.output_tokens) == (20, 10)
+    assert r.meta["attempts"] == 2
+
+
+@pytest.mark.parametrize("budget", [12000, 16000, 20000])
+async def test_still_truncated_raises_and_restores_budget(budget):
+    prov = FakeProvider(replies=[("partial", "length"), ("partial again", "length")],
+                        max_tokens=budget)
+    with pytest.raises(TruncatedCompletionError, match=r"critic.*after 2 attempts"):
+        await CriticAgent(provider=prov)._call_llm("audit")
+    assert len(prov.calls) == 2
+    assert prov.calls[1]["max_tokens"] == max(budget, 16000)
+    assert prov.max_tokens == budget
 
 
 async def test_still_empty_raises_instead_of_passing_on_nothing():
@@ -113,3 +135,24 @@ async def test_claude_provider_raises_on_error_result():
     p._query = fake_query
     with pytest.raises(RuntimeError, match="boom"):
         await p.chat([Message("user", "hi")])
+
+
+async def test_claude_provider_reports_authentication_error_in_result_text():
+    sdk = pytest.importorskip("claude_agent_sdk")
+    from wef_agentic.llm.claude_agent_provider import ClaudeAgentSDKProvider
+
+    p = ClaudeAgentSDKProvider(model="claude-sonnet-4-6")
+    closed = []
+
+    async def fake_query(prompt, options):
+        try:
+            yield sdk.ResultMessage(subtype="success", duration_ms=1, duration_api_ms=0,
+                                    is_error=True, num_turns=1, session_id="s",
+                                    result="Failed to authenticate: OAuth session expired")
+        finally:
+            closed.append(True)
+
+    p._query = fake_query
+    with pytest.raises(RuntimeError, match="OAuth session expired"):
+        await p.chat([Message("user", "hi")])
+    assert closed == [True]

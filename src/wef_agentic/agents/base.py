@@ -9,7 +9,13 @@ from typing import TYPE_CHECKING, Any
 from wef_agentic.config.settings import load_llm_config
 from wef_agentic.llm.footprint import FootprintEntry
 from wef_agentic.llm.provider import LLMProvider, get_provider_for_agent
-from wef_agentic.llm.types import EmptyCompletionError, LLMResponse, Message, Usage
+from wef_agentic.llm.types import (
+    EmptyCompletionError,
+    LLMResponse,
+    Message,
+    TruncatedCompletionError,
+    Usage,
+)
 
 if TYPE_CHECKING:
     from wef_agentic.orchestration.nexus import NexusState
@@ -54,7 +60,7 @@ class Agent:
         self.provider = provider or get_provider_for_agent(self.name)
 
     async def _call_llm(self, user_prompt: str) -> LLMResponse:
-        """Call the provider; retry once on an empty answer, raise if still empty.
+        """Retry empty or truncated answers once; reject incomplete responses.
 
         Reasoning models can spend the whole budget on thinking and return no text.
         Passing that on silently would let downstream agents synthesize from nothing.
@@ -68,7 +74,7 @@ class Agent:
         requested_model = self.provider.model
         attempts = [await self.provider.chat(messages)]
 
-        if not attempts[-1].content.strip():
+        if not attempts[-1].content.strip() or attempts[-1].truncated:
             cap = (load_llm_config().get("retry") or {}).get("max_tokens_cap", 16000)
             original = self.provider.max_tokens
             if attempts[-1].truncated:
@@ -85,6 +91,14 @@ class Agent:
                 f"after {len(attempts)} attempts (done_reason={response.done_reason}, "
                 f"thinking={len(response.thinking)} chars). Raise max_tokens for this agent "
                 "in config/llm.yaml or use a non-reasoning model."
+            )
+
+        if response.truncated:
+            raise TruncatedCompletionError(
+                f"{self.name}: truncated completion from {response.provider}/{response.model} "
+                f"after {len(attempts)} attempts (done_reason={response.done_reason}). "
+                "Raise max_tokens/retry.max_tokens_cap in config/llm.yaml "
+                "or use a model that completes within the budget."
             )
 
         response.usage = Usage(

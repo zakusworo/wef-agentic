@@ -11,6 +11,10 @@ class EmptyCompletionError(RuntimeError):
     """Model returned no answer text (e.g. a reasoning model spent its budget thinking)."""
 
 
+class TruncatedCompletionError(RuntimeError):
+    """Model exhausted its output budget before completing its answer."""
+
+
 @dataclass
 class Message:
     role: Role

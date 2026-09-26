@@ -8,6 +8,8 @@ irrigation:
   application_efficiency: 0.65   # gravity irrigation, Indonesia (existing framework default)
   supply_fraction: 0.6           # ASSUMPTION: share of gross irrigation requirement actually delivered
   groundwater_share: 0.3         # ASSUMPTION: share of delivered water pumped from groundwater
+  electric_pump_share: 1.0       # ASSUMPTION: share of pumped volume served by grid-electric pumps;
+                                 # preserves legacy all-electric screening, NOT a local measured share
   pump_head_m: 30.0              # ASSUMPTION: total dynamic head, shallow-to-medium wells
   pump_efficiency: 0.45          # ASSUMPTION: wire-to-water efficiency of small electric pumps
                                  #   (diesel pumps are common; their energy is NOT grid demand)

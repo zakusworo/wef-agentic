@@ -1,6 +1,8 @@
 """Claude Agent SDK provider — pakai Claude Code subscription via claude-agent-sdk."""
 from __future__ import annotations
 
+from contextlib import aclosing
+
 from wef_agentic.llm.provider import LLMProvider
 from wef_agentic.llm.types import LLMResponse, Message, ToolSchema, Usage
 
@@ -70,28 +72,29 @@ class ClaudeAgentSDKProvider(LLMProvider):
         stop_reason: str | None = None
         usage = Usage()
 
-        async for msg in self._query(prompt=prompt, options=options):
-            if isinstance(msg, self._sdk.AssistantMessage):
-                reported_model = msg.model or reported_model
-                stop_reason = msg.stop_reason or stop_reason
-                for block in msg.content or []:
-                    if isinstance(block, self._sdk.TextBlock):
-                        content_chunks.append(block.text)
-                    elif isinstance(block, self._sdk.ThinkingBlock):
-                        thinking_chunks.append(block.thinking)
-            elif isinstance(msg, self._sdk.ResultMessage):
-                if msg.is_error:
-                    detail = "; ".join(msg.errors or []) or msg.subtype
-                    raise RuntimeError(f"Claude Agent SDK call failed ({self.model}): {detail}")
-                stop_reason = msg.stop_reason or stop_reason
-                u = msg.usage or {}
-                # Cached prompt tokens are still processed tokens for footprint purposes
-                usage = Usage(
-                    input_tokens=(u.get("input_tokens", 0)
-                                  + u.get("cache_creation_input_tokens", 0)
-                                  + u.get("cache_read_input_tokens", 0)),
-                    output_tokens=u.get("output_tokens", 0),
-                )
+        async with aclosing(self._query(prompt=prompt, options=options)) as messages:
+            async for msg in messages:
+                if isinstance(msg, self._sdk.AssistantMessage):
+                    reported_model = msg.model or reported_model
+                    stop_reason = msg.stop_reason or stop_reason
+                    for block in msg.content or []:
+                        if isinstance(block, self._sdk.TextBlock):
+                            content_chunks.append(block.text)
+                        elif isinstance(block, self._sdk.ThinkingBlock):
+                            thinking_chunks.append(block.thinking)
+                elif isinstance(msg, self._sdk.ResultMessage):
+                    if msg.is_error:
+                        detail = "; ".join(msg.errors or []) or msg.result or msg.subtype
+                        raise RuntimeError(f"Claude Agent SDK call failed ({self.model}): {detail}")
+                    stop_reason = msg.stop_reason or stop_reason
+                    u = msg.usage or {}
+                    # Cached prompt tokens are still processed tokens for footprint purposes
+                    usage = Usage(
+                        input_tokens=(u.get("input_tokens", 0)
+                                      + u.get("cache_creation_input_tokens", 0)
+                                      + u.get("cache_read_input_tokens", 0)),
+                        output_tokens=u.get("output_tokens", 0),
+                    )
 
         return LLMResponse(
             content="".join(content_chunks),

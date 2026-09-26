@@ -42,6 +42,27 @@ def test_power_sector_water():
     assert power_sector_water_m3(1, 0.25, 2.6, 0.1) == pytest.approx(1000 * (0.75 * 2.6 + 0.25 * 0.1))
 
 
+@pytest.mark.parametrize("share", [0.0, 0.25, 1.0])
+def test_pump_share_changes_grid_energy_without_changing_water(share):
+    out = irrigation_pumping(
+        deficit_mm=65, physical_area_ha=100, application_efficiency=0.65,
+        supply_fraction=0.5, groundwater_share=0.2, head_m=30, pump_efficiency=0.45,
+        electric_pump_share=share,
+    )
+    assert out["groundwater_volume_m3"] == pytest.approx(10000)
+    assert out["electric_pumped_volume_m3"] + out["non_grid_pumped_volume_m3"] == pytest.approx(10000)
+    assert out["pumping_energy_gwh"] == pytest.approx(10000 * share * 1000 * 9.81 * 30 / 0.45 / 3.6e12)
+    assert out["non_grid_fuel_energy_gwh"] is None
+
+
+@pytest.mark.parametrize("share", [-0.1, 1.1, float("nan")])
+def test_invalid_electric_pump_share_is_rejected(share):
+    with pytest.raises(ValueError, match="electric_pump_share"):
+        irrigation_pumping(deficit_mm=65, physical_area_ha=100, application_efficiency=0.65,
+                           supply_fraction=0.5, groundwater_share=0.2, head_m=30,
+                           pump_efficiency=0.45, electric_pump_share=share)
+
+
 CFG = {
     "kwh_per_1k_output_tokens": 0.0003,
     "input_token_weight": 0.1,

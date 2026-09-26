@@ -36,8 +36,11 @@ Growing-month selection is optional. Until a calendar is sourced, the default is
 annual stress. Selecting several seasons' months produces a combined PET-weighted
 stress value; it does not implement crop-stage yield response or distinguish crops
 with different calendars. Baseline pumping uses baseline land area; scenario
-pumping uses projected land area. Pump energy assumes electric pumps, so applying
-it to diesel installations is an unresolved calibration limitation.
+pumping uses projected land area. `irrigation.electric_pump_share` partitions pumped
+volume before computing grid demand. Its default of 1.0 preserves the previous
+all-electric screening assumption; it is not a measured Sleman share. Non-grid
+volume is reported, but diesel fuel energy remains unknown until supplied with
+appropriate pump and fuel observations.
 
 ## Scientific invariants
 

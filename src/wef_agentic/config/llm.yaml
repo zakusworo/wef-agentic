@@ -18,8 +18,8 @@ defaults:
   max_tokens: 2048
   temperature: 0.2
 
-# Empty completion (e.g. all tokens spent on reasoning) → one retry with a doubled
-# budget up to this cap; still empty → EmptyCompletionError (never passed on silently).
+# Empty or truncated completion → one retry; truncation doubles the budget up to
+# this cap. Still incomplete → explicit error, never passed to downstream agents.
 retry:
   max_tokens_cap: 16000
 
@@ -37,7 +37,7 @@ agents:
     model: deepseek-v4-pro:cloud
     model_local: gemma4:e4b
     model_claude: claude-sonnet-4-6
-    max_tokens: 2048
+    max_tokens: 4096
     temperature: 0.2
 
   energy:
@@ -45,7 +45,7 @@ agents:
     model: deepseek-v4-pro:cloud
     model_local: gemma4:e4b
     model_claude: claude-sonnet-4-6
-    max_tokens: 2048
+    max_tokens: 4096
     temperature: 0.2
 
   food:
@@ -61,7 +61,7 @@ agents:
     model: glm-5.3-flash:cloud
     model_local: gemma4:e4b
     model_claude: claude-opus-4-7
-    max_tokens: 8000        # GLM-5.3-Flash always reasons; keep enough room for the audit text
+    max_tokens: 12000       # The live S2 audit exhausted 8000 tokens including reasoning.
     temperature: 0.1
 
 # Nexus footprint estimation constants (WEF 2026b proxies) — see llm/footprint.py

@@ -1,0 +1,11 @@
+{
+  "timestamp_utc": "2026-09-26T10:22:51.492202+00:00",
+  "requested_model": "claude-sonnet-4-6",
+  "max_tokens": 128,
+  "prompt": "Write a numbered list of the integers from 1 through 1000, one integer per line. Do not abbreviate or omit any integers.",
+  "purpose": "Synthetic output-budget exhaustion probe; no project data sent.",
+  "status": "output_limit_rejected",
+  "error": "Claude Agent SDK call failed (claude-sonnet-4-6): API Error: Claude's response exceeded the 128 output token maximum. To configure this behavior, set the CLAUDE_CODE_MAX_OUTPUT_TOKENS environment variable.",
+  "limit_enforced": true,
+  "interpretation": "SDK rejected the synthetic response at the configured 128-token maximum; provider raised RuntimeError rather than returning done_reason=length. No partial answer was passed to downstream agents. This does not verify automatic retry for SDK error results."
+}
