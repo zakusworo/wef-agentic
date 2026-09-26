@@ -10,6 +10,34 @@ the former internal specification was unavailable.
 
 ## 2026-09-26 status update
 
+## Resume here
+
+Remote main is at 30ac19c; CI passed after the modelling and retry updates. The WEF
+demo remains the checked recorded Claude replay with its matching synthetic S2
+snapshot. Keep its visible synthetic/uncalibrated label: the live Ollama results
+and real-climate sensitivity records are saved separately in docs/runs/ and are
+not loaded by demo mode.
+
+Immediate next steps:
+
+1. Acquire dated Sleman irrigation delivery, groundwater source, pump volume/fuel
+   and rice calendar observations from Distan Sleman, BBWS Serayu-Opak and PLN.
+   Start with docs/calibration-inputs.md; do not replace ASSUMPTION defaults
+   without traceable data.
+2. The N=16/32/64 sensitivity ladder is exploratory only; confidence intervals
+   are wide. Use defensible bounds and pre-set convergence criteria before
+   interpreting rankings. See docs/sensitivity-convergence-20260926.md.
+3. Revisit S4 with sourced rice seasons. Current growing-month mode calculates a
+   combined PET-weighted window; it has no crop-stage yield response.
+4. Keep hydropower and Indonesian grid water intensity missing until flow,
+   generation mix and water-factor inputs are sourced.
+5. Optionally recheck GitHub Mermaid dark rendering; the automated check selected
+   dark URLs but detected no rendered SVG. Local rendering passes.
+
+The author confirmed the UNESCO/ISTIC EOI was submitted and is awaiting results.
+The local EOI DOCX/PDF and email draft have uncommitted edits. Preserve them when
+switching branches or cleaning the checkout.
+
 - Follow-up Claude output-limit probe (synthetic counting prompt, 128-token cap)
   confirmed limit enforcement after the user renewed the expired OAuth session.
   The SDK reports an error that the response exceeded 128 tokens, not a normal
@@ -117,8 +145,8 @@ design work with data requirements in the specification, not implemented engines
 |---|---|
 | Phase 1 framework (5 agents, 5 scenarios, multi-city, data sources, UI, PDF) | ✅ Done |
 | Deterministic nexus coupling + consistency checks | ✅ Done (2026-09-15) |
-| LLM robustness (empty-completion retry, Claude provider fix) | Empty/truncated responses retried once, then rejected if incomplete; live recovery verified September 26 |
-| Offline test suite + GitHub Actions CI | 75 offline tests and Ruff passed September 26; GitHub CI passed for implementation commit ebf9668 |
+| LLM robustness (empty-completion retry, Claude provider fix) | Empty/truncated Ollama answers retry once, then fail if still incomplete; Claude 128-token limit enforcement probed |
+| Offline test suite + GitHub Actions CI | 75 offline tests and Ruff passed September 26; GitHub CI passed for `30ac19c` |
 | README fully in English, with Mermaid architecture diagrams | ✅ Done (2026-09-15) |
 | Real LLM run with the new pipeline | Claude completed September 20; Ollama completed September 26 with all final responses untruncated |
 | Calibration of coupling parameters (`config/nexus.yaml`) | ❌ Placeholders |
